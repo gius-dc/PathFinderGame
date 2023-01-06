@@ -1,11 +1,11 @@
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
-public class Stato {
+public class State {
 
     String stato;
-    enum Stati {pursuit, evade, flee, seek};
-    enum Colori {red, green, yellow, cyan};
+    enum States {pursuit, evade, flee, seek};
+    enum Colors {red, green, yellow, cyan};
 
     public void simulaMacchinaStati()
     {
@@ -46,11 +46,11 @@ public class Stato {
                 System.out.print("Inserisci la scelta: ");
                 try {
                     scelta = br.readLine();
-                    if(!scelta.equals("0") && !coloriContains(scelta)) {System.out.println("Scelta non valida, riprova.");}
+                    if(!scelta.equals("0") && !colorsContains(scelta)) {System.out.println("Scelta non valida, riprova.");}
                 }catch(Exception e) {
                     System.out.println(e);
                 }
-            }while(!scelta.equals("0") && !coloriContains(scelta));
+            }while(!scelta.equals("0") && !colorsContains(scelta));
 
             if(!scelta.equals("0"))
             {
@@ -114,9 +114,9 @@ public class Stato {
         System.out.println("Uscita...");
     }
 
-    public static boolean statiContains(String test) {
+    public static boolean statesContains(String test) {
 
-        for (Stati s : Stati.values()) {
+        for (States s : States.values()) {
             if (s.name().equals(test)) {
                 return true;
             }
@@ -125,9 +125,9 @@ public class Stato {
         return false;
     }
 
-    public static boolean coloriContains(String test) {
+    public static boolean colorsContains(String test) {
 
-        for (Colori c : Colori.values()) {
+        for (Colors c : Colors.values()) {
             if (c.name().equals(test)) {
                 return true;
             }
