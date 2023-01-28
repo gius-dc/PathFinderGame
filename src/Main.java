@@ -20,7 +20,7 @@ public class Main {
                 System.out.print("\033[H\033[2J"); // Pulisce il terminale
                 l.stampa();
                 try {
-                    Thread.sleep(500);
+                    Thread.sleep(1000);
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
