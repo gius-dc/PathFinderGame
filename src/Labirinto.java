@@ -1,11 +1,14 @@
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Observable;
 import java.util.Random;
 
 import static java.lang.Math.pow;
 import static java.lang.Math.sqrt;
 
-public class Labirinto {
+
+public class Labirinto extends Observable {
     // Dimensione del labirinto
     private static final int DIMENSIONE = 16;
     private Robot robot;
@@ -16,6 +19,10 @@ public class Labirinto {
     private Random random;
     private char[][] labirinto;
     RobotState state;
+
+    private List<Observer> observers = new ArrayList<>();
+    public static final int OGGETTO_AGGIUNTO = 1;
+    public static final int OGGETTO_RIMOSSO = 2;
 
     private boolean[][] pathRobot = new boolean[DIMENSIONE][DIMENSIONE];
     // Costruttore
@@ -270,7 +277,6 @@ public class Labirinto {
                 }
                 System.out.print(print + "  ");
             }
-            System.out.println();
         }
         System.out.println();
 
@@ -313,22 +319,19 @@ public class Labirinto {
                         oy = random.nextInt(DIMENSIONE - 2) + 1;
                     }while(labirinto[ox][oy] == '#');
 
-                    oggetti.add(new Oggetto(c,ox,oy));
+                    addOggetto(c,ox,oy);
                 }
 
         }
         else {
             // Fai scomparire qualche oggetto
 
-            if(oggetti.size() > 0)
+            if(oggetti.size() > 5)
             {
                 try{
-
+                    removeOggetto(oggetti.get(random.nextInt(oggetti.size())));
                 }catch(Exception e)
                 {
-                    oggetti.remove(random.nextInt(oggetti.size()));
-                    oggetti.remove(random.nextInt(oggetti.size()));
-                    oggetti.remove(random.nextInt(oggetti.size()));
                 }
             }
         }
@@ -432,36 +435,31 @@ public class Labirinto {
         if(min == 0)
         {
             if(matrice[x-1][y] != '#') {
-                robot.setX(x - 1);
+                robot.setX(x-1);
                 robot.setY(y);
-                pathRobot[x-1][y] = true;
             }
         }
         else if(min == 1)
         {
             if(matrice[x+1][y] != '#') {
-                robot.setX(x + 1);
+                robot.setX(x+1);
                 robot.setY(y);
-                pathRobot[x+1][y] = true;
             }
         }
         else if(min == 2)
         {
             if(matrice[x][y-1] != '#') {
                 robot.setX(x);
-                robot.setY(y - 1);
-                pathRobot[x][y-1] = true;
+                robot.setY(y-1);
             }
         }
         else if(min == 3)
         {
             if(matrice[x][y+1] != '#') {
                 robot.setX(x);
-                robot.setY(y + 1);
-                pathRobot[x][y+1] = true;
+                robot.setY(y+1);
             }
         }
-        passi++;
     }
 
     public Oggetto getNearestObject(List<Oggetto> oggetti, Robot robot)
@@ -522,6 +520,21 @@ public class Labirinto {
 
         return oggetti.get(iMin);
     }
+/*
+    public void aggiungiOggetto(char color) {
+        OggettoFactory factory = null;
+        if (color == 'R') {
+            factory = new OggettoRossoFactory();
+        } else if (color == 'G') {
+            factory = new OggettoVerdeFactory();
+        } else if (color == 'C') {
+        factory = new OggettoCianoFactory();
+    } else if (color == 'G') {
+        factory = new OggettoGialloFactory();
+        }
+        oggetti.add(factory.creaOggetto());
+    }
+*/
 
     public boolean[][] getPathRobot()
     {
@@ -546,9 +559,6 @@ public class Labirinto {
     {
         return oggetti;
     }
-    public int getPassi(){
-        return passi;
-    }
 
     /*public int getStateRobot() {
         return robot.state;
@@ -556,5 +566,38 @@ public class Labirinto {
 
     public Robot getRobot(){
         return robot;
+    }
+
+
+    public void addOggetto(char color, int x, int y) {
+        OggettoFactory factory = null;
+        if (color == 'R') {
+            factory = new OggettoRossoFactory();
+        } else if (color == 'G') {
+            factory = new OggettoVerdeFactory();
+        } else if (color == 'C') {
+            factory = new OggettoCianoFactory();
+        } else if (color == 'Y') {
+            factory = new OggettoGialloFactory();
+        }
+        Oggetto nuovoOggetto = factory.creaOggetto(x,y);
+        oggetti.add(nuovoOggetto);
+        notifyObservers(nuovoOggetto, OGGETTO_AGGIUNTO);
+    }
+
+    public void removeOggetto(Oggetto oggetto) {
+        oggetti.remove(oggetto);
+        notifyObservers(oggetto, OGGETTO_RIMOSSO);
+    }
+
+
+    public void addObserver(Observer observer) {
+        observers.add(observer);
+    }
+
+    private void notifyObservers(Entita entita, int eventType) {
+        for (Observer observer : observers) {
+            observer.update(entita, eventType);
+        }
     }
 }

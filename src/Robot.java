@@ -1,4 +1,7 @@
-// In questa classe viene implementato il design pattern 'State'
+import java.util.ArrayList;
+import java.util.List;
+
+// In questa classe viene implementato i design pattern 'State' e 'Memento'
 public class Robot extends Entita {
     /* La classe Robot estende la classe Entita e mantiene un riferimento allo stato attuale del robot utilizzando
     una variabile di istanza della classe RobotState. Inizialmente, lo stato del robot è impostato su PursuitState.
@@ -16,7 +19,6 @@ public class Robot extends Entita {
 
     public void updateState(Oggetto nearestObj) {
         state.updateState(this, nearestObj);
-        //System.out.println("La classe attuale è: " + state.getClass().getName());
     }
     public void setState(RobotState newState) {
         state = newState;
@@ -25,6 +27,15 @@ public class Robot extends Entita {
     public RobotState getState()
     {
         return state;
+    }
+
+    public Memento saveToMemento() {
+        return new Memento(getX(), getY());
+    }
+
+    public void restoreFromMemento(Memento memento) {
+        setX(memento.getX());
+        setY(memento.getY());
     }
 }
 abstract class RobotState {
@@ -100,5 +111,41 @@ class EvadeState extends RobotState {
                 robot.setState(new FleeState());
                 break;
         }
+    }
+}
+
+
+// Memento
+class Memento {
+    private int x;
+    private int y;
+
+    public Memento(int x, int y) {
+        this.x = x;
+        this.y = y;
+    }
+
+    public int getX() {
+        return x;
+    }
+
+    public int getY() {
+        return y;
+    }
+}
+
+class Caretaker {
+    private List<Memento> mementos = new ArrayList<>();
+
+    public void addMemento(Memento memento) {
+        mementos.add(memento);
+    }
+
+    public Memento getMemento(int index) {
+        return mementos.get(index);
+    }
+
+    public int sizeMemento() {
+        return mementos.size();
     }
 }

@@ -26,4 +26,9 @@ public abstract class Entita {
     public char getTipo() {
         return tipo;
     }
+
+
+
+
+
 }
