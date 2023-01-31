@@ -1,4 +1,5 @@
 import java.awt.event.ActionListener;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
@@ -10,7 +11,7 @@ import static java.lang.Math.sqrt;
 
 public class Labirinto extends Observable {
     // Dimensione del labirinto
-    private static final int DIMENSIONE = 16;
+    private static int DIMENSIONE = 0;
     private Robot robot;
     private String nome;
     private String stato;
@@ -19,325 +20,108 @@ public class Labirinto extends Observable {
     private Random random;
     private char[][] labirinto;
     RobotState state;
+    int exitN;
+
 
     private List<Observer> observers = new ArrayList<>();
     public static final int OGGETTO_AGGIUNTO = 1;
     public static final int OGGETTO_RIMOSSO = 2;
 
     private boolean[][] pathRobot = new boolean[DIMENSIONE][DIMENSIONE];
+
     // Costruttore
-    public Labirinto(String nome) {
-        nome = nome;
-        robot = new Robot(0,0);
+    public Labirinto(Level l) {
+        robot = new Robot(0, 0);
         oggetti = new ArrayList<>();
         passi = 0;
         random = new Random();
-        labirinto = new char[DIMENSIONE][DIMENSIONE];
+        labirinto = l.getLabyrinth();
+        exitN = l.getExit();
 
-        // Inizializzo il labirinto con le pareti esterne
-        for (int i = 0; i < DIMENSIONE; i++) {
-            for (int j = 0; j < DIMENSIONE; j++) {
-                if (i == 0 || i == DIMENSIONE - 1 || j == 0 || j == DIMENSIONE - 1) {
-                    labirinto[i][j] = '#';
-                } else {
-                    labirinto[i][j] = ' ';
-                }
-            }
-        }
-
-
+        DIMENSIONE = (int) sqrt(getSizeMatrix(labirinto));
         // Posiziono il robot in un punto casuale all'interno del labirinto (che non coincida con la parete)
-        do{
+        do {
             robot.setX(random.nextInt(DIMENSIONE - 2) + 1);
             robot.setY(random.nextInt(DIMENSIONE - 2) + 1);
-        }while(labirinto[robot.getX()][robot.getY()] == '#');
+        } while (labirinto[robot.getX()][robot.getY()] == '#');
 
 
-        robot.setX(9);
-        robot.setY(1);
-        // Inserisco le pareti e la via d'uscita
-        // Il labirinto deve essere formato così:
-        /*
-            ################
-            #              #
-            #  #           #
-            #  #   #########
-            #  #           #
-            #  #           #
-            #  #           #
-            #  #           #
-            #  #   #       #
-            #  #   #       #
-            #      #   ### #
-                   #       #
-                   #       #
-                   #       #
-            #      #       #
-            ################
-         */
-
-        // Pareti
-        labirinto[2][3] = '#';
-        labirinto[3][3] = '#';
-        labirinto[4][3] = '#';
-        labirinto[5][3] = '#';
-        labirinto[6][3] = '#';
-        labirinto[7][3] = '#';        nome = nome;
-        robot = new Robot(0,0);
-        oggetti = new ArrayList<>();
-        passi = 0;
-        random = new Random();
-        labirinto = new char[DIMENSIONE][DIMENSIONE];
-
-        // Inizializzo il labirinto con le pareti esterne
-        for (int i = 0; i < DIMENSIONE; i++) {
-            for (int j = 0; j < DIMENSIONE; j++) {
-                if (i == 0 || i == DIMENSIONE - 1 || j == 0 || j == DIMENSIONE - 1) {
-                    labirinto[i][j] = '#';
-                } else {
-                    labirinto[i][j] = ' ';
-                }
-            }
-        }
-
-
-        // Posiziono il robot in un punto casuale all'interno del labirinto (che non coincida con la parete)
-        do{
-            robot.setX(random.nextInt(DIMENSIONE - 2) + 1);
-            robot.setY(random.nextInt(DIMENSIONE - 2) + 1);
-        }while(labirinto[robot.getX()][robot.getY()] == '#');
-
-        // Inserisco le pareti e la via d'uscita
-        // Il labirinto deve essere formato così:
-        /*
-            ################
-            #              #
-            #  #           #
-            #  #   #########
-            #  #           #
-            #  #           #
-            #  #           #
-            #  #           #
-            #  #   #       #
-            #  #   #       #
-            #      #   ### #
-                   #       #
-                   #       #
-                   #       #
-            #      #       #
-            ################
-         */
-
-        // Pareti
-        labirinto[2][3] = '#';
-        labirinto[3][3] = '#';
-        labirinto[4][3] = '#';
-        labirinto[5][3] = '#';
-        labirinto[6][3] = '#';
-        labirinto[7][3] = '#';
-        labirinto[8][3] = '#';
-        labirinto[9][3] = '#';
-
-        labirinto[3][7] = '#';
-        labirinto[3][8] = '#';
-        labirinto[3][9] = '#';
-        labirinto[3][10] = '#';
-        labirinto[3][11] = '#';
-        labirinto[3][12] = '#';
-        labirinto[3][13] = '#';
-        labirinto[3][14] = '#';
-
-        labirinto[8][7] = '#';
-        labirinto[9][7] = '#';
-        labirinto[10][7] = '#';
-        labirinto[11][7] = '#';
-        labirinto[12][7] = '#';
-        labirinto[13][7] = '#';
-        labirinto[14][7] = '#';
-
-        labirinto[10][11] = '#';
-        labirinto[10][12] = '#';
-        labirinto[10][13] = '#';
-
-
-        // Via d'uscita
-        labirinto[11][0] = ' ';
-        labirinto[12][0] = ' ';
-        labirinto[13][0] = ' ';
 
 
         // Aggiungi alcuni oggetti nel labirinto
         // (in posizione casuale e che non coincida con la parete)
 
-/*
-        int ox, oy;
-        // red
-        do{
-            ox = random.nextInt(DIMENSIONE - 2) + 1;
-            oy = random.nextInt(DIMENSIONE - 2) + 1;
-        }while(labirinto[ox][oy] == '#');random.nextInt(oggetti.size())
-        oggetti.add(new Oggetto('R', ox, oy));
-        // green
-        do{
-            ox = random.nextInt(DIMENSIONE - 2) + 1;
-            oy = random.nextInt(DIMENSIONE - 2) + 1;
-        }while(labirinto[ox][oy] == '#');
-        oggetti.add(new Oggetto('G', ox, oy));
-        // yellow
-        do{
-            ox = random.nextInt(DIMENSIONE - 2) + 1;
-            oy = random.nextInt(DIMENSIONE - 2) + 1;
-        }while(labirinto[ox][oy] == '#');
-        oggetti.add(new Oggetto('Y', ox, oy));
-        // cyan
-        do{
-            ox = random.nextInt(DIMENSIONE - 2) + 1;
-            oy = random.nextInt(DIMENSIONE - 2) + 1;
-        }while(labirinto[ox][oy] == '#');
-        oggetti.add(new Oggetto('C', ox, oy));
-        /*
- */
-
-        labirinto[8][3] = '#';
-        labirinto[9][3] = '#';
-
-        labirinto[3][7] = '#';
-        labirinto[3][8] = '#';
-        labirinto[3][9] = '#';
-        labirinto[3][10] = '#';
-        labirinto[3][11] = '#';
-        labirinto[3][12] = '#';
-        labirinto[3][13] = '#';
-        labirinto[3][14] = '#';
-
-        labirinto[8][7] = '#';
-        labirinto[9][7] = '#';
-        labirinto[10][7] = '#';
-        labirinto[11][7] = '#';
-        labirinto[12][7] = '#';
-        labirinto[13][7] = '#';
-        labirinto[14][7] = '#';
-
-        labirinto[10][11] = '#';
-        labirinto[10][12] = '#';
-        labirinto[10][13] = '#';
-
-
-        // Via d'uscita
-        labirinto[11][0] = ' ';
-        labirinto[12][0] = ' ';
-        labirinto[13][0] = ' ';
-
-
 
         int ox, oy;
         // red
-        do{
+        do {
             ox = random.nextInt(DIMENSIONE - 2) + 1;
             oy = random.nextInt(DIMENSIONE - 2) + 1;
-        }while(labirinto[ox][oy] == '#');
+        } while (labirinto[ox][oy] == '#');
         oggetti.add(new Oggetto('R', ox, oy));
         // green
-        do{
+        do {
             ox = random.nextInt(DIMENSIONE - 2) + 1;
             oy = random.nextInt(DIMENSIONE - 2) + 1;
-        }while(labirinto[ox][oy] == '#');
+        } while (labirinto[ox][oy] == '#');
         oggetti.add(new Oggetto('G', ox, oy));
         // yellow
-        do{
+        do {
             ox = random.nextInt(DIMENSIONE - 2) + 1;
             oy = random.nextInt(DIMENSIONE - 2) + 1;
-        }while(labirinto[ox][oy] == '#');
+        } while (labirinto[ox][oy] == '#');
         oggetti.add(new Oggetto('Y', ox, oy));
         // cyan
-        do{
+        do {
             ox = random.nextInt(DIMENSIONE - 2) + 1;
             oy = random.nextInt(DIMENSIONE - 2) + 1;
-        }while(labirinto[ox][oy] == '#');
+        } while (labirinto[ox][oy] == '#');
         oggetti.add(new Oggetto('C', ox, oy));
     }
 
-
-    public void stampa() {
-        char print;
-        Oggetto nearestObject;
-        for (int i = 0; i < DIMENSIONE; i++) {
-            for (int j = 0; j < DIMENSIONE; j++) {
-                print = labirinto[i][j];
-                if (i == robot.getX() && j == robot.getY()) {
-                    print = '@';
-                } else {
-                    for(int k = 0; k < oggetti.size(); k++)
-                    {
-                        if(oggetti.get(k).getX() == i && oggetti.get(k).getY() == j)
-                        {
-                            print = oggetti.get(k).getTipo();
-                        }
-                    }
-                }
-                System.out.print(print + "  ");
-            }
-        }
-        System.out.println();
-
-        // 0 = pursuit, 1 = seek, 2 = flee, 3 = evade
-
-        RobotState state = robot.getState();
-        if (state instanceof PursuitState) {
-            System.out.println("pursuit");
-        } else if (state instanceof SeekState) {
-            System.out.println("seek");
-        } else if (state instanceof FleeState) {
-            System.out.println("flee");
-        } else if (state instanceof EvadeState) {
-            System.out.println("evade");
-        }
-
-    }
-
-
-    public Boolean iterate()
-    {
+    public Boolean iterate() {
         state = robot.getState();
         char c = ' ';
         int r = 0, ox = 0, oy = 0, rx = 0, ry = 0;
         Boolean flag = false;
-        if(random.nextInt(100)%2 == 0)
-        {
+        if (random.nextInt(100) % 2 == 0) {
 
-                // Aggiungi qualche oggetto
-                r = random.nextInt(4);
-                if(r == 0) {c = 'R';}
-                else if (r == 1) {c = 'G';}
-                else if (r == 2) {c = 'Y';}
-                else if (r == 3) {c = 'C';}
+            // Aggiungi qualche oggetto
+            r = random.nextInt(4);
+            if (r == 0) {
+                c = 'R';
+            } else if (r == 1) {
+                c = 'G';
+            } else if (r == 2) {
+                c = 'Y';
+            } else if (r == 3) {
+                c = 'C';
+            }
 
-                for(int i = 0; i < 1; i++)
-                {
-                    do{
-                        ox = random.nextInt(DIMENSIONE - 2) + 1;
-                        oy = random.nextInt(DIMENSIONE - 2) + 1;
-                    }while(labirinto[ox][oy] == '#');
+            for (int i = 0; i < 1; i++) {
+                do {
+                    ox = random.nextInt(DIMENSIONE - 2) + 1;
+                    oy = random.nextInt(DIMENSIONE - 2) + 1;
+                } while (labirinto[ox][oy] == '#');
 
-                    addOggetto(c,ox,oy);
-                }
+                addOggetto(c, ox, oy);
+            }
 
-        }
-        else {
+        } else {
             // Fai scomparire qualche oggetto
 
-            if(oggetti.size() > 5)
-            {
-                try{
+            if (oggetti.size() > 5) {
+                try {
                     removeOggetto(oggetti.get(random.nextInt(oggetti.size())));
-                }catch(Exception e)
-                {
+                } catch (Exception e) {
                 }
             }
         }
 
         // Prossimo passo robot
-        if(!(robot.getX() == 12 && robot.getY() == 0) && !(robot.getX() == 11 && robot.getY() == 0) && !(robot.getX() == 13 && robot.getY() == 0))
+        //if (!(robot.getX() == 12 && robot.getY() == 0) && !(robot.getX() == 11 && robot.getY() == 0) && !(robot.getX() == 13 && robot.getY() == 0)) {
+        System.out.println(checkIfRobotGoal());
+        if(!checkIfRobotGoal())
         {
             state = robot.getState();
             if (state instanceof PursuitState) {
@@ -348,178 +132,213 @@ public class Labirinto extends Observable {
                 doStepRobot(false);
             } else if (state instanceof FleeState) {
                 // esegui l'azione per lo stato di fuga
-                if(!(robot.getX() == 12 && robot.getY() == 0) && !(robot.getX() == 11 && robot.getY() == 0) && !(robot.getX() == 13 && robot.getY() == 0))
-                {
+                if (!checkIfRobotGoal()) {
                     doStepRobot(false);
                 }
             } else if (state instanceof EvadeState) {
                 // esegui l'azione per lo stato di evitamento
                 doStepRobot(true);
             }
-
-
             robot.updateState(getNearestObject(oggetti, robot));
             return true;
         }
-        else
-        {
-            return false;
-        }
+         return false;
     }
 
-    public void doStepRobot(Boolean casual)
+    private Boolean checkIfRobotGoal()
     {
+        int exitX = exitN / DIMENSIONE;
+        int exitY = exitN % DIMENSIONE;
+        System.out.println("Exit (" + exitX + "," + exitY + ")");
+        System.out.println("Robot (" + robot.getX() + "," + robot.getY() + ")");
+        if(robot.getX() == exitX && robot.getY() == exitY)
+        {
+            return true;
+        }
+        else if ((exitX == robot.getX()) && (exitX == 0 || exitX == DIMENSIONE-1))
+        {
+            if(robot.getY() == exitY || robot.getY() == exitY+1 || robot.getY() == exitY-1)
+            {
+                return true;
+            }
+        }
+        else if ((exitY == robot.getY()) && (exitY == 0 || exitY == DIMENSIONE-1))
+        {
+            if(robot.getX() == exitX || robot.getX() == exitX+1 || robot.getX() == exitX-1)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public void doStepRobot(Boolean casual) {
         int x = robot.getX(), y = robot.getY();
         ShortestPath p = new ShortestPath();
         char matrice[][] = new char[DIMENSIONE][DIMENSIONE];
-        for(int i = 0; i < DIMENSIONE; i++)
-        {
-            for(int j = 0; j < DIMENSIONE; j++)
-            {
+        for (int i = 0; i < DIMENSIONE; i++) {
+            for (int j = 0; j < DIMENSIONE; j++) {
                 matrice[i][j] = labirinto[i][j];
             }
         }
 
-        for(int i = 0; i < oggetti.size(); i++)
-        {
+        for (int i = 0; i < oggetti.size(); i++) {
             matrice[oggetti.get(i).getX()][oggetti.get(i).getY()] = '#';
         }
 
-        int graph[][] = p.generateGraph(DIMENSIONE,matrice);
+        int graph[][] = p.generateGraph(DIMENSIONE, matrice);
 
         int source = 30;
         int dist[];
 
-        int confr[] = {Integer.MAX_VALUE,Integer.MAX_VALUE,Integer.MAX_VALUE,Integer.MAX_VALUE};
+        int confr[] = {Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE};
 
-        //System.out.println("(" + x + "," + y + ")");
-        if(matrice[x-1][y] != '#' && x >= 0 && x < DIMENSIONE && y >= 0 && y < DIMENSIONE)
-        {
-                dist = p.dijkstra(graph,((x-1)*DIMENSIONE)+y,DIMENSIONE);
-                confr[0] = dist[192];
+        if (matrice[x - 1][y] != '#' && x >= 0 && x < DIMENSIONE && y >= 0 && y < DIMENSIONE) {
+            dist = p.dijkstra(graph, ((x - 1) * DIMENSIONE) + y, DIMENSIONE);
+            confr[0] = dist[exitN];
         }
-        if(matrice[x+1][y] != '#' && x >= 0 && x < DIMENSIONE && y >= 0 && y < DIMENSIONE)
-        {
-                dist = p.dijkstra(graph,((x+1)*DIMENSIONE)+y,DIMENSIONE);
-                confr[1] = dist[192];
+        if (matrice[x + 1][y] != '#' && x >= 0 && x < DIMENSIONE && y >= 0 && y < DIMENSIONE) {
+            dist = p.dijkstra(graph, ((x + 1) * DIMENSIONE) + y, DIMENSIONE);
+            confr[1] = dist[exitN];
         }
-        if(matrice[x][y-1] != '#' && x >= 0 && x < DIMENSIONE && y >= 0 && y < DIMENSIONE)
-        {
-                dist = p.dijkstra(graph,(x*DIMENSIONE)+(y-1),DIMENSIONE);
-                confr[2] = dist[192];
+        if (matrice[x][y - 1] != '#' && x >= 0 && x < DIMENSIONE && y >= 0 && y < DIMENSIONE) {
+            dist = p.dijkstra(graph, (x * DIMENSIONE) + (y - 1), DIMENSIONE);
+            confr[2] = dist[exitN];
         }
-        if(matrice[x][y+1] != '#' && x >= 0 && x < DIMENSIONE && y >= 0 && y < DIMENSIONE)
-        {
-                dist = p.dijkstra(graph,(x*DIMENSIONE)+(y+1),DIMENSIONE);
-                confr[3] = dist[192];
+        if (matrice[x][y + 1] != '#' && x >= 0 && x < DIMENSIONE && y >= 0 && y < DIMENSIONE) {
+            dist = p.dijkstra(graph, (x * DIMENSIONE) + (y + 1), DIMENSIONE);
+            confr[3] = dist[exitN];
         }
+        if (matrice[x + 1][y - 1] != '#' && x >= 0 && x < DIMENSIONE && y >= 0 && y < DIMENSIONE) {
+            dist = p.dijkstra(graph, ((x + 1) * DIMENSIONE) + (y - 1), DIMENSIONE);
+            confr[4] = dist[exitN];
+        }
+        if (matrice[x + 1][y + 1] != '#' && x >= 0 && x < DIMENSIONE && y >= 0 && y < DIMENSIONE) {
+            dist = p.dijkstra(graph, ((x + 1) * DIMENSIONE) + (y + 1), DIMENSIONE);
+            confr[5] = dist[exitN];
+        }
+        if (matrice[x - 1][y - 1] != '#' && x >= 0 && x < DIMENSIONE && y >= 0 && y < DIMENSIONE) {
+            dist = p.dijkstra(graph, ((x - 1) * DIMENSIONE) + (y - 1), DIMENSIONE);
+            confr[6] = dist[exitN];
+        }
+        if (matrice[x - 1][y + 1] != '#' && x >= 0 && x < DIMENSIONE && y >= 0 && y < DIMENSIONE) {
+            dist = p.dijkstra(graph, ((x - 1) * DIMENSIONE) + (y + 1), DIMENSIONE);
+            confr[7] = dist[exitN];
+        }
+
 
         int min = 0;
-        if(casual)
-        {
-            do{
-                min = random.nextInt(4);
-            }while(confr[min] == Integer.MAX_VALUE);
-        }
-        else {
-            for(int i = 0; i < 4; i++)
-            {
-                if(confr[i] < confr[min])
-                {
+        if (casual) {
+            do {
+                min = random.nextInt(8);
+            } while (confr[min] == Integer.MAX_VALUE);
+        } else {
+            for (int i = 0; i < 8; i++) {
+                if (confr[i] < confr[min]) {
                     min = i;
                 }
             }
         }
 
 
-        if(min == 0)
-        {
-            if(matrice[x-1][y] != '#') {
-                robot.setX(x-1);
+        if (min == 0) {
+            if (matrice[x - 1][y] != '#') {
+                robot.setX(x - 1);
                 robot.setY(y);
             }
-        }
-        else if(min == 1)
-        {
-            if(matrice[x+1][y] != '#') {
-                robot.setX(x+1);
+        } else if (min == 1) {
+            if (matrice[x + 1][y] != '#') {
+                robot.setX(x + 1);
                 robot.setY(y);
             }
-        }
-        else if(min == 2)
-        {
-            if(matrice[x][y-1] != '#') {
+        } else if (min == 2) {
+            if (matrice[x][y - 1] != '#') {
                 robot.setX(x);
-                robot.setY(y-1);
+                robot.setY(y - 1);
             }
-        }
-        else if(min == 3)
-        {
-            if(matrice[x][y+1] != '#') {
+        } else if (min == 3) {
+            if (matrice[x][y + 1] != '#') {
                 robot.setX(x);
-                robot.setY(y+1);
+                robot.setY(y + 1);
+            }
+        } else if (min == 4) {
+            if (matrice[x + 1][y - 1] != '#') {
+                robot.setX(x + 1);
+                robot.setY(y - 1);
+            }
+        } else if (min == 5) {
+            if (matrice[x + 1][y + 1] != '#') {
+                robot.setX(x + 1);
+                robot.setY(y + 1);
+            }
+        } else if (min == 6) {
+            if (matrice[x - 1][y - 1] != '#') {
+                robot.setX(x - 1);
+                robot.setY(y - 1);
+            }
+        } else if (min == 7) {
+            if (matrice[x - 1][y + 1] != '#') {
+                robot.setX(x - 1);
+                robot.setY(y + 1);
             }
         }
     }
 
-    public Oggetto getNearestObject(List<Oggetto> oggetti, Robot robot)
-    {
-        int n = oggetti.size();
-        double iDistance;
-        double distanceNearestObject = sqrt((pow(oggetti.get(0).getX() - robot.getX(), 2) + pow(oggetti.get(0).getY() - robot.getY(), 2)));
-        Oggetto nearestObject = oggetti.get(0);
+    private int getSizeMatrix(char[][] matrix) {
+        int size = 0;
 
-        for(int i = 1; i < n; i++)
-        {
-            iDistance = sqrt((pow(oggetti.get(i).getX() - robot.getX(), 2) + pow(oggetti.get(i).getY() - robot.getY(), 2)));
-            if (iDistance < distanceNearestObject)
-            {
-                nearestObject = oggetti.get(i);
+        for (int i = 0; i < matrix.length; i++) {
+            for (int j = 0; j < matrix[i].length; j++) {
+                size++;
             }
         }
 
-        return nearestObject;
+        return size;
     }
 
-    public Oggetto getNearestObjectDijkstra(List<Oggetto> oggetti, Robot robot)
-    {
-        int iMin;
-        int dist[];
-        double distanceMin;
-        int x = robot.getX(), y = robot.getY();
-        ShortestPath p = new ShortestPath();
-        char matrice[][] = new char[DIMENSIONE][DIMENSIONE];
-        for(int i = 0; i < DIMENSIONE; i++)
-        {
-            for(int j = 0; j < DIMENSIONE; j++)
-            {
-                matrice[i][j] = labirinto[i][j];
-            }
-        }
-
-        for(int i = 0; i < oggetti.size(); i++)
-        {
-            matrice[oggetti.get(i).getX()][oggetti.get(i).getY()] = '#';
-        }
-
-        int graph[][] = p.generateGraph(DIMENSIONE,matrice);
-
-
-        dist = p.dijkstra(graph,(x*DIMENSIONE)+y,DIMENSIONE);
-
-        iMin = 0;
-        distanceMin = dist[(oggetti.get(0).getX()*DIMENSIONE)+oggetti.get(0).getY()];
-        for(int i = 1; i < oggetti.size(); i++)
-        {
-            if(dist[(oggetti.get(i).getX()*DIMENSIONE)+oggetti.get(i).getY()] < distanceMin)
-            {
-                iMin = i;
-                distanceMin = dist[(oggetti.get(i).getX()*DIMENSIONE)+oggetti.get(i).getY()];
-            }
-        }
-
-        return oggetti.get(iMin);
+    private Boolean checkIfMatrixIsSquare(char[][] matrix) {
+        double sqrt = Math.sqrt(getSizeMatrix(matrix));
+        return ((sqrt - Math.floor(sqrt)) == 0);
     }
+
+    public Oggetto getNearestObject(List<Oggetto> oggetti, Robot robot) {
+        ArrayList<Oggetto> oggettiInProssimita = getObjectsInProximity(oggetti,robot);
+        if(oggettiInProssimita.size() > 0)
+        {
+            double iDistance;
+            double distanceNearestObject = sqrt((pow(oggettiInProssimita.get(0).getX() - robot.getX(), 2) + pow(oggettiInProssimita.get(0).getY() - robot.getY(), 2)));
+            Oggetto nearestObject = oggetti.get(0);
+
+            for (int i = 1; i < oggettiInProssimita.size(); i++) {
+                iDistance = sqrt((pow(oggettiInProssimita.get(i).getX() - robot.getX(), 2) + pow(oggettiInProssimita.get(i).getY() - robot.getY(), 2)));
+                if (iDistance < distanceNearestObject) {
+                    nearestObject = oggettiInProssimita.get(i);
+                }
+            }
+
+            return nearestObject;
+        }
+
+
+        return null;
+
+    }
+
+        ArrayList<Oggetto> getObjectsInProximity(List<Oggetto> oggetti, Robot robot) {
+            ArrayList<Oggetto> result = new ArrayList<>();
+            for (Oggetto object : oggetti) {
+                if (distance(robot.getX(), robot.getY(), object.getX(), object.getY()) <= 2) {
+                    result.add(object);
+                }
+            }
+            return result;
+    }
+
+    public double distance(int x1, int y1, int x2, int y2) {
+        return Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
+    }
+
 /*
     public void aggiungiOggetto(char color) {
         OggettoFactory factory = null;
@@ -536,27 +355,23 @@ public class Labirinto extends Observable {
     }
 */
 
-    public boolean[][] getPathRobot()
-    {
+    public boolean[][] getPathRobot() {
         return pathRobot;
     }
 
-    public char[][] getLabyrinth()
-    {
+    public char[][] getLabyrinth() {
         return labirinto;
     }
 
-    public int getRobotX()
-    {
+    public int getRobotX() {
         return robot.getX();
     }
-    public int getRobotY()
-    {
+
+    public int getRobotY() {
         return robot.getY();
     }
 
-    public List<Oggetto> getObjects()
-    {
+    public List<Oggetto> getObjects() {
         return oggetti;
     }
 
@@ -564,7 +379,7 @@ public class Labirinto extends Observable {
         return robot.state;
     }*/
 
-    public Robot getRobot(){
+    public Robot getRobot() {
         return robot;
     }
 
@@ -580,7 +395,7 @@ public class Labirinto extends Observable {
         } else if (color == 'Y') {
             factory = new OggettoGialloFactory();
         }
-        Oggetto nuovoOggetto = factory.creaOggetto(x,y);
+        Oggetto nuovoOggetto = factory.creaOggetto(x, y);
         oggetti.add(nuovoOggetto);
         notifyObservers(nuovoOggetto, OGGETTO_AGGIUNTO);
     }

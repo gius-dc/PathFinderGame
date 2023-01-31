@@ -20,12 +20,12 @@ public class Robot extends Entita {
     public void updateState(Oggetto nearestObj) {
         state.updateState(this, nearestObj);
     }
+
     public void setState(RobotState newState) {
         state = newState;
     }
 
-    public RobotState getState()
-    {
+    public RobotState getState() {
         return state;
     }
 
@@ -38,6 +38,7 @@ public class Robot extends Entita {
         setY(memento.getY());
     }
 }
+
 abstract class RobotState {
     /* La classe astratta RobotState è la classe base per tutti gli stati del robot e ha un metodo
     astratto updateState che deve essere implementato da tutte le sue classi estese. */
@@ -52,64 +53,72 @@ del robot in base a questo. Ad esempio, se l'oggetto più vicino è di tipo 'R',
 
 class PursuitState extends RobotState {
     public void updateState(Robot robot, Oggetto nearestObj) {
-        switch(nearestObj.getTipo()) {
-            case 'R':
-                robot.setState(new SeekState());
-                break;
-            case 'Y':
-                robot.setState(new FleeState());
-                break;
-            case 'C':
-                robot.setState(new EvadeState());
-                break;
+        if (nearestObj != null) {
+            switch (nearestObj.getTipo()) {
+                case 'R':
+                    robot.setState(new SeekState());
+                    break;
+                case 'Y':
+                    robot.setState(new FleeState());
+                    break;
+                case 'C':
+                    robot.setState(new EvadeState());
+                    break;
+            }
         }
     }
 }
 
 class SeekState extends RobotState {
     public void updateState(Robot robot, Oggetto nearestObj) {
-        switch(nearestObj.getTipo()) {
-            case 'Y':
-                robot.setState(new FleeState());
-                break;
-            case 'C':
-                robot.setState(new EvadeState());
-                break;
-            case 'G':
-                robot.setState(new PursuitState());
-                break;
+        if (nearestObj != null) {
+            switch (nearestObj.getTipo()) {
+                case 'Y':
+                    robot.setState(new FleeState());
+                    break;
+                case 'C':
+                    robot.setState(new EvadeState());
+                    break;
+                case 'G':
+                    robot.setState(new PursuitState());
+                    break;
+            }
         }
     }
 }
 
 class FleeState extends RobotState {
     public void updateState(Robot robot, Oggetto nearestObj) {
-        switch(nearestObj.getTipo()) {
-            case 'C':
-                robot.setState(new EvadeState());
-                break;
-            case 'G':
-                robot.setState(new PursuitState());
-                break;
-            case 'R':
-                robot.setState(new SeekState());
-                break;
+        if (nearestObj != null) {
+            switch (nearestObj.getTipo()) {
+                case 'C':
+                    robot.setState(new EvadeState());
+                    break;
+                case 'G':
+                    robot.setState(new PursuitState());
+                    break;
+                case 'R':
+                    robot.setState(new SeekState());
+                    break;
+            }
         }
     }
 }
 
 class EvadeState extends RobotState {
     public void updateState(Robot robot, Oggetto nearestObj) {
-        switch(nearestObj.getTipo()) {
-            case 'G':
-                robot.setState(new PursuitState());
-                break;
-            case 'R':
-                robot.setState(new SeekState());
-                break;
-            case 'Y':
-                robot.setState(new FleeState());
-                break;
+        if (nearestObj != null) {
+            switch (nearestObj.getTipo()) {
+                case 'G':
+                    robot.setState(new PursuitState());
+                    break;
+                case 'R':
+                    robot.setState(new SeekState());
+                    break;
+                case 'Y':
+                    robot.setState(new FleeState());
+                    break;
+            }
         }
     }
 }
