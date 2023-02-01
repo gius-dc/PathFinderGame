@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 // In questa classe viene implementato i design pattern 'State' e 'Memento'
 public class Robot extends Entita {
@@ -11,7 +12,6 @@ public class Robot extends Entita {
     private RobotState state;
 
     public Robot(int x, int y) {
-        setTipo('@');
         setX(x);
         setY(y);
         state = new PursuitState();
@@ -54,7 +54,7 @@ del robot in base a questo. Ad esempio, se l'oggetto più vicino è di tipo 'R',
 class PursuitState extends RobotState {
     public void updateState(Robot robot, Oggetto nearestObj) {
         if (nearestObj != null) {
-            switch (nearestObj.getTipo()) {
+            switch (nearestObj.getColor()) {
                 case 'R':
                     robot.setState(new SeekState());
                     break;
@@ -72,7 +72,7 @@ class PursuitState extends RobotState {
 class SeekState extends RobotState {
     public void updateState(Robot robot, Oggetto nearestObj) {
         if (nearestObj != null) {
-            switch (nearestObj.getTipo()) {
+            switch (nearestObj.getColor()) {
                 case 'Y':
                     robot.setState(new FleeState());
                     break;
@@ -90,7 +90,7 @@ class SeekState extends RobotState {
 class FleeState extends RobotState {
     public void updateState(Robot robot, Oggetto nearestObj) {
         if (nearestObj != null) {
-            switch (nearestObj.getTipo()) {
+            switch (nearestObj.getColor()) {
                 case 'C':
                     robot.setState(new EvadeState());
                     break;
@@ -108,7 +108,7 @@ class FleeState extends RobotState {
 class EvadeState extends RobotState {
     public void updateState(Robot robot, Oggetto nearestObj) {
         if (nearestObj != null) {
-            switch (nearestObj.getTipo()) {
+            switch (nearestObj.getColor()) {
                 case 'G':
                     robot.setState(new PursuitState());
                     break;

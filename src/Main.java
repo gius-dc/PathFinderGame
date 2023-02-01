@@ -1,28 +1,16 @@
 public class Main {
-    public static void main(String[] args)
-    {
-        Level.Builder builder = new Level.Builder(16, 16);
-        builder.aggiungiPareti();
-        builder.aggiungiPareteVerticale(3,2,9);
-        builder.aggiungiPareteVerticale(7,8,14);
-        builder.aggiungiPareteOrizzontale(3,7,14);
-        builder.aggiungiPareteOrizzontale(10,11,13);
-        builder.impostaPosizionePortaUscita(12,0);
+    public static void main(String[] args) {
+        char[][] matrice = null;
+        int exitN = 0;
+        Robot robot = new Robot(3, 6);
+        System.out.println("Coordinate prima: (" + robot.getX() + "," + robot.getY() + ")");
 
-        Level livello = builder.build();
+        RobotMovement strategy = new RobotMovement();
+        strategy.setStrategy(new RobotMovement.RandomMovement());
 
-        char[][] liv = livello.getLabyrinth();
+        strategy.move(robot, matrice, 16, exitN);
 
-        for (int i = 0; i < 16; i++) {
-            for (int j = 0; j < 16; j++) {
-                System.out.print(liv[i][j] + "  ");
-            }
-            System.out.println();
-        }
-
-
-
-
+        System.out.println("Coordinate dopo: (" + robot.getX() + "," + robot.getY() + ")");
 
     }
 }

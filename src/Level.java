@@ -4,11 +4,15 @@ public class Level {
     private int larghezza;
     private int portaUscita = -1;
 
+    private int robotX, robotY;
+
     private Level(Builder builder) {
         this.labirinto = builder.labirinto;
         this.portaUscita = builder.portaUscita;
         this.altezza = builder.altezza;
         this.larghezza = builder.larghezza;
+        this.robotX = builder.robotX;
+        this.robotY = builder.robotY;
     }
 
     public char[][] getLabyrinth()
@@ -20,11 +24,23 @@ public class Level {
         return portaUscita;
     }
 
+
+    public int getRobotX()
+    {
+        return robotX;
+    }
+
+    public int getRobotY()
+    {
+        return robotY;
+    }
+
     public static class Builder {
         private char[][] labirinto;
         private int portaUscita = -1;
         private int altezza;
         private int larghezza;
+        private int robotX, robotY;
 
         public Builder(int larghezza, int altezza) {
             this.labirinto = new char[altezza][larghezza];
@@ -103,6 +119,36 @@ public class Level {
             this.portaUscita = riga * labirinto[0].length + colonna;
             return this;
         }
+
+        public Builder setRobotStartXY (int x,int y)
+        {
+            if(labirinto[x][y] != '#')
+            {
+                this.robotX = x;
+                this.robotY = y;
+            }
+            return this;
+        }
+
+        public Builder setRobotStartX(int x)
+        {
+            if(labirinto[x][robotY] != '#')
+            {
+                robotX = x;
+            }
+            return this;
+        }
+
+        public Builder setRobotStartY(int y)
+        {
+            if(labirinto[robotX][y] != '#')
+            {
+                robotY = y;
+            }
+            return this;
+        }
+
+
 
         public Level build() {
             return new Level(this);

@@ -1,11 +1,5 @@
 public abstract class Entita {
-    private char tipo;
     private int x,y; // coordinate
-
-
-    public void setTipo(char tipo) {
-        this.tipo = tipo;
-    }
 
     public void setX(int x) {
         this.x = x;
@@ -21,10 +15,6 @@ public abstract class Entita {
 
     public int getY() {
         return y;
-    }
-
-    public char getTipo() {
-        return tipo;
     }
 
 

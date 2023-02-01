@@ -1,13 +1,10 @@
 import java.util.List;
 
 public class ShortestPath {
-    public int minDistance(int dist[],Boolean b[], int size)
-    {
+    public int minDistance(int dist[], Boolean b[], int size) {
         int min = Integer.MAX_VALUE, index = -1;
-        for(int x = 0; x < size*size; x++)
-        {
-            if(b[x] == false && dist[x] <= min)
-            {
+        for (int x = 0; x < size * size; x++) {
+            if (b[x] == false && dist[x] <= min) {
                 min = dist[x];
                 index = x;
             }
@@ -16,25 +13,20 @@ public class ShortestPath {
     }
 
 
-    public int[] dijkstra(int graph[][], int src, int size)
-    {
-        int dist[] = new int[size*size];
-        Boolean b[] = new Boolean[size*size];
-        for(int i = 0; i < size*size; i++)
-        {
+    public int[] dijkstra(int graph[][], int src, int size) {
+        int dist[] = new int[size * size];
+        Boolean b[] = new Boolean[size * size];
+        for (int i = 0; i < size * size; i++) {
             dist[i] = Integer.MAX_VALUE;
             b[i] = false;
         }
 
         dist[src] = 0;
-        for(int count = 0; count < size*size; count++)
-        {
+        for (int count = 0; count < size * size; count++) {
             int u = minDistance(dist, b, size);
             b[u] = true;
-            for(int x = 0; x < size*size; x++)
-            {
-                if(!b[x] && graph[u][x] != 0 && dist[u] != Integer.MAX_VALUE && dist[u]+graph[u][x] < dist[x])
-                {
+            for (int x = 0; x < size * size; x++) {
+                if (!b[x] && graph[u][x] != 0 && dist[u] != Integer.MAX_VALUE && dist[u] + graph[u][x] < dist[x]) {
                     dist[x] = dist[u] + graph[u][x];
                 }
             }
@@ -51,8 +43,7 @@ public class ShortestPath {
                     // i--
                     cX = i - 1;
                     cY = j;
-                    if(labyrinth[cX][cY] != '#')
-                    {
+                    if (labyrinth[cX][cY] != '#') {
                         graph[(i * size) + j][(cX * size) + cY] = 1;
                     }
                 }
@@ -60,8 +51,7 @@ public class ShortestPath {
                     // i++
                     cX = i + 1;
                     cY = j;
-                    if(labyrinth[cX][cY] != '#')
-                    {
+                    if (labyrinth[cX][cY] != '#') {
                         graph[(i * size) + j][(cX * size) + cY] = 1;
                     }
                 }
@@ -69,8 +59,7 @@ public class ShortestPath {
                     // j--
                     cX = i;
                     cY = j - 1;
-                    if(labyrinth[cX][cY] != '#')
-                    {
+                    if (labyrinth[cX][cY] != '#') {
                         graph[(i * size) + j][(cX * size) + cY] = 1;
                     }
                 }
@@ -78,8 +67,7 @@ public class ShortestPath {
                     // j++
                     cX = i;
                     cY = j + 1;
-                    if(labyrinth[cX][cY] != '#')
-                    {
+                    if (labyrinth[cX][cY] != '#') {
                         graph[(i * size) + j][(cX * size) + cY] = 1;
                     }
                 }

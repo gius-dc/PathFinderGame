@@ -1,4 +1,4 @@
 // Interfaccia Observer
 interface Observer {
-    void update(Entita entita, int eventType);
+    void update(Oggetto oggetto, int eventType);
 }
