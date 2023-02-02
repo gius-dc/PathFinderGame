@@ -1,5 +1,3 @@
-import java.awt.event.ActionListener;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
@@ -12,10 +10,10 @@ import static java.lang.Math.sqrt;
 public class Labirinto extends Observable {
     // Dimensione del labirinto
     private static int DIMENSIONE = 0;
-    private Robot robot;
+    private RobotEntity robot;
     private String nome;
     private String stato;
-    private List<Oggetto> oggetti;
+    private List<ObjectEntity> oggetti;
     private int passi;
     private Random random;
     private char[][] labirinto;
@@ -46,7 +44,7 @@ public class Labirinto extends Observable {
         DIMENSIONE = (int) sqrt(getSizeMatrix(labirinto));
 
 
-        robot = new Robot(l.getRobotX(), l.getRobotY());
+        robot = new RobotEntity(l.getRobotX(), l.getRobotY());
 
 
         // Posiziono il robot in un punto casuale all'interno del labirinto (che non coincida con la parete)
@@ -64,25 +62,25 @@ public class Labirinto extends Observable {
             ox = random.nextInt(DIMENSIONE - 2) + 1;
             oy = random.nextInt(DIMENSIONE - 2) + 1;
         } while (labirinto[ox][oy] == '#');
-        oggetti.add(new Oggetto('R', ox, oy));
+        oggetti.add(new ObjectEntity('R', ox, oy));
         // green
         do {
             ox = random.nextInt(DIMENSIONE - 2) + 1;
             oy = random.nextInt(DIMENSIONE - 2) + 1;
         } while (labirinto[ox][oy] == '#');
-        oggetti.add(new Oggetto('G', ox, oy));
+        oggetti.add(new ObjectEntity('G', ox, oy));
         // yellow
         do {
             ox = random.nextInt(DIMENSIONE - 2) + 1;
             oy = random.nextInt(DIMENSIONE - 2) + 1;
         } while (labirinto[ox][oy] == '#');
-        oggetti.add(new Oggetto('Y', ox, oy));
+        oggetti.add(new ObjectEntity('Y', ox, oy));
         // cyan
         do {
             ox = random.nextInt(DIMENSIONE - 2) + 1;
             oy = random.nextInt(DIMENSIONE - 2) + 1;
         } while (labirinto[ox][oy] == '#');
-        oggetti.add(new Oggetto('C', ox, oy));
+        oggetti.add(new ObjectEntity('C', ox, oy));
     }
 
     public Boolean iterate() {
@@ -113,22 +111,31 @@ public class Labirinto extends Observable {
                     c = 'C';
                 }
 
+                do {
+                    ox = random.nextInt(DIMENSIONE - 2) + 1;
+                    oy = random.nextInt(DIMENSIONE - 2) + 1;
+
+                } while ((ox == robot.getX() && oy == robot.getY()) || labirinto[ox][oy] == '#' || distance(robot.getX(), robot.getY(), ox, oy) > 5 || checkIfObjectXYExists(oggetti,ox,oy) == -1 && limit < 50);
+
+
+
+                /*
                 if (flag) {
                     do {
                         ox = random.nextInt(DIMENSIONE - 2) + 1;
                         oy = random.nextInt(DIMENSIONE - 2) + 1;
                         limit++;
-                    } while ((ox == robot.getX() && oy == robot.getY()) || labirinto[ox][oy] == '#' || distance(robot.getX(), robot.getY(), ox, oy) > 5 || checkIfObjectXYExists(oggetti,ox,oy) && limit < 50);
+                    } while ((ox == robot.getX() && oy == robot.getY()) || labirinto[ox][oy] == '#' || distance(robot.getX(), robot.getY(), ox, oy) > 5 || checkIfObjectXYExists(oggetti,ox,oy) == -1 && limit < 50);
                     flag = false;
                 } else {
                     do {
                         ox = random.nextInt(DIMENSIONE - 2) + 1;
                         oy = random.nextInt(DIMENSIONE - 2) + 1;
                         limit++;
-                    } while ((ox == robot.getX() && oy == robot.getY()) || labirinto[ox][oy] == '#' || checkIfObjectXYExists(oggetti,ox,oy) && limit < 50);
+                    } while ((ox == robot.getX() && oy == robot.getY()) || labirinto[ox][oy] == '#' || checkIfObjectXYExists(oggetti,ox,oy) == -1 && limit < 50);
                     flag = true;
                 }
-
+*/
 
                 addOggetto(c, ox, oy);
             }
@@ -183,6 +190,11 @@ public class Labirinto extends Observable {
             return true;
         }
         return false;
+    }
+
+    private Boolean checkEntityProximity(Entity e, int r)
+    {
+
     }
 
     private Boolean checkIfRobotGoal() {
@@ -243,21 +255,52 @@ public class Labirinto extends Observable {
         return ((sqrt - Math.floor(sqrt)) == 0);
     }
 
-    private Boolean checkIfObjectXYExists(List<Oggetto> oggetti, int x, int y) {
+    private int checkIfObjectXYExists(List<ObjectEntity> oggetti, int x, int y) {
         for (int i = 0; i < oggetti.size(); i++) {
             if (oggetti.get(i).getX() == x && oggetti.get(i).getY() == y) {
-                return true;
+                return i;
             }
         }
-        return false;
+        return -1;
     }
 
-    public Oggetto getNearestObject(List<Oggetto> oggetti, Robot robot) {
-        ArrayList<Oggetto> oggettiInProssimita = getObjectsInProximity(oggetti, robot);
+    public ObjectEntity getNearestObject(List<ObjectEntity> oggetti, RobotEntity robot) {
+  /*
+        ArrayList<ObjectEntity> objectsPr = new ArrayList<ObjectEntity>();
+        int n;
+        n = checkIfObjectXYExists(oggetti, robot.getX()-1, robot.getY());
+        if(n != -1)
+        {
+            objectsPr.add(oggetti.get(n));
+        }
+        n = checkIfObjectXYExists(oggetti, robot.getX()+1, robot.getY());
+        if(n != -1)
+        {
+            objectsPr.add(oggetti.get(n));
+        }
+        n = checkIfObjectXYExists(oggetti, robot.getX(), robot.getY()-1);
+        if(n != -1)
+        {
+            objectsPr.add(oggetti.get(n));
+        }
+        n = checkIfObjectXYExists(oggetti, robot.getX(), robot.getY()+1);
+        if(n != -1)
+        {
+            objectsPr.add(oggetti.get(n));
+        }
+
+        if (objectsPr.size() > 0) {
+
+        }
+*/
+
+        //raggio
+
+        ArrayList<ObjectEntity> oggettiInProssimita = getObjectsInProximity(oggetti, robot);
         if (oggettiInProssimita.size() > 0) {
             double iDistance;
             double distanceNearestObject = sqrt((pow(oggettiInProssimita.get(0).getX() - robot.getX(), 2) + pow(oggettiInProssimita.get(0).getY() - robot.getY(), 2)));
-            Oggetto nearestObject = oggetti.get(0);
+            ObjectEntity nearestObject = oggetti.get(0);
 
             for (int i = 1; i < oggettiInProssimita.size(); i++) {
                 iDistance = sqrt((pow(oggettiInProssimita.get(i).getX() - robot.getX(), 2) + pow(oggettiInProssimita.get(i).getY() - robot.getY(), 2)));
@@ -274,10 +317,10 @@ public class Labirinto extends Observable {
 
     }
 
-    ArrayList<Oggetto> getObjectsInProximity(List<Oggetto> oggetti, Robot robot) {
-        ArrayList<Oggetto> result = new ArrayList<>();
-        for (Oggetto object : oggetti) {
-            if (distance(robot.getX(), robot.getY(), object.getX(), object.getY()) <= 2) {
+    ArrayList<ObjectEntity> getObjectsInProximity(List<ObjectEntity> oggetti, RobotEntity robot) {
+        ArrayList<ObjectEntity> result = new ArrayList<>();
+        for (ObjectEntity object : oggetti) {
+            if (distance(robot.getX(), robot.getY(), object.getX(), object.getY()) <= 1) {
                 result.add(object);
             }
         }
@@ -300,7 +343,7 @@ public class Labirinto extends Observable {
     } else if (color == 'G') {
         factory = new OggettoGialloFactory();
         }
-        oggetti.add(factory.creaOggetto());
+        oggetti.add(factory.createObject());
     }
 */
 
@@ -318,28 +361,28 @@ public class Labirinto extends Observable {
     }
 
 
-    public Robot getRobot() {
+    public RobotEntity getRobot() {
         return robot;
     }
 
 
     public void addOggetto(char color, int x, int y) {
-        OggettoFactory factory = null;
+        ObjectFactory factory = null;
         if (color == 'R') {
-            factory = new OggettoRossoFactory();
+            factory = new ObjectRedFactory();
         } else if (color == 'G') {
-            factory = new OggettoVerdeFactory();
+            factory = new ObjectGreenFactory();
         } else if (color == 'C') {
-            factory = new OggettoCianoFactory();
+            factory = new ObjectCyanFactory();
         } else if (color == 'Y') {
-            factory = new OggettoGialloFactory();
+            factory = new ObjectYellowFactory();
         }
-        Oggetto nuovoOggetto = factory.creaOggetto(x, y);
+        ObjectEntity nuovoOggetto = factory.createObject(x, y);
         oggetti.add(nuovoOggetto);
         notifyObservers(nuovoOggetto, OGGETTO_AGGIUNTO);
     }
 
-    public void removeOggetto(Oggetto oggetto) {
+    public void removeOggetto(ObjectEntity oggetto) {
         oggetti.remove(oggetto);
         notifyObservers(oggetto, OGGETTO_RIMOSSO);
     }
@@ -349,7 +392,7 @@ public class Labirinto extends Observable {
         observers.add(observer);
     }
 
-    private void notifyObservers(Oggetto oggetto, int eventType) {
+    private void notifyObservers(ObjectEntity oggetto, int eventType) {
         for (Observer observer : observers) {
             observer.update(oggetto, eventType);
         }

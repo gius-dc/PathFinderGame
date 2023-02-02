@@ -1,4 +1,8 @@
-import java.util.List;
+/*
+Questa classe implementa l'algoritmo di Dijkstra per il calcolo del percorso più breve in un grafo.
+Include metodi per la generazione del grafo a partire da un labirinto, per il calcolo della distanza minima tra un nodo sorgente e tutti gli altri nodi,
+e per il recupero del nodo con distanza minima non ancora visitato.
+ */
 
 public class ShortestPath {
     public int minDistance(int dist[], Boolean b[], int size) {

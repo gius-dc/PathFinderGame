@@ -1,12 +1,8 @@
 import com.formdev.flatlaf.FlatLightLaf;
 
 import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
@@ -91,7 +87,6 @@ public class RankGUI extends JFrame {
 
         for(int i = 0; i < model.getRowCount(); i++)
         {
-            System.out.println(model.getValueAt(i,level+2));
             if(!model.getValueAt(i,level+2).toString().equals("?"))
             {
                 modelRank.addRow(new Object[]{model.getValueAt(i,0), model.getValueAt(i,1), model.getValueAt(i,level+2)});

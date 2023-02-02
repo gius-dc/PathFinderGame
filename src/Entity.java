@@ -1,4 +1,10 @@
-public abstract class Entita {
+/**
+ * Classe astratta che rappresenta un'entità con coordinate x e y.
+ * Tali entità possono essere un oggetto o un robot, rappresentati dalle loro rispettive classi concrete
+ */
+
+
+public abstract class Entity {
     private int x,y; // coordinate
 
     public void setX(int x) {
@@ -16,7 +22,6 @@ public abstract class Entita {
     public int getY() {
         return y;
     }
-
 
 
 
