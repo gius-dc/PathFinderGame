@@ -39,8 +39,7 @@ public class Labirinto extends Observable {
         exitN = l.getExit();
 
 
-        if(!checkIfMatrixIsSquare(labirinto))
-        {
+        if (!checkIfMatrixIsSquare(labirinto)) {
             throw new IllegalAccessException("Il livello contiene una matrice non quadrata.");
         }
 
@@ -89,40 +88,75 @@ public class Labirinto extends Observable {
     public Boolean iterate() {
         state = robot.getState();
         char c = ' ';
-        int r = 0, ox = 0, oy = 0, rx = 0, ry = 0;
-        Boolean flag = false;
-        if (random.nextInt(100) % 2 == 0) {
+        int r = 0, ox = 0, oy = 0, limit = 0;
+        Boolean flag = true;
 
-            // Aggiungi qualche oggetto
-            r = random.nextInt(4);
-            if (r == 0) {
-                c = 'R';
-            } else if (r == 1) {
-                c = 'G';
-            } else if (r == 2) {
-                c = 'Y';
-            } else if (r == 3) {
-                c = 'C';
+        for(int i = 0; i < oggetti.size(); i++)
+        {
+            if(oggetti.get(i).getX() == robot.getX() && oggetti.get(i).getY() == robot.getY())
+            {
+                removeOggetto(oggetti.get(i));
             }
+        }
 
+        if (random.nextInt(100) % 2 == 0) {
             for (int i = 0; i < 1; i++) {
-                do {
-                    ox = random.nextInt(DIMENSIONE - 2) + 1;
-                    oy = random.nextInt(DIMENSIONE - 2) + 1;
-                } while (labirinto[ox][oy] == '#');
+                // Aggiungi qualche oggetto
+                r = random.nextInt(4);
+                if (r == 0) {
+                    c = 'R';
+                } else if (r == 1) {
+                    c = 'G';
+                } else if (r == 2) {
+                    c = 'Y';
+                } else if (r == 3) {
+                    c = 'C';
+                }
+
+                if (flag) {
+                    do {
+                        ox = random.nextInt(DIMENSIONE - 2) + 1;
+                        oy = random.nextInt(DIMENSIONE - 2) + 1;
+                        limit++;
+                    } while ((ox == robot.getX() && oy == robot.getY()) || labirinto[ox][oy] == '#' || distance(robot.getX(), robot.getY(), ox, oy) > 5 || checkIfObjectXYExists(oggetti,ox,oy) && limit < 50);
+                    flag = false;
+                } else {
+                    do {
+                        ox = random.nextInt(DIMENSIONE - 2) + 1;
+                        oy = random.nextInt(DIMENSIONE - 2) + 1;
+                        limit++;
+                    } while ((ox == robot.getX() && oy == robot.getY()) || labirinto[ox][oy] == '#' || checkIfObjectXYExists(oggetti,ox,oy) && limit < 50);
+                    flag = true;
+                }
+
 
                 addOggetto(c, ox, oy);
             }
 
         } else {
             // Fai scomparire qualche oggetto
+            if (oggetti.size() > 3) {
+                if (flag) {
+                    r = random.nextInt(oggetti.size());
 
-            if (oggetti.size() > 5) {
-                try {
-                    removeOggetto(oggetti.get(random.nextInt(oggetti.size())));
-                } catch (Exception e) {
+                    if (distance(robot.getX(), robot.getY(), oggetti.get(r).getX(), oggetti.get(r).getX()) > 3) {
+                        try {
+                            removeOggetto(oggetti.get(random.nextInt(oggetti.size())));
+                        } catch (Exception e) {
+                        }
+                    }
+                    flag = false;
+                } else {
+                    r = random.nextInt(oggetti.size());
+                    try {
+                        removeOggetto(oggetti.get(random.nextInt(oggetti.size())));
+                    } catch (Exception e) {
+                    }
+                    flag = true;
                 }
             }
+
+
         }
 
         // Prossimo passo robot
@@ -207,6 +241,15 @@ public class Labirinto extends Observable {
     private Boolean checkIfMatrixIsSquare(char[][] matrix) {
         double sqrt = Math.sqrt(getSizeMatrix(matrix));
         return ((sqrt - Math.floor(sqrt)) == 0);
+    }
+
+    private Boolean checkIfObjectXYExists(List<Oggetto> oggetti, int x, int y) {
+        for (int i = 0; i < oggetti.size(); i++) {
+            if (oggetti.get(i).getX() == x && oggetti.get(i).getY() == y) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public Oggetto getNearestObject(List<Oggetto> oggetti, Robot robot) {
