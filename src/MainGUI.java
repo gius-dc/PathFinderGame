@@ -35,6 +35,7 @@ public class MainGUI extends JFrame implements Observer {
     MyTableModel fullRankModel;
     int level = 0, maxLevels = 3;
     int[] scores = new int[3];
+    Level livello;
 
     Caretaker caretaker = null;
     File fileClassifica;
@@ -443,7 +444,7 @@ public class MainGUI extends JFrame implements Observer {
         }
 
 
-        Level livello = builder.build();
+        livello = builder.build();
         drawLabyrinth(livello);
         try {
             l = new Labirinto(livello);
@@ -519,12 +520,11 @@ public class MainGUI extends JFrame implements Observer {
         setImagePanelXY("/img/circle_gray.png", l.getRobotX(), l.getRobotY());
     }
 
+
     public void startLabyrinth() {
         newGameButton.setEnabled(false);
-        setImagePanelXY("/img/square_white.png", l.getRobotX(), l.getRobotY());
+        int differenceSizeMemento = 0;
         labirintoPanel.setBackground(Color.WHITE);
-        caretaker = new Caretaker();
-        Color checker;
         char lab[][] = l.getLabyrinth();
 
 
@@ -532,7 +532,35 @@ public class MainGUI extends JFrame implements Observer {
         labelImg.setIcon(imgIcon);
         labelImg.setVisible(true);
         stateLabel.setText("Labirinto in esecuzione...");
+
+        for (int i = 0; i < 16; i++) {
+            for (int j = 0; j < 16; j++) {
+                if (livello.getLabyrinth()[i][j] != '#') {
+                    setImagePanelXY("/img/square_white.png", i, j);
+                } else {
+                    setImagePanelXY("/img/square_black.png", i, j);
+                }
+            }
+        }
+
         while (l.iterate()) {
+            if (caretaker != null) {
+                if (caretaker.sizeMemento() > 1) {
+                    setImagePanelXY("/img/square_white.png", caretaker.getMemento(caretaker.sizeMemento() - 2).getX(), caretaker.getMemento(caretaker.sizeMemento() - 2).getY());
+
+
+                    if(caretaker.sizeMemento() > 3 && (caretaker.sizeMemento() - differenceSizeMemento == 2))
+                    {
+                        setImagePanelXY("/img/square_white.png", caretaker.getMemento(caretaker.sizeMemento() - 3).getX(), caretaker.getMemento(caretaker.sizeMemento() - 3).getY());
+
+                    }
+
+                }
+                differenceSizeMemento = caretaker.sizeMemento();
+            }
+
+
+
             state = l.getRobot().getState();
             if (state instanceof PursuitState) {
                 // esegui l'azione per lo stato pursuit
@@ -548,18 +576,23 @@ public class MainGUI extends JFrame implements Observer {
                 stateRobotLabel.setText("Stato robot: evade");
             }
 
-            if (caretaker.sizeMemento() > 0) {
-                Memento memento = caretaker.getMemento(caretaker.sizeMemento() - 1);
-                setImagePanelXY("/img/square_white.png", memento.getX(), memento.getY());
-            }
+
+            //if (caretaker.sizeMemento() > 0) {
+            //    Memento memento = caretaker.getMemento(caretaker.sizeMemento() - 1);
+            //    setImagePanelXY("/img/square_white.png", memento.getX(), memento.getY());
+            //}
+
+
+            caretaker = l.getRobotCaretaker();
+            System.out.println("DOPO " + l.getRobotX() + " " + l.getRobotY());
             setImagePanelXY("/img/circle_gray.png", l.getRobotX(), l.getRobotY());
 
             try {
-                Thread.sleep(700);
+                Thread.sleep(300);
             } catch (InterruptedException ex) {
                 throw new RuntimeException(ex);
             }
-            caretaker.addMemento(l.getRobot().saveToMemento()); // salva il nuovo stato del robot (design pattern Memento)
+            //caretaker.addMemento(l.getRobot().saveToMemento()); // salva il nuovo stato del robot (design pattern Memento)
         }
 
 

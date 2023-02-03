@@ -3,8 +3,7 @@ import java.util.List;
 import java.util.Observable;
 import java.util.Random;
 
-import static java.lang.Math.pow;
-import static java.lang.Math.sqrt;
+import static java.lang.Math.*;
 
 
 public class Labirinto extends Observable {
@@ -19,6 +18,7 @@ public class Labirinto extends Observable {
     private char[][] labirinto;
     RobotState state;
     int exitN;
+    Caretaker caretaker = null;
 
 
     private List<Observer> observers = new ArrayList<>();
@@ -35,7 +35,7 @@ public class Labirinto extends Observable {
         random = new Random();
         labirinto = l.getLabyrinth();
         exitN = l.getExit();
-
+        caretaker = new Caretaker();
 
         if (!checkIfMatrixIsSquare(labirinto)) {
             throw new IllegalAccessException("Il livello contiene una matrice non quadrata.");
@@ -56,47 +56,26 @@ public class Labirinto extends Observable {
         */
 
 
-        int ox, oy;
-        // red
-        do {
-            ox = random.nextInt(DIMENSIONE - 2) + 1;
-            oy = random.nextInt(DIMENSIONE - 2) + 1;
-        } while (labirinto[ox][oy] == '#');
-        oggetti.add(new ObjectEntity('R', ox, oy));
-        // green
-        do {
-            ox = random.nextInt(DIMENSIONE - 2) + 1;
-            oy = random.nextInt(DIMENSIONE - 2) + 1;
-        } while (labirinto[ox][oy] == '#');
-        oggetti.add(new ObjectEntity('G', ox, oy));
-        // yellow
-        do {
-            ox = random.nextInt(DIMENSIONE - 2) + 1;
-            oy = random.nextInt(DIMENSIONE - 2) + 1;
-        } while (labirinto[ox][oy] == '#');
-        oggetti.add(new ObjectEntity('Y', ox, oy));
-        // cyan
-        do {
-            ox = random.nextInt(DIMENSIONE - 2) + 1;
-            oy = random.nextInt(DIMENSIONE - 2) + 1;
-        } while (labirinto[ox][oy] == '#');
-        oggetti.add(new ObjectEntity('C', ox, oy));
+    }
+
+    public Caretaker getRobotCaretaker()
+    {
+        return caretaker;
     }
 
     public Boolean iterate() {
         state = robot.getState();
+
         char c = ' ';
         int r = 0, ox = 0, oy = 0, limit = 0;
         Boolean flag = true;
-
-        for(int i = 0; i < oggetti.size(); i++)
-        {
-            if(oggetti.get(i).getX() == robot.getX() && oggetti.get(i).getY() == robot.getY())
-            {
+/*
+        for (int i = 0; i < oggetti.size(); i++) {
+            if (oggetti.get(i).getX() == robot.getX() && oggetti.get(i).getY() == robot.getY()) {
                 removeOggetto(oggetti.get(i));
             }
         }
-
+*/
         if (random.nextInt(100) % 2 == 0) {
             for (int i = 0; i < 1; i++) {
                 // Aggiungi qualche oggetto
@@ -114,9 +93,12 @@ public class Labirinto extends Observable {
                 do {
                     ox = random.nextInt(DIMENSIONE - 2) + 1;
                     oy = random.nextInt(DIMENSIONE - 2) + 1;
+                }
+                while (checkIfObjectXYExists(oggetti, ox, oy) != -1 || ox == robot.getX() && oy == robot.getY() || labirinto[ox][oy] == '#');
 
-                } while ((ox == robot.getX() && oy == robot.getY()) || labirinto[ox][oy] == '#' || distance(robot.getX(), robot.getY(), ox, oy) > 5 || checkIfObjectXYExists(oggetti,ox,oy) == -1 && limit < 50);
-
+                addOggetto(c, ox, oy);
+                System.out.println("Numero oggetti presenti: " + oggetti.size());
+                System.out.println("Carattere labirinto coordinate nuovo oggetto: " + labirinto[ox][oy]);
 
 
                 /*
@@ -137,10 +119,11 @@ public class Labirinto extends Observable {
                 }
 */
 
-                addOggetto(c, ox, oy);
+
             }
 
         } else {
+
             // Fai scomparire qualche oggetto
             if (oggetti.size() > 3) {
                 if (flag) {
@@ -163,38 +146,113 @@ public class Labirinto extends Observable {
                 }
             }
 
-
         }
 
         // Prossimo passo robot
         //if (!(robot.getX() == 12 && robot.getY() == 0) && !(robot.getX() == 11 && robot.getY() == 0) && !(robot.getX() == 13 && robot.getY() == 0)) {
 
         if (!checkIfRobotGoal()) {
+
+
             state = robot.getState();
             if (state instanceof PursuitState) {
                 // esegui l'azione per lo stato di inseguimento
                 doStepRobot(false);
+                caretaker.addMemento(robot.saveToMemento());
             } else if (state instanceof SeekState) {
                 // esegui l'azione per lo stato di ricerca
                 doStepRobot(false);
+                caretaker.addMemento(robot.saveToMemento());
             } else if (state instanceof FleeState) {
                 // esegui l'azione per lo stato di fuga
+                doStepRobot(false);
+                caretaker.addMemento(robot.saveToMemento());
                 if (!checkIfRobotGoal()) {
                     doStepRobot(false);
+                    caretaker.addMemento(robot.saveToMemento());
+
                 }
             } else if (state instanceof EvadeState) {
                 // esegui l'azione per lo stato di evitamento
                 doStepRobot(true);
+                caretaker.addMemento(robot.saveToMemento());
             }
-            robot.updateState(getNearestObject(oggetti, robot));
+
+
+            List<ObjectEntity> adjacentObjects = new ArrayList<>();
+            int indx = -1;
+            indx = checkIfObjectXYExists(oggetti, robot.getX() - 1, robot.getY());
+            // se esiste l'oggetto adiacente aggiungi nella lista
+            if (indx != -1) {
+                // sopra
+                adjacentObjects.add(oggetti.get(indx));
+                indx = -1;
+            }
+            indx = checkIfObjectXYExists(oggetti, robot.getX() - 1, robot.getY() + 1);
+            if (indx != -1) {
+                // in alto a destra
+                adjacentObjects.add(oggetti.get(indx));
+                indx = -1;
+            }
+            indx = checkIfObjectXYExists(oggetti, robot.getX(), robot.getY() + 1);
+            if (indx != -1) {
+                // destra
+                adjacentObjects.add(oggetti.get(indx));
+                indx = -1;
+            }
+            indx = checkIfObjectXYExists(oggetti, robot.getX() + 1, robot.getY() + 1);
+            if (indx != -1) {
+                // in basso a destra
+                adjacentObjects.add(oggetti.get(indx));
+                indx = -1;
+            }
+            indx = checkIfObjectXYExists(oggetti, robot.getX() + 1, robot.getY());
+            if (indx != -1) {
+                // giù
+                adjacentObjects.add(oggetti.get(indx));
+                indx = -1;
+            }
+            indx = checkIfObjectXYExists(oggetti, robot.getX() + 1, robot.getY() - 1);
+            if (indx != -1) {
+                // giù a sinistra
+                adjacentObjects.add(oggetti.get(indx));
+                indx = -1;
+            }
+            indx = checkIfObjectXYExists(oggetti, robot.getX(), robot.getY() - 1);
+            if (indx != -1) {
+                // sinistra
+                adjacentObjects.add(oggetti.get(indx));
+                indx = -1;
+            }
+            indx = checkIfObjectXYExists(oggetti, robot.getX() - 1, robot.getY() - 1);
+            if (indx != -1) {
+                // in alto a sinistra
+                adjacentObjects.add(oggetti.get(indx));
+                indx = -1;
+            }
+
+            for (int i = 0; i < adjacentObjects.size(); i++) {
+                System.out.print("");
+                System.out.println("Oggetto vicino: " + adjacentObjects.get(i).getColor());
+                System.out.println("Stato attuale: " + state.getClass());
+                robot.updateState(adjacentObjects.get(i));
+                state = robot.getState();
+                System.out.println("Stato aggiornato: " + state.getClass());
+                System.out.println("------------------------");
+            }
+
             return true;
         }
         return false;
     }
 
-    private Boolean checkEntityProximity(Entity e, int r)
-    {
-
+    private Boolean checkObjectProximity(List<ObjectEntity> obj, int ox, int oy) {
+        for (int i = 0; i < obj.size(); i++) {
+            if (distance(obj.get(i).getX(), obj.get(i).getY(), ox, oy) <= 2) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private Boolean checkIfRobotGoal() {
@@ -316,6 +374,7 @@ public class Labirinto extends Observable {
         return null;
 
     }
+
 
     ArrayList<ObjectEntity> getObjectsInProximity(List<ObjectEntity> oggetti, RobotEntity robot) {
         ArrayList<ObjectEntity> result = new ArrayList<>();

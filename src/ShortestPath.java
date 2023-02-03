@@ -75,6 +75,38 @@ public class ShortestPath {
                         graph[(i * size) + j][(cX * size) + cY] = 1;
                     }
                 }
+                if (i > 0 && j > 0) {
+                    // i-- & j--
+                    cX = i - 1;
+                    cY = j - 1;
+                    if (labyrinth[cX][cY] != '#') {
+                        graph[(i * size) + j][(cX * size) + cY] = 1;
+                    }
+                }
+                if (i < size - 1 && j < size - 1) {
+                    // i++ & j++
+                    cX = i + 1;
+                    cY = j + 1;
+                    if (labyrinth[cX][cY] != '#') {
+                        graph[(i * size) + j][(cX * size) + cY] = 1;
+                    }
+                }
+                if (i < size - 1 && j > 0) {
+                    // i++ & j--
+                    cX = i + 1;
+                    cY = j - 1;
+                    if (labyrinth[cX][cY] != '#') {
+                        graph[(i * size) + j][(cX * size) + cY] = 1;
+                    }
+                }
+                if (i > 0 && j < size - 1) {
+                    // i-- & j++
+                    cX = i - 1;
+                    cY = j + 1;
+                    if (labyrinth[cX][cY] != '#') {
+                        graph[(i * size) + j][(cX * size) + cY] = 1;
+                    }
+                }
             }
         }
 
