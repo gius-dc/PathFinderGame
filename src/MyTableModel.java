@@ -52,8 +52,10 @@ public class MyTableModel extends AbstractTableModel {
         dataList.sort((o1, o2) -> {
             Object o1Value = o1.get(columnIndex);
             Object o2Value = o2.get(columnIndex);
-            if (o1Value instanceof Comparable && o2Value instanceof Comparable) {
-                return ((Comparable) o1Value).compareTo(o2Value);
+            if (o1Value instanceof String && o2Value instanceof String) {
+                int int1 = Integer.parseInt((String) o1Value);
+                int int2 = Integer.parseInt((String) o2Value);
+                return Integer.compare(int1, int2);
             }
             return 0;
         });

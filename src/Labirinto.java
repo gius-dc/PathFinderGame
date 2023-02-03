@@ -6,7 +6,7 @@ import java.util.Random;
 import static java.lang.Math.*;
 
 
-public class Labirinto extends Observable {
+public class Labirinto extends Observable implements Cloneable {
     // Dimensione del labirinto
     private static int DIMENSIONE = 0;
     private RobotEntity robot;
@@ -27,9 +27,37 @@ public class Labirinto extends Observable {
 
     private boolean[][] pathRobot = new boolean[DIMENSIONE][DIMENSIONE];
 
+    @Override
+    public Labirinto clone() {
+        try {
+            return (Labirinto) super.clone();
+        } catch (CloneNotSupportedException e) {
+            return null;
+        }
+    }
+
     // Costruttore
     public Labirinto(Level l) throws IllegalAccessException {
+        setLabirinto(l);
 
+
+        // Posiziono il robot in un punto casuale all'interno del labirinto (che non coincida con la parete)
+        /*
+        do {
+            robot.setX(random.nextInt(DIMENSIONE - 2) + 1);
+            robot.setY(random.nextInt(DIMENSIONE - 2) + 1);
+        } while (labirinto[robot.getX()][robot.getY()] == '#');
+        */
+
+
+    }
+
+
+    public void resetLabyrinth(Level l) throws IllegalAccessException {
+        setLabirinto(l);
+    }
+
+    public void setLabirinto(Level l) throws IllegalAccessException {
         oggetti = new ArrayList<>();
         passi = 0;
         random = new Random();
@@ -45,21 +73,9 @@ public class Labirinto extends Observable {
 
 
         robot = new RobotEntity(l.getRobotX(), l.getRobotY());
-
-
-        // Posiziono il robot in un punto casuale all'interno del labirinto (che non coincida con la parete)
-        /*
-        do {
-            robot.setX(random.nextInt(DIMENSIONE - 2) + 1);
-            robot.setY(random.nextInt(DIMENSIONE - 2) + 1);
-        } while (labirinto[robot.getX()][robot.getY()] == '#');
-        */
-
-
     }
 
-    public Caretaker getRobotCaretaker()
-    {
+    public Caretaker getRobotCaretaker() {
         return caretaker;
     }
 
@@ -97,8 +113,6 @@ public class Labirinto extends Observable {
                 while (checkIfObjectXYExists(oggetti, ox, oy) != -1 || ox == robot.getX() && oy == robot.getY() || labirinto[ox][oy] == '#');
 
                 addOggetto(c, ox, oy);
-                System.out.println("Numero oggetti presenti: " + oggetti.size());
-                System.out.println("Carattere labirinto coordinate nuovo oggetto: " + labirinto[ox][oy]);
 
 
                 /*
@@ -231,16 +245,10 @@ public class Labirinto extends Observable {
                 indx = -1;
             }
 
-            for (int i = 0; i < adjacentObjects.size(); i++) {
-                System.out.print("");
-                System.out.println("Oggetto vicino: " + adjacentObjects.get(i).getColor());
-                System.out.println("Stato attuale: " + state.getClass());
+            for(int i = 0; i < adjacentObjects.size(); i++)
+            {
                 robot.updateState(adjacentObjects.get(i));
-                state = robot.getState();
-                System.out.println("Stato aggiornato: " + state.getClass());
-                System.out.println("------------------------");
             }
-
             return true;
         }
         return false;

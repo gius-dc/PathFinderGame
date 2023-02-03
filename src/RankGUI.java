@@ -71,7 +71,7 @@ public class RankGUI extends JFrame {
         setTitle("Classifica");
         setSize(400, 400);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        setSize(800, 700);
+        //setSize(1000, 700);
 
         setTableLevel();
 
