@@ -67,6 +67,12 @@ public class Level {
             return this;
         }
 
+        public Builder aggiungiPuntoParete(int x, int y) {
+            this.labirinto[x][y] = '#';
+            return this;
+        }
+
+
         public Builder aggiungiPareti()
         {
             // Inizializzo il labirinto con le pareti esterne

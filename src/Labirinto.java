@@ -18,7 +18,7 @@ public class Labirinto extends Observable implements Cloneable {
     private char[][] labirinto;
     RobotState state;
     int exitN;
-    Caretaker caretaker = null;
+    private Caretaker caretaker = null;
 
 
     private List<Observer> observers = new ArrayList<>();
@@ -38,6 +38,7 @@ public class Labirinto extends Observable implements Cloneable {
 
     // Costruttore
     public Labirinto(Level l) throws IllegalAccessException {
+        caretaker = Caretaker.getInstance();
         setLabirinto(l);
 
 
@@ -63,7 +64,7 @@ public class Labirinto extends Observable implements Cloneable {
         random = new Random();
         labirinto = l.getLabyrinth();
         exitN = l.getExit();
-        caretaker = new Caretaker();
+        caretaker.resetMemento();
 
         if (!checkIfMatrixIsSquare(labirinto)) {
             throw new IllegalAccessException("Il livello contiene una matrice non quadrata.");

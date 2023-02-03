@@ -33,8 +33,8 @@ public class MainGUI extends JFrame implements Observer {
     Boolean firstRun = true;
     RobotState state;
     MyTableModel fullRankModel;
-    int level = 0, maxLevels = 3;
-    int[] scores = new int[3];
+    int level = 0, maxLevels = 5;
+    int[] scores = new int[maxLevels];
     Level livello;
 
     Caretaker caretaker = null;
@@ -175,13 +175,15 @@ public class MainGUI extends JFrame implements Observer {
     public void newGame() throws IllegalAccessException {
         int exists[] = checkIfGameAlreadyExists(inputName, inputSurname);
         if (exists[0] == 0) {
-            Object[] row = new Object[6];
+            Object[] row = new Object[8];
             row[0] = inputName;
             row[1] = inputSurname;
             row[2] = '?';
             row[3] = '?';
             row[4] = '?';
             row[5] = '?';
+            row[6] = '?';
+            row[7] = '?';
             fullRankModel.addRow(row);
             level = 0;
         } else if (exists[0] == 1) {
@@ -225,13 +227,15 @@ public class MainGUI extends JFrame implements Observer {
 
                 if (result == JOptionPane.YES_OPTION) {
                     fullRankModel.removeRow(exists[1]);
-                    Object[] row = new Object[6];
+                    Object[] row = new Object[8];
                     row[0] = inputName;
                     row[1] = inputSurname;
                     row[2] = '?';
                     row[3] = '?';
                     row[4] = '?';
                     row[5] = '?';
+                    row[6] = '?';
+                    row[7] = '?';
                     fullRankModel.addRow(row);
                     level = 0;
                 } else if (result == JOptionPane.NO_OPTION) {
@@ -313,10 +317,36 @@ public class MainGUI extends JFrame implements Observer {
             builder.aggiungiPareteOrizzontale(8, 6, 12);
             builder.aggiungiPareteVerticale(12, 3, 8);
             builder.aggiungiPareteVerticale(10, 1, 6);
-            //builder.aggiungiPareteVerticale(, 2, 6);
             builder.impostaPosizionePortaUscita(0, 0);
             builder.setRobotStartXY(14, 1);
+        } else if (level == 3) {
+            builder.aggiungiPareti();
+            builder.aggiungiPareteVerticale(11, 1, 10);
+            builder.aggiungiPuntoParete(1, 12);
+            builder.aggiungiPuntoParete(2, 14);
+            builder.aggiungiPuntoParete(3, 12);
+            builder.aggiungiPuntoParete(4, 14);
+            builder.aggiungiPuntoParete(5, 12);
+            builder.aggiungiPuntoParete(6, 14);
+            builder.aggiungiPuntoParete(7, 12);
+            builder.aggiungiPuntoParete(8, 14);
+            builder.aggiungiPuntoParete(9, 12);
+            builder.aggiungiPuntoParete(10, 14);
+            builder.aggiungiPareteOrizzontale(10, 3, 10);
+            builder.aggiungiPareteVerticale(8, 1, 2);
+            builder.aggiungiPareteVerticale(8, 4, 5);
+            builder.aggiungiPareteVerticale(8, 7, 8);
+            builder.aggiungiPareteVerticale(6, 2, 9);
+            builder.aggiungiPareteVerticale(3, 2, 8);
+            builder.aggiungiPareteVerticale(3, 10, 13);
+            builder.aggiungiPareteVerticale(6, 12, 14);
+            builder.aggiungiPareteVerticale(9, 10, 13);
+            builder.aggiungiPareteVerticale(12, 12, 14);
+            builder.aggiungiPareteOrizzontale(2, 2, 4);
+            builder.impostaPosizionePortaUscita(0, 15);
+            builder.setRobotStartXY(1, 10);
         }
+
 
         livello = builder.build();
         if (l == null) {
@@ -373,6 +403,7 @@ public class MainGUI extends JFrame implements Observer {
 
 
     public void drawLabyrinth(Level l) {
+
         char[][] labirinto = mediator.getLabyrinth();
         if (firstRun) {
             Color checker;
@@ -389,7 +420,7 @@ public class MainGUI extends JFrame implements Observer {
                     if (checker == Color.BLACK) {
                         panel.setImage(new ImageIcon(getClass().getResource("/img/square_black.png").toString().substring(5)).getImage());
                     }
-                    panel.setPreferredSize(new Dimension(400 / row, 400 / col));
+                    panel.setMaximumSize(new Dimension(30, 30));
                     panel.setBackground(Color.WHITE);
                     labirintoPanel.add(panel);
                 }
@@ -475,7 +506,7 @@ public class MainGUI extends JFrame implements Observer {
             setImagePanelXY("/img/circle_gray.png", l.getRobotX(), l.getRobotY());
 
             try {
-                Thread.sleep(100);
+                Thread.sleep(200);
             } catch (InterruptedException ex) {
                 throw new RuntimeException(ex);
             }
@@ -514,7 +545,7 @@ public class MainGUI extends JFrame implements Observer {
         }
         //scores[level] = caretaker.sizeMemento();
         stateLabel.setText("Il robot ha raggiunto la destinazione con " + scores[level] + " passi!");
-        if (level < 2) {
+        if (level < maxLevels) {
             nextLevelButton.setEnabled(true);
         }
 
@@ -564,11 +595,11 @@ public class MainGUI extends JFrame implements Observer {
         //table1 = new JTable();
         while (!fileCreatedOrRead) {
             if (createFile()) {
-                fullRankModel = new MyTableModel(new String[]{"Nome", "Cognome", "Passi LV.1", "Passi LV.2", "Passi LV.3", "Totale passi"});
+                fullRankModel = new MyTableModel(new String[]{"Nome", "Cognome", "Passi LV.1", "Passi LV.2", "Passi LV.3", "Passi LV.4", "Passi LV.5", "Totale passi"});
                 //table1.setModel(modelLevelRank);
                 fileCreatedOrRead = true;
             } else {
-                fullRankModel = new MyTableModel(new String[]{"Nome", "Cognome", "Passi LV.1", "Passi LV.2", "Passi LV.3", "Totale passi"});
+                fullRankModel = new MyTableModel(new String[]{"Nome", "Cognome", "Passi LV.1", "Passi LV.2", "Passi LV.3", "Passi LV.4", "Passi LV.5", "Totale passi"});
                 try {
                     fullRankModel.loadFromFile(fileClassifica);
                     //table1.setModel(modelLevelRank);
