@@ -2,15 +2,11 @@ import com.formdev.flatlaf.FlatLightLaf;
 
 import javax.sound.sampled.*;
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.AdjustmentEvent;
-import java.awt.event.AdjustmentListener;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -31,7 +27,7 @@ public class MainGUI extends JFrame implements Observer {
     private JButton showRankButton;
     private JButton newGameButton;
     private JLabel rankLabel;
-    private JSlider volumeControl;
+    private JSlider volumeSlider;
     private JPanel topPanel;
     MyTableModel modelLevelRank;
     Labirinto l;
@@ -51,6 +47,9 @@ public class MainGUI extends JFrame implements Observer {
 
     private Mediator mediator;
 
+    private Clip clip;
+    private FloatControl volumeControl = null;
+
     public MainGUI() throws IllegalAccessException {
         setContentPane(mainPanel);
         setTitle("Labirinto");
@@ -60,39 +59,28 @@ public class MainGUI extends JFrame implements Observer {
 
         //setIconImage(new ImageIcon(getClass().getResource("/img/robot.png")).getImage());
 
+
+        File audioFile = new File("file.wav");
+        volumeSlider = new JSlider(0, 100, 50);
+
+
         try {
-            File audioFile = new File(getClass().getResource("/sounds/pathfinderTrack.wav").getPath());
             AudioInputStream audioStream = AudioSystem.getAudioInputStream(audioFile);
             AudioFormat format = audioStream.getFormat();
             DataLine.Info info = new DataLine.Info(Clip.class, format);
-            final Clip audioClip = (Clip) AudioSystem.getLine(info);
-            audioClip.open(audioStream);
-
-            volumeControl.addChangeListener(new ChangeListener() {
-                Timer timer = new Timer(100, new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        FloatControl gainControl = (FloatControl) audioClip.getControl(FloatControl.Type.MASTER_GAIN);
-                        float range = gainControl.getMaximum() - gainControl.getMinimum();
-                        float gain = (range * volumeControl.getValue() / 100) + gainControl.getMinimum();
-                        gainControl.setValue(gain );
-                    }
-                });
-                @Override
-                public void stateChanged(ChangeEvent e) {
-                    timer.start();
-                }
-            });
-
-            audioClip.loop(Clip.LOOP_CONTINUOUSLY);
-            audioClip.start();
-        } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
+            clip = (Clip) AudioSystem.getLine(info);
+            clip.open(audioStream);
+            volumeControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
+        volumeSlider.addChangeListener(e -> {
+            float gain = (float) (volumeSlider.getValue() / 100.0);
+            volumeControl.setValue( volumeControl.getMinimum() + gain * (volumeControl.getMaximum() - volumeControl.getMinimum()) );
+        });
 
-
-
+        clip.start();
         /*
         try {
             File audioFile = new File(getClass().getResource("/sounds/pathfinderTrack.wav").getPath());
