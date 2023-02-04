@@ -72,7 +72,7 @@ public class MainGUI extends JFrame implements Observer {
 
         //nextLevelButton.setVisible(false);
 
-
+        setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/img/robot.png").getPath()));
         modelLevelRank = new MyTableModel(new String[]{"Nome", "Cognome", "Punteggio"});
         //toolBar1.add(avviaButton);
         try {
@@ -612,7 +612,6 @@ public class MainGUI extends JFrame implements Observer {
         FlatLightLaf.setup();
 
         MainGUI myMainGUI = new MainGUI();
-        myMainGUI.setIconImage(new ImageIcon("/home/giuseppe/IdeaProjects/progettoProg3/src/img/robot.png").getImage());
 
 
     }
@@ -702,6 +701,5 @@ public class MainGUI extends JFrame implements Observer {
             setImagePanelXY("/img/sand.png", entita.getX(), entita.getY());
         }
     }
-
 
 }
