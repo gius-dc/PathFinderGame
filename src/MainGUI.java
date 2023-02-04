@@ -90,8 +90,8 @@ public class MainGUI extends JFrame implements Observer {
                 executor.execute(new Runnable() {
                     @Override
                     public void run() {
+                        level++;
                         if (level < maxLevels) {
-                            level++;
                             try {
                                 prepareLabyrinth();
                             } catch (IllegalAccessException ex) {
@@ -103,6 +103,13 @@ public class MainGUI extends JFrame implements Observer {
                             labelImg.setIcon(imgIcon);
                             labelImg.setIcon(null);
                             stateLabel.setText("Livello " + (level + 1) + " - Avvia  per iniziare");
+                        } else {
+                            nextLevelButton.setEnabled(false);
+                            avviaButton.setEnabled(false);
+                            newGameButton.setEnabled(true);
+                            stateLabel.setText("Il robot ha completato tutti i livelli!");
+                            updateRank();
+
                         }
 
                     }
@@ -134,7 +141,7 @@ public class MainGUI extends JFrame implements Observer {
                 if (rankGUI == null) {
                     rankGUI = new RankGUI();
                 }
-                rankGUI.showRank(fullRankModel);
+                rankGUI.showRank(fullRankModel,maxLevels);
 
                 JDialog frame2 = new JDialog(rankGUI, "Classifica", true);
                 frame2.setContentPane(rankGUI.getContentPane());
@@ -345,6 +352,8 @@ public class MainGUI extends JFrame implements Observer {
             builder.aggiungiPareteOrizzontale(2, 2, 4);
             builder.impostaPosizionePortaUscita(0, 15);
             builder.setRobotStartXY(1, 10);
+        } else if (level == 4) {
+
         }
 
 
@@ -385,18 +394,19 @@ public class MainGUI extends JFrame implements Observer {
         while (modelLevelRank.getRowCount() > 0) {
             modelLevelRank.removeRow(0);
         }
+
+        if (level == maxLevels) {
+            rankLabel.setText("Classifica finale");
+        } else {
+            rankLabel.setText("Classifica - Livello " + (level + 1));
+        }
+
         for (int i = 0; i < fullRankModel.getRowCount(); i++) {
             if (!fullRankModel.getValueAt(i, level + 2).toString().equals("?")) {
                 modelLevelRank.addRow(new Object[]{fullRankModel.getValueAt(i, 0), fullRankModel.getValueAt(i, 1), fullRankModel.getValueAt(i, level + 2)});
             }
         }
 
-        modelLevelRank.sortByColumn(2);
-        for (int i = 0; i < modelLevelRank.getRowCount(); i++) {
-            System.out.println((i + 1) + " - " + modelLevelRank.getValueAt(i, 0) + " " + modelLevelRank.getValueAt(i, 1) + " " + modelLevelRank.getValueAt(i, 2));
-        }
-
-        rankLabel.setText("Classifica - Livello " + (level + 1));
         modelLevelRank.sortByColumn(2);
         table1.setModel(modelLevelRank);
     }
@@ -506,7 +516,7 @@ public class MainGUI extends JFrame implements Observer {
             setImagePanelXY("/img/robot.png", l.getRobotX(), l.getRobotY());
 
             try {
-                Thread.sleep(200);
+                Thread.sleep(10);
             } catch (InterruptedException ex) {
                 throw new RuntimeException(ex);
             }
@@ -557,6 +567,15 @@ public class MainGUI extends JFrame implements Observer {
                         fullRankModel.setValueAt(Integer.toString((scores[0] + scores[1])), i, level + 3);
                     }*/
                 //sorter.sort();
+
+                if (level == maxLevels - 1) {
+                    int totalScore = 0;
+                    for (int j = 2; j < fullRankModel.getColumnCount() - 1; j++) {
+                        totalScore = totalScore + Integer.parseInt(fullRankModel.getValueAt(i, j).toString());
+                    }
+
+                    fullRankModel.setValueAt(Integer.toString(totalScore), i, maxLevels + 2);
+                }
                 try {
                     fullRankModel.saveToFile(fileClassifica);
                 } catch (IOException e) {
@@ -595,11 +614,23 @@ public class MainGUI extends JFrame implements Observer {
         //table1 = new JTable();
         while (!fileCreatedOrRead) {
             if (createFile()) {
-                fullRankModel = new MyTableModel(new String[]{"Nome", "Cognome", "Passi LV.1", "Passi LV.2", "Passi LV.3", "Passi LV.4", "Passi LV.5", "Totale passi"});
+                String[] columnsText = new String[maxLevels + 3];
+                columnsText[0] = "Nome";
+                columnsText[1] = "Cognome";
+                for (int i = 2; i < maxLevels + 2; i++) {
+                    columnsText[i] = ("Passi LV." + (i - 1));
+                }
+                columnsText[maxLevels + 2] = "Totale passi";
+                fullRankModel = new MyTableModel(columnsText);
                 //table1.setModel(modelLevelRank);
                 fileCreatedOrRead = true;
             } else {
-                fullRankModel = new MyTableModel(new String[]{"Nome", "Cognome", "Passi LV.1", "Passi LV.2", "Passi LV.3", "Passi LV.4", "Passi LV.5", "Totale passi"});
+                String[] columnsText = new String[maxLevels + 3];
+                for (int i = 2; i < maxLevels + 2; i++) {
+                    columnsText[i] = ("Passi LV." + i);
+                }
+                columnsText[maxLevels + 2] = "Totale passi";
+                fullRankModel = new MyTableModel(columnsText);
                 try {
                     fullRankModel.loadFromFile(fileClassifica);
                     //table1.setModel(modelLevelRank);
@@ -634,7 +665,7 @@ public class MainGUI extends JFrame implements Observer {
         if (eventType == Labirinto.OGGETTO_AGGIUNTO) {
             // Aggiungi graficamente l'oggetto al labirinto
             if (entita.getColor() == 'R') {
-                setImagePanelXY("/img/circle_red.png", entita.getX(), entita.getY());
+                setImagePanelXY("/img/red_stone.png", entita.getX(), entita.getY());
             } else if (entita.getColor() == 'Y') {
                 setImagePanelXY("/img/yellow_lemon.png", entita.getX(), entita.getY());
             } else if (entita.getColor() == 'C') {

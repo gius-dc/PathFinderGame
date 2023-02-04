@@ -35,7 +35,7 @@
             </constraints>
             <properties>
               <font size="24"/>
-              <text value="Classifica - livello 1"/>
+              <text value="Classifica - Livello 1"/>
             </properties>
           </component>
           <component id="7dfff" class="javax.swing.JButton" binding="backButton">
@@ -45,6 +45,7 @@
               </grid>
             </constraints>
             <properties>
+              <enabled value="false"/>
               <icon value="img/back.png"/>
               <text value=""/>
             </properties>
