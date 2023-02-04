@@ -9,6 +9,8 @@ import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -30,6 +32,7 @@ public class MainGUI extends JFrame implements Observer {
     private JButton newGameButton;
     private JLabel rankLabel;
     private JSlider volumeSlider;
+    private JLabel muteButton;
     private JPanel topPanel;
     MyTableModel modelLevelRank;
     Labirinto l;
@@ -58,11 +61,6 @@ public class MainGUI extends JFrame implements Observer {
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setVisible(true);
         setResizable(false);
-
-        //setIconImage(new ImageIcon(getClass().getResource("/img/robot.png")).getImage());
-
-
-
 
 
         setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/img/robot.png").getPath()));
@@ -117,13 +115,31 @@ public class MainGUI extends JFrame implements Observer {
                             nextLevelButton.setEnabled(false);
                             avviaButton.setEnabled(false);
                             newGameButton.setEnabled(true);
-                            stateLabel.setText("Il robot ha completato tutti i livelli!");
+                            stateLabel.setText("Complimenti, hai finito tutti i livelli! ☺");
                             updateRank();
+                            try {
+                                prepareLabyrinth();
+                            } catch (IllegalAccessException ex) {
+                                throw new RuntimeException(ex);
+                            }
+
 
                         }
 
                     }
                 });
+            }
+        });
+
+        muteButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (volumeSlider.getValue() != 0) {
+                    volumeSlider.setValue(0);
+                } else {
+                    volumeSlider.setValue(50);
+                }
+
             }
         });
 
@@ -186,6 +202,54 @@ public class MainGUI extends JFrame implements Observer {
             }
         });
 
+
+        String filePath = getClass().getResource("/sounds/pathfinderTrack.wav").getPath();
+
+        try {
+            File audioFile = new File(filePath);
+            final AudioInputStream audioStream = AudioSystem.getAudioInputStream(audioFile);
+            AudioFormat format = audioStream.getFormat();
+            DataLine.Info info = new DataLine.Info(SourceDataLine.class, format, AudioSystem.NOT_SPECIFIED);
+            final SourceDataLine audioLine = (SourceDataLine) AudioSystem.getLine(info);
+            audioLine.open(format);
+            audioLine.start();
+
+            final FloatControl volume = (FloatControl) audioLine.getControl(FloatControl.Type.MASTER_GAIN);
+            volumeSlider.addChangeListener(new ChangeListener() {
+                @Override
+                public void stateChanged(ChangeEvent e) {
+                    float gain = (float) volumeSlider.getValue() / 100;
+                    float dB = (float) (Math.log(gain) / Math.log(10.0) * 20.0);
+                    volume.setValue(dB);
+
+                    if (volumeSlider.getValue() != 0) {
+                        muteButton.setIcon(new ImageIcon(getClass().getResource("/img/volume.png").toString().substring(5)));
+                    } else {
+                        muteButton.setIcon(new ImageIcon(getClass().getResource("/img/volume_mute.png").toString().substring(5)));
+                    }
+                }
+            });
+
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    int bufferSize = (int) format.getSampleRate() * format.getFrameSize();
+                    byte[] buffer = new byte[bufferSize];
+                    int bytesRead = 0;
+                    while (true) {
+                        try (AudioInputStream audioStream = AudioSystem.getAudioInputStream(audioFile)) {
+                            while ((bytesRead = audioStream.read(buffer, 0, buffer.length)) != -1) {
+                                audioLine.write(buffer, 0, bytesRead);
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }).start();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
     }
 
@@ -303,96 +367,149 @@ public class MainGUI extends JFrame implements Observer {
 
     public void prepareLabyrinth() throws IllegalAccessException {
         Level.Builder builder = new Level.Builder(16, 16);
-        if (level == 0) {
-            builder.aggiungiPareti();
-            builder.aggiungiPareteVerticale(3, 2, 9);
-            builder.aggiungiPareteVerticale(7, 8, 14);
-            builder.aggiungiPareteOrizzontale(3, 7, 14);
-            builder.aggiungiPareteOrizzontale(10, 11, 13);
-            builder.impostaPosizionePortaUscita(12, 0);
-            builder.setRobotStartXY(1, 14);
-        } else if (level == 1) {
-            builder.aggiungiPareti();
-            builder.aggiungiPareteVerticale(6, 1, 7);
-            builder.aggiungiPareteVerticale(9, 2, 10);
-            builder.aggiungiPareteVerticale(9, 2, 10);
-            builder.aggiungiPareteOrizzontale(9, 1, 5);
-            builder.aggiungiPareteOrizzontale(7, 11, 14);
-            builder.aggiungiPareteOrizzontale(4, 2, 4);
-            builder.aggiungiPareteVerticale(3, 11, 14);
-            builder.aggiungiPareteOrizzontale(13, 7, 12);
-            builder.impostaPosizionePortaUscita(13, 15);
-            builder.setRobotStartXY(1, 1);
-        } else if (level == 2) {
-            builder.aggiungiPareti();
-            builder.aggiungiPareteOrizzontale(11, 1, 11);
-            builder.aggiungiPareteOrizzontale(8, 1, 3);
-            builder.aggiungiPareteVerticale(3, 3, 8);
-            builder.aggiungiPareteVerticale(6, 1, 4);
-            builder.aggiungiPareteVerticale(6, 7, 8);
-            builder.aggiungiPareteVerticale(8, 2, 8);
-            builder.aggiungiPareteOrizzontale(8, 6, 12);
-            builder.aggiungiPareteVerticale(12, 3, 8);
-            builder.aggiungiPareteVerticale(10, 1, 6);
-            builder.impostaPosizionePortaUscita(0, 0);
-            builder.setRobotStartXY(14, 1);
-        } else if (level == 3) {
-            builder.aggiungiPareti();
-            builder.aggiungiPareteVerticale(11, 1, 10);
-            builder.aggiungiPuntoParete(1, 12);
-            builder.aggiungiPuntoParete(2, 14);
-            builder.aggiungiPuntoParete(3, 12);
-            builder.aggiungiPuntoParete(4, 14);
-            builder.aggiungiPuntoParete(5, 12);
-            builder.aggiungiPuntoParete(6, 14);
-            builder.aggiungiPuntoParete(7, 12);
-            builder.aggiungiPuntoParete(8, 14);
-            builder.aggiungiPuntoParete(9, 12);
-            builder.aggiungiPuntoParete(10, 14);
-            builder.aggiungiPareteOrizzontale(10, 3, 10);
-            builder.aggiungiPareteVerticale(8, 1, 2);
-            builder.aggiungiPareteVerticale(8, 4, 5);
-            builder.aggiungiPareteVerticale(8, 7, 8);
-            builder.aggiungiPareteVerticale(6, 2, 9);
-            builder.aggiungiPareteVerticale(3, 2, 8);
-            builder.aggiungiPareteVerticale(3, 10, 13);
-            builder.aggiungiPareteVerticale(6, 12, 14);
-            builder.aggiungiPareteVerticale(9, 10, 13);
-            builder.aggiungiPareteVerticale(12, 12, 14);
-            builder.aggiungiPareteOrizzontale(2, 2, 4);
-            builder.impostaPosizionePortaUscita(0, 15);
-            builder.setRobotStartXY(1, 10);
-        } else if (level == 4) {
-
+        System.out.println(level);
+        if(level == maxLevels)
+        {
+            builder.aggiungiPareteVerticale(0,3,11);
+            builder.aggiungiPareteOrizzontale(3,1,4);
+            builder.aggiungiPareteOrizzontale(7,1,3);
+            builder.aggiungiPareteOrizzontale(11,1,4);
+            builder.aggiungiPareteVerticale(6,3,11);
+            builder.aggiungiPareteVerticale(7,4,5);
+            builder.aggiungiPareteVerticale(8,6,7);
+            builder.aggiungiPareteVerticale(9,8,9);
+            builder.aggiungiPareteVerticale(10,3,11);
+            builder.aggiungiPareteVerticale(12,3,11);
+            builder.aggiungiPareteOrizzontale(3,13,14);
+            builder.aggiungiPareteOrizzontale(11,13,14);
+            builder.aggiungiPareteVerticale(15,4,10);
+            builder.setRobotStartXY(13,8);
+            drawLabyrinth(builder.build());
         }
+        else {
+            if (level == 0) {
+                builder.aggiungiPareti();
+                builder.aggiungiPareteVerticale(3, 2, 9);
+                builder.aggiungiPareteVerticale(7, 8, 14);
+                builder.aggiungiPareteOrizzontale(3, 7, 14);
+                builder.aggiungiPareteOrizzontale(10, 11, 13);
+                builder.impostaPosizionePortaUscita(12, 0);
+                builder.setRobotStartXY(1, 14);
+            } else if (level == 1) {
+                builder.aggiungiPareti();
+                builder.aggiungiPareteVerticale(6, 1, 7);
+                builder.aggiungiPareteVerticale(9, 2, 10);
+                builder.aggiungiPareteVerticale(9, 2, 10);
+                builder.aggiungiPareteOrizzontale(9, 1, 5);
+                builder.aggiungiPareteOrizzontale(7, 11, 14);
+                builder.aggiungiPareteOrizzontale(4, 2, 4);
+                builder.aggiungiPareteVerticale(3, 11, 14);
+                builder.aggiungiPareteOrizzontale(13, 7, 12);
+                builder.impostaPosizionePortaUscita(13, 15);
+                builder.setRobotStartXY(1, 1);
+            } else if (level == 2) {
+                builder.aggiungiPareti();
+                builder.impostaPosizionePortaUscita(0, 8);
+                builder.aggiungiPareteVerticale(8, 2, 12);
+                builder.aggiungiPareteOrizzontale(12, 4, 12);
+                builder.aggiungiPareteOrizzontale(14, 3, 4);
+                builder.aggiungiPareteOrizzontale(13, 13, 14);
+                builder.aggiungiPareteVerticale(3, 10, 12);
+                builder.aggiungiPuntoParete(2, 9);
+                builder.aggiungiPareteOrizzontale(7, 1, 4);
+                builder.aggiungiPuntoParete(7, 7);
+                builder.aggiungiPareteVerticale(6, 5, 6);
+                builder.aggiungiPuntoParete(5, 5);
+                builder.aggiungiPuntoParete(10, 13);
+                builder.aggiungiPuntoParete(9, 12);
+                builder.aggiungiPuntoParete(9, 9);
+                builder.aggiungiPareteOrizzontale(11, 5, 6);
+                builder.aggiungiPuntoParete(4, 13);
+                builder.aggiungiPuntoParete(4, 10);
+                builder.aggiungiPareteOrizzontale(3, 11, 12);
+                builder.aggiungiPareteOrizzontale(1, 10, 13);
+                builder.aggiungiPareteVerticale(14, 3, 9);
+                builder.aggiungiPuntoParete(7, 13);
+                builder.aggiungiPareteVerticale(4, 1, 4);
+                builder.aggiungiPuntoParete(1, 2);
+                builder.aggiungiPuntoParete(2, 3);
+                builder.aggiungiPuntoParete(3, 4);
+                builder.aggiungiPareteVerticale(9, 5, 7);
+                builder.aggiungiPareteOrizzontale(5, 10, 12);
+                builder.aggiungiPareteOrizzontale(6, 10, 12);
+                builder.aggiungiPuntoParete(3, 13);
+                builder.setRobotStartXY(14, 8);
+            } else if (level == 3) {
+                builder.aggiungiPareti();
+                builder.aggiungiPareteOrizzontale(11, 1, 11);
+                builder.aggiungiPareteOrizzontale(8, 1, 3);
+                builder.aggiungiPareteVerticale(3, 3, 8);
+                builder.aggiungiPareteVerticale(6, 1, 4);
+                builder.aggiungiPareteVerticale(6, 7, 8);
+                builder.aggiungiPareteVerticale(8, 2, 8);
+                builder.aggiungiPareteOrizzontale(8, 6, 12);
+                builder.aggiungiPareteVerticale(12, 3, 8);
+                builder.aggiungiPareteVerticale(10, 1, 6);
+                builder.impostaPosizionePortaUscita(0, 0);
+                builder.setRobotStartXY(14, 1);
+            } else if (level == 4) {
+                builder.aggiungiPareti();
+                builder.aggiungiPareteVerticale(11, 1, 10);
+                builder.aggiungiPuntoParete(1, 12);
+                builder.aggiungiPuntoParete(2, 14);
+                builder.aggiungiPuntoParete(3, 12);
+                builder.aggiungiPuntoParete(4, 14);
+                builder.aggiungiPuntoParete(5, 12);
+                builder.aggiungiPuntoParete(6, 14);
+                builder.aggiungiPuntoParete(7, 12);
+                builder.aggiungiPuntoParete(8, 14);
+                builder.aggiungiPuntoParete(9, 12);
+                builder.aggiungiPuntoParete(10, 14);
+                builder.aggiungiPareteOrizzontale(10, 3, 10);
+                builder.aggiungiPareteVerticale(8, 1, 2);
+                builder.aggiungiPareteVerticale(8, 4, 5);
+                builder.aggiungiPareteVerticale(8, 7, 8);
+                builder.aggiungiPareteVerticale(6, 2, 9);
+                builder.aggiungiPareteVerticale(3, 2, 8);
+                builder.aggiungiPareteVerticale(3, 10, 13);
+                builder.aggiungiPareteVerticale(6, 12, 14);
+                builder.aggiungiPareteVerticale(9, 10, 13);
+                builder.aggiungiPareteVerticale(12, 12, 14);
+                builder.aggiungiPareteOrizzontale(2, 2, 4);
+                builder.impostaPosizionePortaUscita(0, 15);
+                builder.setRobotStartXY(1, 10);
 
-
-        livello = builder.build();
-        if (l == null) {
-            try {
-                l = new Labirinto(livello);
-            } catch (IllegalAccessException e) {
-                throw new RuntimeException(e);
             }
-        } else {
-            l = l.clone();
-            l.resetLabyrinth(livello);
+
+
+            livello = builder.build();
+            if (l == null) {
+                try {
+                    l = new Labirinto(livello);
+                } catch (IllegalAccessException e) {
+                    throw new RuntimeException(e);
+                }
+            } else {
+                l = l.clone();
+                l.resetLabyrinth(livello);
+            }
+
+
+            Mediator mediator = new Mediator(l, this);
+            this.setMediator(mediator);
+
+            drawLabyrinth(livello);
+
+            mediator.addObserver(this);
+
+            updateRank();
+            //if (avviaButton.isEnabled()) {
+                stateLabel.setText("Livello " + (level + 1) + " - Avvia per iniziare");
+            //}
+            scores[level] = 0;
+
         }
-
-
-        Mediator mediator = new Mediator(l, this);
-        this.setMediator(mediator);
-
-        drawLabyrinth(livello);
-
-        mediator.addObserver(this);
-
-        updateRank();
-        if (avviaButton.isEnabled()) {
-            stateLabel.setText("Livello " + (level + 1) + " - Avvia per iniziare");
-        }
-        scores[level] = 0;
-
+        
 
     }
 
@@ -424,7 +541,7 @@ public class MainGUI extends JFrame implements Observer {
 
     public void drawLabyrinth(Level l) {
 
-        char[][] labirinto = mediator.getLabyrinth();
+        char[][] labirinto = l.getLabyrinth();
         if (firstRun) {
             Color checker;
             labirintoPanel.setLayout(new GridLayout(row, col));
@@ -605,39 +722,6 @@ public class MainGUI extends JFrame implements Observer {
         FlatLightLaf.setup();
 
         MainGUI myMainGUI = new MainGUI();
-
-        try {
-            File audioFile = new File("C:\\Users\\Giuseppe\\IdeaProjects\\progettoProg3\\src\\sounds\\pathfinderTrack.wav");
-
-            AudioInputStream audioStream = AudioSystem.getAudioInputStream(audioFile);
-            AudioFormat format = audioStream.getFormat();
-            DataLine.Info info = new DataLine.Info(SourceDataLine.class, format, AudioSystem.NOT_SPECIFIED);
-            final SourceDataLine audioLine = (SourceDataLine) AudioSystem.getLine(info);
-            audioLine.open(format);
-            audioLine.start();
-
-            final FloatControl volume = (FloatControl) audioLine.getControl(FloatControl.Type.MASTER_GAIN);
-            myMainGUI.volumeSlider.addChangeListener(new ChangeListener() {
-                @Override
-                public void stateChanged(ChangeEvent e) {
-                    float gain = (float) myMainGUI.volumeSlider.getValue() / 100;
-                    float dB = (float) (Math.log(gain) / Math.log(10.0) * 20.0);
-                    volume.setValue(dB);
-                }
-            });
-
-            //int bufferSize = (int) format.getSampleRate() * format.getFrameSize();
-            int bufferSize = (int) 2048;
-            byte[] buffer = new byte[bufferSize];
-            int bytesRead = 0;
-            while ((bytesRead = audioStream.read(buffer, 0, buffer.length)) != -1) {
-                System.out.println("osce");
-                audioLine.write(buffer, 0, bytesRead);
-
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
 
 
     }
