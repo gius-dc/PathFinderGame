@@ -14,10 +14,11 @@ public class RankGUI extends JFrame {
     private JLabel jlabel1;
     MyTableModel model;
     int level = 0;
+    int maxLevels = 0;
 
     public RankGUI() {
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setSize(10,10);
+        setSize(10, 10);
         setResizable(false);
 
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -26,35 +27,30 @@ public class RankGUI extends JFrame {
         nextButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                Executor executor = Executors.newSingleThreadExecutor();
-                executor.execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        if(level < 2)
-                        {
-                            level++;
-                            setTableLevel();
-                        }
+                if (level < maxLevels) {
+                    level++;
+                    backButton.setEnabled(true);
+                    setTableLevel();
+                    if(level == maxLevels)
+                    {
+                        nextButton.setEnabled(false);
                     }
-                });
+                }
             }
         });
 
         backButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                Executor executor = Executors.newSingleThreadExecutor();
-                executor.execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        if(level > 0)
-                        {
-                            level--;
-                            setTableLevel();
-                        }
-
+                if (level > 0) {
+                    level--;
+                    nextButton.setEnabled(true);
+                    setTableLevel();
+                    if(level == 0)
+                    {
+                        backButton.setEnabled(false);
                     }
-                });
+                }
             }
         });
     }
@@ -64,32 +60,30 @@ public class RankGUI extends JFrame {
         RankGUI myRankGUI = new RankGUI();
     }
 
-    public void showRank(MyTableModel model)
-    {
+    public void showRank(MyTableModel model, int maxLevels) {
         this.model = model;
         setContentPane(mainPanel);
         setTitle("Classifica");
         setSize(400, 400);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         //setSize(1000, 700);
-
+        this.maxLevels = maxLevels;
         setTableLevel();
 
     }
 
-    public void setTableLevel()
-    {
-        jlabel1.setText("Classifica - livello " + (level+1));
-        MyTableModel modelRank = new MyTableModel(new String[] {"Nome", "Cognome", "Punteggio"});
-
-
+    public void setTableLevel() {
+        MyTableModel modelRank = new MyTableModel(new String[]{"Nome", "Cognome", "Punteggio"});
         table1.setModel(modelRank);
 
-        for(int i = 0; i < model.getRowCount(); i++)
-        {
-            if(!model.getValueAt(i,level+2).toString().equals("?"))
-            {
-                modelRank.addRow(new Object[]{model.getValueAt(i,0), model.getValueAt(i,1), model.getValueAt(i,level+2)});
+        if (level == maxLevels) {
+            jlabel1.setText("Classifica finale");
+        } else {
+            jlabel1.setText("Classifica - Livello " + (level + 1));
+        }
+        for (int i = 0; i < model.getRowCount(); i++) {
+            if (!model.getValueAt(i, level + 2).toString().equals("?")) {
+                modelRank.addRow(new Object[]{model.getValueAt(i, 0), model.getValueAt(i, 1), model.getValueAt(i, level + 2)});
             }
         }
 
