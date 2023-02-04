@@ -48,13 +48,15 @@ public class MainGUI extends JFrame implements Observer {
     private Mediator mediator;
 
     public MainGUI() throws IllegalAccessException {
+        ClassLoader classLoader = Main.class.getClassLoader();
+        System.setProperty("awt.window.icon", getClass().getResource("img/robot.png").getPath().toString());
         setContentPane(mainPanel);
         setTitle("Labirinto");
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setVisible(true);
         setResizable(false);
 
-        setIconImage(new ImageIcon(getClass().getResource("/img/robot.png")).getImage());
+        //setIconImage(new ImageIcon(getClass().getResource("/img/robot.png")).getImage());
         try {
             File audioFile = new File(getClass().getResource("/sounds/pathfinderTrack.wav").getPath());
             AudioInputStream audioStream = AudioSystem.getAudioInputStream(audioFile);
@@ -607,6 +609,7 @@ public class MainGUI extends JFrame implements Observer {
 
     public static void main(String[] args) throws IllegalAccessException {
         FlatLightLaf.setup();
+
         MainGUI myMainGUI = new MainGUI();
 
 
