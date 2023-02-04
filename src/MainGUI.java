@@ -54,7 +54,7 @@ public class MainGUI extends JFrame implements Observer {
         setResizable(false);
 
         try {
-            File audioFile = new File("/Users/annagreco/Downloads/progettoProg3-master-8/src/sounds/pathfinderTrack.wav");
+            File audioFile = new File(getClass().getResource("/sounds/pathfinderTrack.wav").getPath());
             AudioInputStream audioStream = AudioSystem.getAudioInputStream(audioFile);
             AudioFormat format = audioStream.getFormat();
             DataLine.Info info = new DataLine.Info(Clip.class, format);
