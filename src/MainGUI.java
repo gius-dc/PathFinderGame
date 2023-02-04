@@ -54,12 +54,13 @@ public class MainGUI extends JFrame implements Observer {
         setResizable(false);
 
         try {
-            File audioFile = new File("/home/giuseppe/IdeaProjects/progettoProg3/src/sounds/pathfinderTrack.wav");
+            File audioFile = new File("/Users/annagreco/Downloads/progettoProg3-master-8/src/sounds/pathfinderTrack.wav");
             AudioInputStream audioStream = AudioSystem.getAudioInputStream(audioFile);
             AudioFormat format = audioStream.getFormat();
             DataLine.Info info = new DataLine.Info(Clip.class, format);
             Clip audioClip = (Clip) AudioSystem.getLine(info);
             audioClip.open(audioStream);
+            audioClip.loop(Clip.LOOP_CONTINUOUSLY);
             audioClip.start();
         } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
             e.printStackTrace();
