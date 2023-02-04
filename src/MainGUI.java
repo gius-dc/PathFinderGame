@@ -665,7 +665,7 @@ public class MainGUI extends JFrame implements Observer {
         if (eventType == Labirinto.OGGETTO_AGGIUNTO) {
             // Aggiungi graficamente l'oggetto al labirinto
             if (entita.getColor() == 'R') {
-                setImagePanelXY("/img/circle_red.png", entita.getX(), entita.getY());
+                setImagePanelXY("/img/red_stone.png", entita.getX(), entita.getY());
             } else if (entita.getColor() == 'Y') {
                 setImagePanelXY("/img/yellow_lemon.png", entita.getX(), entita.getY());
             } else if (entita.getColor() == 'C') {
