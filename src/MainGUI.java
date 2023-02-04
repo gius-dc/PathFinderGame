@@ -2,6 +2,8 @@ import com.formdev.flatlaf.FlatLightLaf;
 
 import javax.sound.sampled.*;
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
@@ -60,45 +62,8 @@ public class MainGUI extends JFrame implements Observer {
         //setIconImage(new ImageIcon(getClass().getResource("/img/robot.png")).getImage());
 
 
-        File audioFile = new File("file.wav");
-        volumeSlider = new JSlider(0, 100, 50);
 
 
-        try {
-            AudioInputStream audioStream = AudioSystem.getAudioInputStream(audioFile);
-            AudioFormat format = audioStream.getFormat();
-            DataLine.Info info = new DataLine.Info(Clip.class, format);
-            clip = (Clip) AudioSystem.getLine(info);
-            clip.open(audioStream);
-            volumeControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        volumeSlider.addChangeListener(e -> {
-            float gain = (float) (volumeSlider.getValue() / 100.0);
-            volumeControl.setValue( volumeControl.getMinimum() + gain * (volumeControl.getMaximum() - volumeControl.getMinimum()) );
-        });
-
-        clip.start();
-        /*
-        try {
-            File audioFile = new File(getClass().getResource("/sounds/pathfinderTrack.wav").getPath());
-            AudioInputStream audioStream = AudioSystem.getAudioInputStream(audioFile);
-            AudioFormat format = audioStream.getFormat();
-            DataLine.Info info = new DataLine.Info(Clip.class, format);
-            Clip audioClip = (Clip) AudioSystem.getLine(info);
-            audioClip.open(audioStream);
-            audioClip.loop(Clip.LOOP_CONTINUOUSLY);
-            audioClip.start();
-
-
-        } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
-            e.printStackTrace();
-        }
-*/
-
-        //nextLevelButton.setVisible(false);
 
         setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/img/robot.png").getPath()));
         modelLevelRank = new MyTableModel(new String[]{"Nome", "Cognome", "Punteggio"});
@@ -640,6 +605,39 @@ public class MainGUI extends JFrame implements Observer {
         FlatLightLaf.setup();
 
         MainGUI myMainGUI = new MainGUI();
+
+        try {
+            File audioFile = new File("C:\\Users\\Giuseppe\\IdeaProjects\\progettoProg3\\src\\sounds\\pathfinderTrack.wav");
+
+            AudioInputStream audioStream = AudioSystem.getAudioInputStream(audioFile);
+            AudioFormat format = audioStream.getFormat();
+            DataLine.Info info = new DataLine.Info(SourceDataLine.class, format, AudioSystem.NOT_SPECIFIED);
+            final SourceDataLine audioLine = (SourceDataLine) AudioSystem.getLine(info);
+            audioLine.open(format);
+            audioLine.start();
+
+            final FloatControl volume = (FloatControl) audioLine.getControl(FloatControl.Type.MASTER_GAIN);
+            myMainGUI.volumeSlider.addChangeListener(new ChangeListener() {
+                @Override
+                public void stateChanged(ChangeEvent e) {
+                    float gain = (float) myMainGUI.volumeSlider.getValue() / 100;
+                    float dB = (float) (Math.log(gain) / Math.log(10.0) * 20.0);
+                    volume.setValue(dB);
+                }
+            });
+
+            //int bufferSize = (int) format.getSampleRate() * format.getFrameSize();
+            int bufferSize = (int) 2048;
+            byte[] buffer = new byte[bufferSize];
+            int bytesRead = 0;
+            while ((bytesRead = audioStream.read(buffer, 0, buffer.length)) != -1) {
+                System.out.println("osce");
+                audioLine.write(buffer, 0, bytesRead);
+
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
 
     }
