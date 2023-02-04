@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
@@ -48,8 +49,6 @@ public class MainGUI extends JFrame implements Observer {
     private Mediator mediator;
 
     public MainGUI() throws IllegalAccessException {
-        ClassLoader classLoader = Main.class.getClassLoader();
-        System.setProperty("awt.window.icon", getClass().getResource("img/robot.png").getPath().toString());
         setContentPane(mainPanel);
         setTitle("Labirinto");
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -159,7 +158,7 @@ public class MainGUI extends JFrame implements Observer {
                 if (rankGUI == null) {
                     rankGUI = new RankGUI();
                 }
-                rankGUI.showRank(fullRankModel,maxLevels);
+                rankGUI.showRank(fullRankModel, maxLevels);
 
                 JDialog frame2 = new JDialog(rankGUI, "Classifica", true);
                 frame2.setContentPane(rankGUI.getContentPane());
@@ -608,10 +607,12 @@ public class MainGUI extends JFrame implements Observer {
 
 
     public static void main(String[] args) throws IllegalAccessException {
+
+
         FlatLightLaf.setup();
 
         MainGUI myMainGUI = new MainGUI();
-
+        myMainGUI.setIconImage(new ImageIcon("/home/giuseppe/IdeaProjects/progettoProg3/src/img/robot.png").getImage());
 
 
     }
