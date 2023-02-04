@@ -1,5 +1,6 @@
 import com.formdev.flatlaf.FlatLightLaf;
 
+import javax.sound.sampled.*;
 import javax.swing.*;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
@@ -51,6 +52,18 @@ public class MainGUI extends JFrame implements Observer {
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setVisible(true);
         setResizable(false);
+
+        try {
+            File audioFile = new File("/home/giuseppe/IdeaProjects/progettoProg3/src/sounds/pathfinderTrack.wav");
+            AudioInputStream audioStream = AudioSystem.getAudioInputStream(audioFile);
+            AudioFormat format = audioStream.getFormat();
+            DataLine.Info info = new DataLine.Info(Clip.class, format);
+            Clip audioClip = (Clip) AudioSystem.getLine(info);
+            audioClip.open(audioStream);
+            audioClip.start();
+        } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
+            e.printStackTrace();
+        }
 
 
         //nextLevelButton.setVisible(false);
@@ -592,6 +605,9 @@ public class MainGUI extends JFrame implements Observer {
     public static void main(String[] args) throws IllegalAccessException {
         FlatLightLaf.setup();
         MainGUI myMainGUI = new MainGUI();
+
+
+
     }
 
     private Boolean createFile() {
