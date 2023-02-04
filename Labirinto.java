@@ -93,8 +93,12 @@ public class Labirinto extends Observable implements Cloneable {
             }
         }
 */
+
+
+
         if (random.nextInt(100) % 2 == 0) {
-            for (int i = 0; i < 1; i++) {
+            int n = random.nextInt(5);
+            for (int i = 0; i < n; i++) {
                 // Aggiungi qualche oggetto
                 r = random.nextInt(4);
                 if (r == 0) {
@@ -138,28 +142,31 @@ public class Labirinto extends Observable implements Cloneable {
             }
 
         } else {
+            int n = random.nextInt(6);
+            for (int i = 0; i < n; i++) {
+                // Fai scomparire qualche oggetto
+                if (oggetti.size() > 3) {
+                    if (flag) {
+                        r = random.nextInt(oggetti.size());
 
-            // Fai scomparire qualche oggetto
-            if (oggetti.size() > 3) {
-                if (flag) {
-                    r = random.nextInt(oggetti.size());
-
-                    if (distance(robot.getX(), robot.getY(), oggetti.get(r).getX(), oggetti.get(r).getX()) > 3) {
+                        if (distance(robot.getX(), robot.getY(), oggetti.get(r).getX(), oggetti.get(r).getX()) > 3) {
+                            try {
+                                removeOggetto(oggetti.get(random.nextInt(oggetti.size())));
+                            } catch (Exception e) {
+                            }
+                        }
+                        flag = false;
+                    } else {
+                        r = random.nextInt(oggetti.size());
                         try {
                             removeOggetto(oggetti.get(random.nextInt(oggetti.size())));
                         } catch (Exception e) {
                         }
+                        flag = true;
                     }
-                    flag = false;
-                } else {
-                    r = random.nextInt(oggetti.size());
-                    try {
-                        removeOggetto(oggetti.get(random.nextInt(oggetti.size())));
-                    } catch (Exception e) {
-                    }
-                    flag = true;
                 }
             }
+
 
         }
 
