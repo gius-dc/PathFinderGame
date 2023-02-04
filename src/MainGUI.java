@@ -68,7 +68,7 @@ public class MainGUI extends JFrame implements Observer {
             final Clip audioClip = (Clip) AudioSystem.getLine(info);
             audioClip.open(audioStream);
 
-            volumeControl.addChangeListener(new ChangeListener()  {
+            volumeControl.addChangeListener(new ChangeListener() {
                 @Override
                 public void stateChanged(ChangeEvent e) {
                     FloatControl gainControl = (FloatControl) audioClip.getControl(FloatControl.Type.MASTER_GAIN);
@@ -77,11 +77,16 @@ public class MainGUI extends JFrame implements Observer {
                     gainControl.setValue(gain );
                 }
             });
+
+
             audioClip.loop(Clip.LOOP_CONTINUOUSLY);
             audioClip.start();
         } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
             e.printStackTrace();
         }
+
+
+
 
         /*
         try {
