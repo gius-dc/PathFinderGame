@@ -426,9 +426,9 @@ public class MainGUI extends JFrame implements Observer {
                         checker = Color.WHITE;
                     }
                     //JPanel panel = new JPanel();
-                    ImagePanel panel = new ImagePanel(new ImageIcon(getClass().getResource("/img/square_white.png").toString().substring(5)).getImage());
+                    ImagePanel panel = new ImagePanel(new ImageIcon(getClass().getResource("/img/sand.png").toString().substring(5)).getImage());
                     if (checker == Color.BLACK) {
-                        panel.setImage(new ImageIcon(getClass().getResource("/img/square_black.png").toString().substring(5)).getImage());
+                        panel.setImage(new ImageIcon(getClass().getResource("/img/wall.png").toString().substring(5)).getImage());
                     }
                     panel.setMaximumSize(new Dimension(30, 30));
                     panel.setBackground(Color.WHITE);
@@ -441,15 +441,15 @@ public class MainGUI extends JFrame implements Observer {
             for (int x = 0; x < 16; x++) {
                 for (int y = 0; y < 16; y++) {
                     if (labirinto[x][y] == '#') {
-                        setImagePanelXY("/img/square_black.png", x, y);
+                        setImagePanelXY("/img/wall.png", x, y);
                     } else {
-                        setImagePanelXY("/img/square_white.png", x, y);
+                        setImagePanelXY("/img/sand.png", x, y);
 
                     }
                 }
             }
         }
-        setImagePanelXY("/img/circle_gray.png", l.getRobotX(), l.getRobotY());
+        setImagePanelXY("/img/robot.png", l.getRobotX(), l.getRobotY());
     }
 
     public void startLabyrinth() {
@@ -467,9 +467,9 @@ public class MainGUI extends JFrame implements Observer {
         for (int i = 0; i < 16; i++) {
             for (int j = 0; j < 16; j++) {
                 if (livello.getLabyrinth()[i][j] != '#') {
-                    setImagePanelXY("/img/square_white.png", i, j);
+                    setImagePanelXY("/img/sand.png", i, j);
                 } else {
-                    setImagePanelXY("/img/square_black.png", i, j);
+                    setImagePanelXY("/img/wall.png", i, j);
                 }
             }
         }
@@ -477,11 +477,11 @@ public class MainGUI extends JFrame implements Observer {
         while (l.iterate()) {
             if (caretaker != null) {
                 if (caretaker.sizeMemento() > 1) {
-                    setImagePanelXY("/img/square_white.png", caretaker.getMemento(caretaker.sizeMemento() - 2).getX(), caretaker.getMemento(caretaker.sizeMemento() - 2).getY());
+                    setImagePanelXY("/img/sand.png", caretaker.getMemento(caretaker.sizeMemento() - 2).getX(), caretaker.getMemento(caretaker.sizeMemento() - 2).getY());
 
 
                     if (caretaker.sizeMemento() > 3 && (caretaker.sizeMemento() - differenceSizeMemento == 2)) {
-                        setImagePanelXY("/img/square_white.png", caretaker.getMemento(caretaker.sizeMemento() - 3).getX(), caretaker.getMemento(caretaker.sizeMemento() - 3).getY());
+                        setImagePanelXY("/img/sand.png", caretaker.getMemento(caretaker.sizeMemento() - 3).getX(), caretaker.getMemento(caretaker.sizeMemento() - 3).getY());
 
                     }
 
@@ -509,11 +509,11 @@ public class MainGUI extends JFrame implements Observer {
 
             //if (caretaker.sizeMemento() > 0) {
             //    Memento memento = caretaker.getMemento(caretaker.sizeMemento() - 1);
-            //    setImagePanelXY("/img/square_white.png", memento.getX(), memento.getY());
+            //    setImagePanelXY("/img/sand.png", memento.getX(), memento.getY());
             //}
 
             caretaker = mediator.getCaretaker();
-            setImagePanelXY("/img/circle_gray.png", l.getRobotX(), l.getRobotY());
+            setImagePanelXY("/img/robot.png", l.getRobotX(), l.getRobotY());
 
             try {
                 Thread.sleep(10);
@@ -532,9 +532,9 @@ public class MainGUI extends JFrame implements Observer {
         for (int x = 0; x < 16; x++) {
             for (int y = 0; y < 16; y++) {
                 if (lab[x][y] == '#') {
-                    setImagePanelXY("/img/square_black.png", x, y);
+                    setImagePanelXY("/img/wall.png", x, y);
                 } else {
-                    setImagePanelXY("/img/square_white.png", x, y);
+                    setImagePanelXY("/img/sand.png", x, y);
                 }
             }
         }
@@ -544,7 +544,7 @@ public class MainGUI extends JFrame implements Observer {
         for (int i = 0; i < caretaker.sizeMemento(); i++) {
             Memento memento = caretaker.getMemento(i);
             l.getRobot().restoreFromMemento(memento);
-            setImagePanelXY("/img/square_gray.png", l.getRobot().getX(), l.getRobot().getY());
+            setImagePanelXY("/img/footprints.png", l.getRobot().getX(), l.getRobot().getY());
         }
 
 
@@ -667,16 +667,16 @@ public class MainGUI extends JFrame implements Observer {
             if (entita.getColor() == 'R') {
                 setImagePanelXY("/img/circle_red.png", entita.getX(), entita.getY());
             } else if (entita.getColor() == 'Y') {
-                setImagePanelXY("/img/circle_yellow.png", entita.getX(), entita.getY());
+                setImagePanelXY("/img/yellow_lemon.png", entita.getX(), entita.getY());
             } else if (entita.getColor() == 'C') {
-                setImagePanelXY("/img/circle_cyan.png", entita.getX(), entita.getY());
+                setImagePanelXY("/img/cyan_bucket.png", entita.getX(), entita.getY());
             } else if (entita.getColor() == 'G') {
-                setImagePanelXY("/img/circle_green.png", entita.getX(), entita.getY());
+                setImagePanelXY("/img/green_cactus.png", entita.getX(), entita.getY());
             }
 
         } else if (eventType == Labirinto.OGGETTO_RIMOSSO) {
             // Rimuovi graficamente l'oggetto dal labirinto
-            setImagePanelXY("/img/square_white.png", entita.getX(), entita.getY());
+            setImagePanelXY("/img/sand.png", entita.getX(), entita.getY());
         }
     }
 
