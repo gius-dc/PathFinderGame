@@ -69,15 +69,20 @@ public class MainGUI extends JFrame implements Observer {
             audioClip.open(audioStream);
 
             volumeControl.addChangeListener(new ChangeListener() {
+                Timer timer = new Timer(100, new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        FloatControl gainControl = (FloatControl) audioClip.getControl(FloatControl.Type.MASTER_GAIN);
+                        float range = gainControl.getMaximum() - gainControl.getMinimum();
+                        float gain = (range * volumeControl.getValue() / 100) + gainControl.getMinimum();
+                        gainControl.setValue(gain );
+                    }
+                });
                 @Override
                 public void stateChanged(ChangeEvent e) {
-                    FloatControl gainControl = (FloatControl) audioClip.getControl(FloatControl.Type.MASTER_GAIN);
-                    float range = gainControl.getMaximum() - gainControl.getMinimum();
-                    float gain = (range * volumeControl.getValue() / 100) + gainControl.getMinimum();
-                    gainControl.setValue(gain );
+                    timer.start();
                 }
             });
-
 
             audioClip.loop(Clip.LOOP_CONTINUOUSLY);
             audioClip.start();
