@@ -27,6 +27,7 @@ public class MainGUI extends JFrame implements Observer {
     private JButton showRankButton;
     private JButton newGameButton;
     private JLabel rankLabel;
+    private JSlider slider1;
     private JPanel topPanel;
     MyTableModel modelLevelRank;
     Labirinto l;
@@ -53,6 +54,7 @@ public class MainGUI extends JFrame implements Observer {
         setVisible(true);
         setResizable(false);
 
+        setIconImage(new ImageIcon(getClass().getResource("/img/robot.png")).getImage());
         try {
             File audioFile = new File(getClass().getResource("/sounds/pathfinderTrack.wav").getPath());
             AudioInputStream audioStream = AudioSystem.getAudioInputStream(audioFile);
