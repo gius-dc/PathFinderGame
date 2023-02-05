@@ -3,7 +3,7 @@ import java.util.List;
 import java.util.Observable;
 import java.util.Random;
 
-import static java.lang.Math.*;
+import static java.lang.Math.sqrt;
 
 /**
 *    Questa classe Labirinto è il vero e proprio cuore del progetto:

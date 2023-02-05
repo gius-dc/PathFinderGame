@@ -10,8 +10,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
@@ -45,25 +43,23 @@ public class MainGUI extends JFrame implements Observer {
     private RankGUI rankGUI = null;
     private Mediator mediator;
 
+    private FloatControl volume;
+
+    /**
+     * Costruttore della classe MainGUI che inizializza la GUI del gioco e prepara il file (motivo per il quale può generare un eccezione).
+     *
+     * @throws IllegalAccessException
+     */
+
     public MainGUI() throws IllegalAccessException {
         setContentPane(mainPanel);
         setTitle("Labirinto");
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setVisible(true);
         setResizable(false);
-
-
         setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/img/robot.png").getPath()));
         modelLevelRank = new CustomTableModel(new String[]{"Nome", "Cognome", "Punteggio"});
-
-        try {
-            prepareFile();
-        } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
-        } catch (MalformedURLException e) {
-            throw new RuntimeException(e);
-        }
-
+        prepareFile();
         if (!fileClassifica.exists()) {
             try {
                 fileClassifica.createNewFile();
@@ -71,127 +67,159 @@ public class MainGUI extends JFrame implements Observer {
                 e.printStackTrace();
             }
         }
-
         prepareLabyrinth();
         updateRank();
-        //char lab[][] = l.getLabyrinth();
-        Color checker;
-
         firstRun = false;
         setSize(900, 600);
         setLocationRelativeTo(null);
-        nextLevelButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                Executor executor = Executors.newSingleThreadExecutor();
-                executor.execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        currentLevel++;
-                        if (currentLevel < maxLevels) {
-                            try {
-                                prepareLabyrinth();
-                            } catch (IllegalAccessException ex) {
-                                throw new RuntimeException(ex);
-                            }
-                            nextLevelButton.setEnabled(false);
-                            avviaButton.setEnabled(true);
-                            Icon imgIcon = new ImageIcon(getClass().getResource("/img/blank.png").toString().substring(5));
-                            labelImg.setIcon(imgIcon);
-                            labelImg.setIcon(null);
-                            stateLabel.setText("Livello " + (currentLevel + 1) + " - Avvia  per iniziare");
-                        } else {
-                            nextLevelButton.setEnabled(false);
-                            avviaButton.setEnabled(false);
-                            newGameButton.setEnabled(true);
-                            stateLabel.setText("Complimenti, hai finito tutti i livelli! ☺");
-                            updateRank();
-                            try {
-                                prepareLabyrinth();
-                            } catch (IllegalAccessException ex) {
-                                throw new RuntimeException(ex);
-                            }
+        nextLevelButton.addActionListener(new NextLevelButtonHandler());
+        muteButton.addMouseListener(new MuteButtonHandler());
+        avviaButton.addActionListener(new AvviaButtonHandler());
+        showRankButton.addActionListener(new ShowRankButtonHandler());
+        newGameButton.addActionListener(new NewGameButtonHandler());
+        startMusic();
+        volumeSlider.addChangeListener(new VolumeSliderHandler());
+    }
 
+    /**
+     * Le classi interne sottostanti implementano la gestione dei pulsanti presenti nell'interfaccia.
+     */
 
-                        }
-
-                    }
-                });
+    private class NextLevelButtonHandler implements ActionListener {
+        /**
+         * Metodo che viene eseguito quando viene premuto il pulsante "Prossimo livello".
+         * Aumenta il livello corrente e prepara il labirinto per il prossimo livello.
+         */
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            currentLevel++;
+            if (currentLevel < maxLevels) {
+                prepareLabyrinth();
+                nextLevelButton.setEnabled(false);
+                avviaButton.setEnabled(true);
+                labelImg.setIcon(null);
+                stateLabel.setText("Livello " + (currentLevel + 1) + " - Avvia per iniziare");
+            } else {
+                nextLevelButton.setEnabled(false);
+                avviaButton.setEnabled(false);
+                newGameButton.setEnabled(true);
+                stateLabel.setText("Complimenti, hai finito tutti i livelli! ☺");
+                updateRank();
+                prepareLabyrinth();
             }
-        });
+        }
+    }
 
-        muteButton.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                if (volumeSlider.getValue() != 0) {
-                    volumeSlider.setValue(0);
-                } else {
-                    volumeSlider.setValue(50);
+
+    private class MuteButtonHandler extends MouseAdapter {
+        /**
+         * Metodo che viene eseguito quando viene fatto clic sul pulsante del volume.
+         * Imposta il volume su 0 (muto) o su 50 in base allo stato corrente.
+         */
+        @Override
+        public void mouseClicked(MouseEvent e) {
+            if (volumeSlider.getValue() != 0) {
+                /* Quando viene cambiato il valore dello slider, il thread che gestisce l'audio in background
+                   va a leggere il valore e cambia di conseguenza il volume */
+                volumeSlider.setValue(0);
+            } else {
+                volumeSlider.setValue(50);
+            }
+        }
+    }
+
+    private class AvviaButtonHandler implements ActionListener {
+        /**
+         * Metodo che viene eseguito quando viene premuto il pulsante "Avvia".
+         * Viene avviato un thread separato che esegue il metodo startLabyrinth.
+         * Il metodo startLabyrinth() termina quando il labirinto termina la sua esecuzione (cioè quando il robot è arrivato a destinazione),
+         * quindi è necessario eseguirlo in un thread separato per permettere al thread principale (che gestisce l'interfaccia grafica) di continuare
+         * la sua esecuzione.
+         */
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            Executor executor = Executors.newSingleThreadExecutor();
+            executor.execute(new Runnable() {
+                @Override
+                public void run() {
+                    avviaButton.setEnabled(false);
+                    startLabyrinth();
                 }
+            });
+        }
+    }
 
+    private class ShowRankButtonHandler implements ActionListener {
+        /**
+         * Metodo che viene eseguito quando viene premuto il pulsante "Classifica".
+         * Avvia una finestra di dialogo dove il suo contenuto è definito nel form RankGUI.
+         */
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if (rankGUI == null) {
+                rankGUI = new RankGUI();
             }
-        });
+            rankGUI.showRank(fullRankModel, maxLevels);
 
+            JDialog frame2 = new JDialog(rankGUI, "Classifica", true);
+            frame2.setContentPane(rankGUI.getContentPane());
+            frame2.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+            frame2.setSize(500, 400);
+            frame2.setLocationRelativeTo(null);
+            frame2.setVisible(true);
+        }
+    }
 
-        avviaButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                Executor executor = Executors.newSingleThreadExecutor();
-                executor.execute(new Runnable() {
-                    @Override
-                    public void run() {
-
-                        avviaButton.setEnabled(false);
-                        startLabyrinth();
-                    }
-                });
-            }
-        });
-
-
-        showRankButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-                if (rankGUI == null) {
-                    rankGUI = new RankGUI();
+    private class NewGameButtonHandler implements ActionListener {
+        /**
+         * Classe per gestire l'evento del pulsante Nuovo gioco.
+         * Chiede all'utente di inserire il nome e il cognome del robot tramite finestra di dialogo e inizializza una nuova partita.
+         * In caso entrambi i campi siano vuoti, verrà visualizzato un messaggio di errore.
+         */
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            Boolean showMessage = false;
+            do {
+                if (showMessage) {
+                    JFrame currentFrame = (JFrame) SwingUtilities.getWindowAncestor((Component) e.getSource());
+                    JOptionPane.showMessageDialog(currentFrame, "Entrambi i campi non possono essere vuoti, riprova",
+                            "Errore", JOptionPane.ERROR_MESSAGE);
                 }
-                rankGUI.showRank(fullRankModel, maxLevels);
+                inputName = JOptionPane.showInputDialog("Inserisci il nome del robot:");
+                inputSurname = JOptionPane.showInputDialog("Inserisci il cognome del robot:");
+                showMessage = true;
+            } while (inputName == null || inputName.equals("") || inputName.equals(" ") || inputSurname == null || inputSurname.equals("") || inputSurname.equals(" "));
 
-                JDialog frame2 = new JDialog(rankGUI, "Classifica", true);
-                frame2.setContentPane(rankGUI.getContentPane());
-                frame2.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-                frame2.setSize(500, 400);
-                frame2.setLocationRelativeTo(null);
-                frame2.setVisible(true);
+            newGame();
+        }
+    }
 
+    private class VolumeSliderHandler implements ChangeListener {
+        /**
+         *  Questo metodo viene chiamato ogni volta che lo stato del volume cambia.
+         *  Il volume viene regolato in base alla posizione del cursore del volumeSlider e l'immagine del bottone mute viene cambiata
+         *  in base allo stato del volume (muto o non).
+         */
+        @Override
+        public void stateChanged(ChangeEvent e) {
+            float gain = (float) volumeSlider.getValue() / 100;
+            float dB = (float) (Math.log(gain) / Math.log(10.0) * 20.0);
+            volume.setValue(dB);
+
+            if (volumeSlider.getValue() != 0) {
+                muteButton.setIcon(new ImageIcon(getClass().getResource("/img/volume.png").toString().substring(5)));
+            } else {
+                muteButton.setIcon(new ImageIcon(getClass().getResource("/img/volume_mute.png").toString().substring(5)));
             }
-        });
+        }
+    }
 
-        newGameButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                Boolean showMessage = false;
-                do {
-                    if (showMessage) {
-                        JFrame currentFrame = (JFrame) SwingUtilities.getWindowAncestor((Component) e.getSource());
-                        JOptionPane.showMessageDialog(currentFrame, "Entrambi i campi non possono essere vuoti, riprova",
-                                "Errore", JOptionPane.ERROR_MESSAGE);
-                    }
-                    inputName = JOptionPane.showInputDialog("Inserisci il nome del robot:");
-                    inputSurname = JOptionPane.showInputDialog("Inserisci il cognome del robot:");
-                    showMessage = true;
-                } while (inputName == null || inputName.equals("") || inputName.equals(" ") || inputSurname == null || inputSurname.equals("") || inputSurname.equals(" "));
-
-                try {
-                    newGame();
-                } catch (IllegalAccessException ex) {
-                    throw new RuntimeException(ex);
-                }
-            }
-        });
-
-
+    /**
+     * Questo metodo viene utilizzato per riprodurre l'audio del gioco. La riproduzione viene eseguita in un thread separato
+     * per poter implementare l'uso della lettura di un buffer in un ciclo che itera sempre.
+     * Questo è stato fatto per rendere più responsivo il cambio volume.
+     */
+    private void startMusic() {
         String filePath = getClass().getResource("/sounds/pathfinderTrack.wav").getPath();
 
         try {
@@ -203,21 +231,8 @@ public class MainGUI extends JFrame implements Observer {
             audioLine.open(format);
             audioLine.start();
 
-            final FloatControl volume = (FloatControl) audioLine.getControl(FloatControl.Type.MASTER_GAIN);
-            volumeSlider.addChangeListener(new ChangeListener() {
-                @Override
-                public void stateChanged(ChangeEvent e) {
-                    float gain = (float) volumeSlider.getValue() / 100;
-                    float dB = (float) (Math.log(gain) / Math.log(10.0) * 20.0);
-                    volume.setValue(dB);
+            volume = (FloatControl) audioLine.getControl(FloatControl.Type.MASTER_GAIN);
 
-                    if (volumeSlider.getValue() != 0) {
-                        muteButton.setIcon(new ImageIcon(getClass().getResource("/img/volume.png").toString().substring(5)));
-                    } else {
-                        muteButton.setIcon(new ImageIcon(getClass().getResource("/img/volume_mute.png").toString().substring(5)));
-                    }
-                }
-            });
 
             new Thread(new Runnable() {
                 @Override
@@ -239,13 +254,18 @@ public class MainGUI extends JFrame implements Observer {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
 
-    public void newGame() throws IllegalAccessException {
+    /**
+     * Questa funzione viene eseguita quando viene cliccato il pulsante "Nuova partita".
+     * Si occupa di avviare una nuova partita, andando a verificare se il nome e cognome specificato dall'utente
+     * esiste già in classifica e, in tal caso, gestire informando l'utente presentandogli alcune opzioni
+     * per proseguire.
+     */
+    private void newGame() {
         int exists[] = checkIfGameAlreadyExists(inputName, inputSurname);
         if (exists[0] == 0) {
-            Object[] row = new Object[8];
+            Object[] row = new Object[maxLevels+3];
             row[0] = inputName;
             row[1] = inputSurname;
             row[2] = '?';
@@ -258,7 +278,6 @@ public class MainGUI extends JFrame implements Observer {
             currentLevel = 0;
         } else if (exists[0] == 1) {
             Object[] options = {"Elimina e inizia da zero", "Aggiungi 'nuovo' al nome", "Specifica nome"};
-//
             int result = JOptionPane.showOptionDialog(this, ("Il robot " + inputName + " " + inputSurname + " già esiste ed ha completato tutti i livelli. Come desideri procedere? Puoi eliminare la partita attualmente salvata e iniziare da zero, creare una nuova partita aggiungendo '(nuovo)' alla fine del nome oppure creare una nuova partita specificando il nome."), "Scegli",
                     JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE,
                     null, options, null);
@@ -290,14 +309,13 @@ public class MainGUI extends JFrame implements Observer {
             } else if (result == JOptionPane.NO_OPTION) {
 
                 Object[] options = {"Elimina e inizia da zero", "Aggiungi 'nuovo' al nome", "Specifica nome"};
-//
                 result = JOptionPane.showOptionDialog(this, ("Se non vuoi riprendere la partita, scegli in che modo vuoi iniziare una nuova partita. Puoi avviare una nuova partita di " + inputName + " " + inputSurname + " eliminando quella corrente, creare una nuova partita aggiungendo '(nuovo)' al nome, oppure creare una nuova partita specificando il nome"), "Scegli",
                         JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE,
                         null, options, null);
 
                 if (result == JOptionPane.YES_OPTION) {
                     fullRankModel.removeRow(exists[1]);
-                    Object[] row = new Object[8];
+                    Object[] row = new Object[maxLevels+3];
                     row[0] = inputName;
                     row[1] = inputSurname;
                     row[2] = '?';
@@ -354,27 +372,25 @@ public class MainGUI extends JFrame implements Observer {
     }
 
 
-    public void prepareLabyrinth() throws IllegalAccessException {
+    public void prepareLabyrinth() {
         Level.Builder builder = new Level.Builder(16, 16);
-        if(currentLevel == maxLevels)
-        {
-            builder.addVerticalWall(0,3,11);
-            builder.addHorizontalWall(3,1,4);
-            builder.addHorizontalWall(7,1,3);
-            builder.addHorizontalWall(11,1,4);
-            builder.addVerticalWall(6,3,11);
-            builder.addVerticalWall(7,4,5);
-            builder.addVerticalWall(8,6,7);
-            builder.addVerticalWall(9,8,9);
-            builder.addVerticalWall(10,3,11);
-            builder.addVerticalWall(12,3,11);
-            builder.addHorizontalWall(3,13,14);
-            builder.addHorizontalWall(11,13,14);
-            builder.addVerticalWall(15,4,10);
-            builder.setRobotStartXY(13,8);
+        if (currentLevel == maxLevels) {
+            builder.addVerticalWall(0, 3, 11);
+            builder.addHorizontalWall(3, 1, 4);
+            builder.addHorizontalWall(7, 1, 3);
+            builder.addHorizontalWall(11, 1, 4);
+            builder.addVerticalWall(6, 3, 11);
+            builder.addVerticalWall(7, 4, 5);
+            builder.addVerticalWall(8, 6, 7);
+            builder.addVerticalWall(9, 8, 9);
+            builder.addVerticalWall(10, 3, 11);
+            builder.addVerticalWall(12, 3, 11);
+            builder.addHorizontalWall(3, 13, 14);
+            builder.addHorizontalWall(11, 13, 14);
+            builder.addVerticalWall(15, 4, 10);
+            builder.setRobotStartXY(13, 8);
             drawLabyrinth(builder.build());
-        }
-        else {
+        } else {
             if (currentLevel == 0) {
                 builder.addWalls();
                 builder.addVerticalWall(3, 2, 9);
@@ -479,7 +495,11 @@ public class MainGUI extends JFrame implements Observer {
                 }
             } else {
                 l = l.clone();
-                l.resetLabyrinth(level);
+                try {
+                    l.resetLabyrinth(level);
+                } catch (IllegalAccessException e) {
+                    throw new RuntimeException(e);
+                }
             }
 
 
@@ -492,7 +512,7 @@ public class MainGUI extends JFrame implements Observer {
 
             updateRank();
             //if (avviaButton.isEnabled()) {
-                stateLabel.setText("Livello " + (currentLevel + 1) + " - Avvia per iniziare");
+            stateLabel.setText("Livello " + (currentLevel + 1) + " - Avvia per iniziare");
             //}
             scores[currentLevel] = 0;
 
@@ -726,7 +746,7 @@ public class MainGUI extends JFrame implements Observer {
         return false;
     }
 
-    private void prepareFile() throws URISyntaxException, MalformedURLException {
+    private void prepareFile() {
         Boolean fileCreatedOrRead = false;
 
         modelLevelRank = new CustomTableModel(new String[]{"Nome", "Cognome", "Punteggio"});
