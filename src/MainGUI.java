@@ -739,6 +739,8 @@ public class MainGUI extends JFrame implements Observer {
         MainGUI myMainGUI = new MainGUI(); // Avvia il costruttore di questa classe che estende JForm, quindi avvia l'interfaccia grafica
     }
 
+
+    // Metodo che crea un file "classifica.csv"
     private Boolean createFile() {
         fileClassifica = new File(getClass().getProtectionDomain().getCodeSource().getLocation().getPath() + "classifica.csv");
         if (!fileClassifica.exists()) {
