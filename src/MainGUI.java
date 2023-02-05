@@ -35,7 +35,7 @@ public class MainGUI extends JFrame implements Observer {
     private JLabel muteButton;
     private JPanel topPanel;
     MyTableModel modelLevelRank;
-    Labirinto l;
+    Labyrinth l;
     int row = 16, col = 16;
     Boolean firstRun = true;
     RobotState state;
@@ -46,14 +46,10 @@ public class MainGUI extends JFrame implements Observer {
 
     Caretaker caretaker = null;
     File fileClassifica;
-    TableRowSorter<TableModel> sorter;
     String inputName, inputSurname;
     RankGUI rankGUI = null;
 
     private Mediator mediator;
-
-    private Clip clip;
-    private FloatControl volumeControl = null;
 
     public MainGUI() throws IllegalAccessException {
         setContentPane(mainPanel);
@@ -65,7 +61,7 @@ public class MainGUI extends JFrame implements Observer {
 
         setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/img/robot.png").getPath()));
         modelLevelRank = new MyTableModel(new String[]{"Nome", "Cognome", "Punteggio"});
-        //toolBar1.add(avviaButton);
+
         try {
             prepareFile();
         } catch (URISyntaxException e) {
@@ -74,7 +70,6 @@ public class MainGUI extends JFrame implements Observer {
             throw new RuntimeException(e);
         }
 
-        //File file = new File(getClass().getProtectionDomain().getCodeSource().getLocation().getPath() + "classifica.csv");
         if (!fileClassifica.exists()) {
             try {
                 fileClassifica.createNewFile();
@@ -370,113 +365,113 @@ public class MainGUI extends JFrame implements Observer {
         System.out.println(level);
         if(level == maxLevels)
         {
-            builder.aggiungiPareteVerticale(0,3,11);
-            builder.aggiungiPareteOrizzontale(3,1,4);
-            builder.aggiungiPareteOrizzontale(7,1,3);
-            builder.aggiungiPareteOrizzontale(11,1,4);
-            builder.aggiungiPareteVerticale(6,3,11);
-            builder.aggiungiPareteVerticale(7,4,5);
-            builder.aggiungiPareteVerticale(8,6,7);
-            builder.aggiungiPareteVerticale(9,8,9);
-            builder.aggiungiPareteVerticale(10,3,11);
-            builder.aggiungiPareteVerticale(12,3,11);
-            builder.aggiungiPareteOrizzontale(3,13,14);
-            builder.aggiungiPareteOrizzontale(11,13,14);
-            builder.aggiungiPareteVerticale(15,4,10);
+            builder.addVerticalWall(0,3,11);
+            builder.addHorizontalWall(3,1,4);
+            builder.addHorizontalWall(7,1,3);
+            builder.addHorizontalWall(11,1,4);
+            builder.addVerticalWall(6,3,11);
+            builder.addVerticalWall(7,4,5);
+            builder.addVerticalWall(8,6,7);
+            builder.addVerticalWall(9,8,9);
+            builder.addVerticalWall(10,3,11);
+            builder.addVerticalWall(12,3,11);
+            builder.addHorizontalWall(3,13,14);
+            builder.addHorizontalWall(11,13,14);
+            builder.addVerticalWall(15,4,10);
             builder.setRobotStartXY(13,8);
             drawLabyrinth(builder.build());
         }
         else {
             if (level == 0) {
-                builder.aggiungiPareti();
-                builder.aggiungiPareteVerticale(3, 2, 9);
-                builder.aggiungiPareteVerticale(7, 8, 14);
-                builder.aggiungiPareteOrizzontale(3, 7, 14);
-                builder.aggiungiPareteOrizzontale(10, 11, 13);
-                builder.impostaPosizionePortaUscita(12, 0);
+                builder.addWalls();
+                builder.addVerticalWall(3, 2, 9);
+                builder.addVerticalWall(7, 8, 14);
+                builder.addHorizontalWall(3, 7, 14);
+                builder.addHorizontalWall(10, 11, 13);
+                builder.setExit(12, 0);
                 builder.setRobotStartXY(1, 14);
             } else if (level == 1) {
-                builder.aggiungiPareti();
-                builder.aggiungiPareteVerticale(6, 1, 7);
-                builder.aggiungiPareteVerticale(9, 2, 10);
-                builder.aggiungiPareteVerticale(9, 2, 10);
-                builder.aggiungiPareteOrizzontale(9, 1, 5);
-                builder.aggiungiPareteOrizzontale(7, 11, 14);
-                builder.aggiungiPareteOrizzontale(4, 2, 4);
-                builder.aggiungiPareteVerticale(3, 11, 14);
-                builder.aggiungiPareteOrizzontale(13, 7, 12);
-                builder.impostaPosizionePortaUscita(13, 15);
+                builder.addWalls();
+                builder.addVerticalWall(6, 1, 7);
+                builder.addVerticalWall(9, 2, 10);
+                builder.addVerticalWall(9, 2, 10);
+                builder.addHorizontalWall(9, 1, 5);
+                builder.addHorizontalWall(7, 11, 14);
+                builder.addHorizontalWall(4, 2, 4);
+                builder.addVerticalWall(3, 11, 14);
+                builder.addHorizontalWall(13, 7, 12);
+                builder.setExit(13, 15);
                 builder.setRobotStartXY(1, 1);
             } else if (level == 2) {
-                builder.aggiungiPareti();
-                builder.impostaPosizionePortaUscita(0, 8);
-                builder.aggiungiPareteVerticale(8, 2, 12);
-                builder.aggiungiPareteOrizzontale(12, 4, 12);
-                builder.aggiungiPareteOrizzontale(14, 3, 4);
-                builder.aggiungiPareteOrizzontale(13, 13, 14);
-                builder.aggiungiPareteVerticale(3, 10, 12);
-                builder.aggiungiPuntoParete(2, 9);
-                builder.aggiungiPareteOrizzontale(7, 1, 4);
-                builder.aggiungiPuntoParete(7, 7);
-                builder.aggiungiPareteVerticale(6, 5, 6);
-                builder.aggiungiPuntoParete(5, 5);
-                builder.aggiungiPuntoParete(10, 13);
-                builder.aggiungiPuntoParete(9, 12);
-                builder.aggiungiPuntoParete(9, 9);
-                builder.aggiungiPareteOrizzontale(11, 5, 6);
-                builder.aggiungiPuntoParete(4, 13);
-                builder.aggiungiPuntoParete(4, 10);
-                builder.aggiungiPareteOrizzontale(3, 11, 12);
-                builder.aggiungiPareteOrizzontale(1, 10, 13);
-                builder.aggiungiPareteVerticale(14, 3, 9);
-                builder.aggiungiPuntoParete(7, 13);
-                builder.aggiungiPareteVerticale(4, 1, 4);
-                builder.aggiungiPuntoParete(1, 2);
-                builder.aggiungiPuntoParete(2, 3);
-                builder.aggiungiPuntoParete(3, 4);
-                builder.aggiungiPareteVerticale(9, 5, 7);
-                builder.aggiungiPareteOrizzontale(5, 10, 12);
-                builder.aggiungiPareteOrizzontale(6, 10, 12);
-                builder.aggiungiPuntoParete(3, 13);
+                builder.addWalls();
+                builder.setExit(0, 8);
+                builder.addVerticalWall(8, 2, 12);
+                builder.addHorizontalWall(12, 4, 12);
+                builder.addHorizontalWall(14, 3, 4);
+                builder.addHorizontalWall(13, 13, 14);
+                builder.addVerticalWall(3, 10, 12);
+                builder.addDotWall(2, 9);
+                builder.addHorizontalWall(7, 1, 4);
+                builder.addDotWall(7, 7);
+                builder.addVerticalWall(6, 5, 6);
+                builder.addDotWall(5, 5);
+                builder.addDotWall(10, 13);
+                builder.addDotWall(9, 12);
+                builder.addDotWall(9, 9);
+                builder.addHorizontalWall(11, 5, 6);
+                builder.addDotWall(4, 13);
+                builder.addDotWall(4, 10);
+                builder.addHorizontalWall(3, 11, 12);
+                builder.addHorizontalWall(1, 10, 13);
+                builder.addVerticalWall(14, 3, 9);
+                builder.addDotWall(7, 13);
+                builder.addVerticalWall(4, 1, 4);
+                builder.addDotWall(1, 2);
+                builder.addDotWall(2, 3);
+                builder.addDotWall(3, 4);
+                builder.addVerticalWall(9, 5, 7);
+                builder.addHorizontalWall(5, 10, 12);
+                builder.addHorizontalWall(6, 10, 12);
+                builder.addDotWall(3, 13);
                 builder.setRobotStartXY(14, 8);
             } else if (level == 3) {
-                builder.aggiungiPareti();
-                builder.aggiungiPareteOrizzontale(11, 1, 11);
-                builder.aggiungiPareteOrizzontale(8, 1, 3);
-                builder.aggiungiPareteVerticale(3, 3, 8);
-                builder.aggiungiPareteVerticale(6, 1, 4);
-                builder.aggiungiPareteVerticale(6, 7, 8);
-                builder.aggiungiPareteVerticale(8, 2, 8);
-                builder.aggiungiPareteOrizzontale(8, 6, 12);
-                builder.aggiungiPareteVerticale(12, 3, 8);
-                builder.aggiungiPareteVerticale(10, 1, 6);
-                builder.impostaPosizionePortaUscita(0, 0);
+                builder.addWalls();
+                builder.addHorizontalWall(11, 1, 11);
+                builder.addHorizontalWall(8, 1, 3);
+                builder.addVerticalWall(3, 3, 8);
+                builder.addVerticalWall(6, 1, 4);
+                builder.addVerticalWall(6, 7, 8);
+                builder.addVerticalWall(8, 2, 8);
+                builder.addHorizontalWall(8, 6, 12);
+                builder.addVerticalWall(12, 3, 8);
+                builder.addVerticalWall(10, 1, 6);
+                builder.setExit(0, 0);
                 builder.setRobotStartXY(14, 1);
             } else if (level == 4) {
-                builder.aggiungiPareti();
-                builder.aggiungiPareteVerticale(11, 1, 10);
-                builder.aggiungiPuntoParete(1, 12);
-                builder.aggiungiPuntoParete(2, 14);
-                builder.aggiungiPuntoParete(3, 12);
-                builder.aggiungiPuntoParete(4, 14);
-                builder.aggiungiPuntoParete(5, 12);
-                builder.aggiungiPuntoParete(6, 14);
-                builder.aggiungiPuntoParete(7, 12);
-                builder.aggiungiPuntoParete(8, 14);
-                builder.aggiungiPuntoParete(9, 12);
-                builder.aggiungiPuntoParete(10, 14);
-                builder.aggiungiPareteOrizzontale(10, 3, 10);
-                builder.aggiungiPareteVerticale(8, 1, 2);
-                builder.aggiungiPareteVerticale(8, 4, 5);
-                builder.aggiungiPareteVerticale(8, 7, 8);
-                builder.aggiungiPareteVerticale(6, 2, 9);
-                builder.aggiungiPareteVerticale(3, 2, 8);
-                builder.aggiungiPareteVerticale(3, 10, 13);
-                builder.aggiungiPareteVerticale(6, 12, 14);
-                builder.aggiungiPareteVerticale(9, 10, 13);
-                builder.aggiungiPareteVerticale(12, 12, 14);
-                builder.aggiungiPareteOrizzontale(2, 2, 4);
-                builder.impostaPosizionePortaUscita(0, 15);
+                builder.addWalls();
+                builder.addVerticalWall(11, 1, 10);
+                builder.addDotWall(1, 12);
+                builder.addDotWall(2, 14);
+                builder.addDotWall(3, 12);
+                builder.addDotWall(4, 14);
+                builder.addDotWall(5, 12);
+                builder.addDotWall(6, 14);
+                builder.addDotWall(7, 12);
+                builder.addDotWall(8, 14);
+                builder.addDotWall(9, 12);
+                builder.addDotWall(10, 14);
+                builder.addHorizontalWall(10, 3, 10);
+                builder.addVerticalWall(8, 1, 2);
+                builder.addVerticalWall(8, 4, 5);
+                builder.addVerticalWall(8, 7, 8);
+                builder.addVerticalWall(6, 2, 9);
+                builder.addVerticalWall(3, 2, 8);
+                builder.addVerticalWall(3, 10, 13);
+                builder.addVerticalWall(6, 12, 14);
+                builder.addVerticalWall(9, 10, 13);
+                builder.addVerticalWall(12, 12, 14);
+                builder.addHorizontalWall(2, 2, 4);
+                builder.setExit(0, 15);
                 builder.setRobotStartXY(1, 10);
 
             }
@@ -485,7 +480,7 @@ public class MainGUI extends JFrame implements Observer {
             livello = builder.build();
             if (l == null) {
                 try {
-                    l = new Labirinto(livello);
+                    l = new Labyrinth(livello);
                 } catch (IllegalAccessException e) {
                     throw new RuntimeException(e);
                 }
@@ -509,7 +504,7 @@ public class MainGUI extends JFrame implements Observer {
             scores[level] = 0;
 
         }
-        
+
 
     }
 
@@ -601,7 +596,7 @@ public class MainGUI extends JFrame implements Observer {
             }
         }
 
-        while (l.iterate()) {
+        while (!l.iterate()) {
             if (caretaker != null) {
                 if (caretaker.sizeMemento() > 1) {
                     setImagePanelXY("/img/sand.png", caretaker.getMemento(caretaker.sizeMemento() - 2).getX(), caretaker.getMemento(caretaker.sizeMemento() - 2).getY());
@@ -643,7 +638,7 @@ public class MainGUI extends JFrame implements Observer {
             setImagePanelXY("/img/robot.png", l.getRobotX(), l.getRobotY());
 
             try {
-                Thread.sleep(10);
+                Thread.sleep(150);
             } catch (InterruptedException ex) {
                 throw new RuntimeException(ex);
             }
@@ -794,7 +789,7 @@ public class MainGUI extends JFrame implements Observer {
 
     @Override
     public void update(ObjectEntity entita, int eventType) {
-        if (eventType == Labirinto.OGGETTO_AGGIUNTO) {
+        if (eventType == Labyrinth.OBJECT_ADDED) {
             // Aggiungi graficamente l'oggetto al labirinto
             if (entita.getColor() == 'R') {
                 setImagePanelXY("/img/red_stone.png", entita.getX(), entita.getY());
@@ -806,7 +801,7 @@ public class MainGUI extends JFrame implements Observer {
                 setImagePanelXY("/img/green_cactus.png", entita.getX(), entita.getY());
             }
 
-        } else if (eventType == Labirinto.OGGETTO_RIMOSSO) {
+        } else if (eventType == Labyrinth.OBJECT_REMOVED) {
             // Rimuovi graficamente l'oggetto dal labirinto
             setImagePanelXY("/img/sand.png", entita.getX(), entita.getY());
         }

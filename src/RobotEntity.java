@@ -4,11 +4,8 @@
  */
 
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class RobotEntity extends Entity {
-    /* La classe Robot estende la classe Entita e mantiene un riferimento allo stato attuale del robot utilizzando
+    /* La classe Robot estende la classe Entity e mantiene un riferimento allo stato attuale del robot utilizzando
     una variabile d'istanza della classe RobotState. Inizialmente, lo stato del robot è impostato su PursuitState.
     Il metodo updateState viene chiamato per cambiare lo stato del robot in base all'oggetto più vicino e la classe
     setState viene utilizzata per impostare il nuovo stato. */
@@ -59,15 +56,9 @@ class PursuitState extends RobotState {
     public void updateState(RobotEntity robot, ObjectEntity nearestObj) {
         if (nearestObj != null) {
             switch (nearestObj.getColor()) {
-                case 'R':
-                    robot.setState(new SeekState());
-                    break;
-                case 'Y':
-                    robot.setState(new FleeState());
-                    break;
-                case 'C':
-                    robot.setState(new EvadeState());
-                    break;
+                case 'R' -> robot.setState(new SeekState());
+                case 'Y' -> robot.setState(new FleeState());
+                case 'C' -> robot.setState(new EvadeState());
             }
         }
     }
@@ -77,15 +68,9 @@ class SeekState extends RobotState {
     public void updateState(RobotEntity robot, ObjectEntity nearestObj) {
         if (nearestObj != null) {
             switch (nearestObj.getColor()) {
-                case 'Y':
-                    robot.setState(new FleeState());
-                    break;
-                case 'C':
-                    robot.setState(new EvadeState());
-                    break;
-                case 'G':
-                    robot.setState(new PursuitState());
-                    break;
+                case 'Y' -> robot.setState(new FleeState());
+                case 'C' -> robot.setState(new EvadeState());
+                case 'G' -> robot.setState(new PursuitState());
             }
         }
     }
@@ -95,15 +80,9 @@ class FleeState extends RobotState {
     public void updateState(RobotEntity robot, ObjectEntity nearestObj) {
         if (nearestObj != null) {
             switch (nearestObj.getColor()) {
-                case 'C':
-                    robot.setState(new EvadeState());
-                    break;
-                case 'G':
-                    robot.setState(new PursuitState());
-                    break;
-                case 'R':
-                    robot.setState(new SeekState());
-                    break;
+                case 'C' -> robot.setState(new EvadeState());
+                case 'G' -> robot.setState(new PursuitState());
+                case 'R' -> robot.setState(new SeekState());
             }
         }
     }
@@ -113,15 +92,9 @@ class EvadeState extends RobotState {
     public void updateState(RobotEntity robot, ObjectEntity nearestObj) {
         if (nearestObj != null) {
             switch (nearestObj.getColor()) {
-                case 'G':
-                    robot.setState(new PursuitState());
-                    break;
-                case 'R':
-                    robot.setState(new SeekState());
-                    break;
-                case 'Y':
-                    robot.setState(new FleeState());
-                    break;
+                case 'G' -> robot.setState(new PursuitState());
+                case 'R' -> robot.setState(new SeekState());
+                case 'Y' -> robot.setState(new FleeState());
             }
         }
     }

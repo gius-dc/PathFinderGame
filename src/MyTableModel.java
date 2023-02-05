@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MyTableModel extends AbstractTableModel {
-    private String[] columnNames = {};
+    private String[] columnNames;
     private Object[][] data = {};
 
     public MyTableModel(String[] columnNames) {
@@ -91,22 +91,6 @@ public class MyTableModel extends AbstractTableModel {
         fireTableRowsInserted(rowCount, rowCount);
     }
 
-    public void addColumn(String columnName, Object[] columnData) {
-        int columnCount = getColumnCount();
-        String[] newColumnNames = new String[columnCount + 1];
-        System.arraycopy(columnNames, 0, newColumnNames, 0, columnCount);
-        newColumnNames[columnCount] = columnName;
-        columnNames = newColumnNames;
-
-        Object[][] newData = new Object[getRowCount()][columnCount + 1];
-        for (int i = 0; i < getRowCount(); i++) {
-            System.arraycopy(data[i], 0, newData[i], 0, columnCount);
-            newData[i][columnCount] = columnData[i];
-        }
-        data = newData;
-        fireTableStructureChanged();
-    }
-
     public void saveToFile(File file) throws IOException {
         try (FileWriter writer = new FileWriter(file)) {
             for (String columnName : columnNames) {
@@ -129,9 +113,7 @@ public class MyTableModel extends AbstractTableModel {
         for (int i = 1; i < lines.size(); i++) {
             String[] values = lines.get(i).split(",");
             Object[] row = new Object[values.length];
-            for (int j = 0; j < values.length; j++) {
-                row[j] = values[j];
-            }
+            System.arraycopy(values, 0, row, 0, values.length);
             rows.add(row);
         }
         data = rows.toArray(new Object[0][]);

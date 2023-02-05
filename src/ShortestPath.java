@@ -5,10 +5,10 @@ e per il recupero del nodo con distanza minima non ancora visitato.
  */
 
 public class ShortestPath {
-    public int minDistance(int dist[], Boolean b[], int size) {
+    public int minDistance(int[] dist, Boolean[] b, int size) {
         int min = Integer.MAX_VALUE, index = -1;
         for (int x = 0; x < size * size; x++) {
-            if (b[x] == false && dist[x] <= min) {
+            if (!b[x] && dist[x] <= min) {
                 min = dist[x];
                 index = x;
             }
@@ -17,9 +17,9 @@ public class ShortestPath {
     }
 
 
-    public int[] dijkstra(int graph[][], int src, int size) {
-        int dist[] = new int[size * size];
-        Boolean b[] = new Boolean[size * size];
+    public int[] dijkstra(int[][] graph, int src, int size) {
+        int[] dist = new int[size * size];
+        Boolean[] b = new Boolean[size * size];
         for (int i = 0; i < size * size; i++) {
             dist[i] = Integer.MAX_VALUE;
             b[i] = false;
@@ -38,9 +38,9 @@ public class ShortestPath {
         return dist;
     }
 
-    public int[][] generateGraph(int size, char labyrinth[][]) {
-        int graph[][] = new int[size * size][size * size];
-        int cX = 0, cY = 0;
+    public int[][] generateGraph(int size, char[][] labyrinth) {
+        int[][] graph = new int[size * size][size * size];
+        int cX, cY;
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
                 if (i > 0) {

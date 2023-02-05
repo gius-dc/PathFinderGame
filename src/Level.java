@@ -1,27 +1,27 @@
 public class Level {
-    private char[][] labirinto;
-    private int altezza;
-    private int larghezza;
-    private int portaUscita = -1;
+    private char[][] labyrinth;
+    private int height;
+    private int width;
+    private int exit = -1;
 
     private int robotX, robotY;
 
     private Level(Builder builder) {
-        this.labirinto = builder.labirinto;
-        this.portaUscita = builder.portaUscita;
-        this.altezza = builder.altezza;
-        this.larghezza = builder.larghezza;
+        this.labyrinth = builder.labyrinth;
+        this.exit = builder.exit;
+        this.height = builder.height;
+        this.width = builder.width;
         this.robotX = builder.robotX;
         this.robotY = builder.robotY;
     }
 
     public char[][] getLabyrinth()
     {
-        return labirinto;
+        return labyrinth;
     }
     public int getExit()
     {
-        return portaUscita;
+        return exit;
     }
 
 
@@ -36,99 +36,99 @@ public class Level {
     }
 
     public static class Builder {
-        private char[][] labirinto;
-        private int portaUscita = -1;
-        private int altezza;
-        private int larghezza;
+        private char[][] labyrinth;
+        private int exit = -1;
+        private int height;
+        private int width;
         private int robotX, robotY;
 
-        public Builder(int larghezza, int altezza) {
-            this.labirinto = new char[altezza][larghezza];
-            for (int i = 0; i < altezza; i++) {
-                for (int j = 0; j < larghezza; j++) {
-                    this.labirinto[i][j] = ' ';
+        public Builder(int width, int height) {
+            this.labyrinth = new char[height][width];
+            for (int i = 0; i < height; i++) {
+                for (int j = 0; j < width; j++) {
+                    this.labyrinth[i][j] = ' ';
                 }
             }
-            this.altezza = altezza;
-            this.larghezza = larghezza;
+            this.height = height;
+            this.width = width;
         }
 
-        public Builder aggiungiPareteOrizzontale(int riga, int colonnaInizio, int colonnaFine) {
-            for (int i = colonnaInizio; i <= colonnaFine; i++) {
-                this.labirinto[riga][i] = '#';
+        public Builder addHorizontalWall(int row, int startingColumn, int endingColumn) {
+            for (int i = startingColumn; i <= endingColumn; i++) {
+                this.labyrinth[row][i] = '#';
             }
             return this;
         }
 
-        public Builder aggiungiPareteVerticale(int colonna, int rigaInizio, int rigaFine) {
-            for (int i = rigaInizio; i <= rigaFine; i++) {
-                this.labirinto[i][colonna] = '#';
+        public Builder addVerticalWall(int column, int startingRow, int endingRow) {
+            for (int i = startingRow; i <= endingRow; i++) {
+                this.labyrinth[i][column] = '#';
             }
             return this;
         }
 
-        public Builder aggiungiPuntoParete(int x, int y) {
-            this.labirinto[x][y] = '#';
+        public Builder addDotWall(int x, int y) {
+            this.labyrinth[x][y] = '#';
             return this;
         }
 
 
-        public Builder aggiungiPareti()
+        public Builder addWalls()
         {
             // Inizializzo il labirinto con le pareti esterne
-            for (int i = 0; i < labirinto.length; i++) {
-                for (int j = 0; j < labirinto[i].length; j++) {
-                    if (i == 0 || i == labirinto.length - 1 || j == 0 || j == labirinto[i].length - 1) {
-                        labirinto[i][j] = '#';
+            for (int i = 0; i < labyrinth.length; i++) {
+                for (int j = 0; j < labyrinth[i].length; j++) {
+                    if (i == 0 || i == labyrinth.length - 1 || j == 0 || j == labyrinth[i].length - 1) {
+                        labyrinth[i][j] = '#';
                     }
                 }
             }
             return this;
         }
 
-        public Builder impostaPosizionePortaUscita(int riga, int colonna) {
-            aggiungiPareti();
+        public Builder setExit(int row, int column) {
+            addWalls();
 
-            if(riga == 0 && colonna == 0)
+            if(row == 0 && column == 0)
             {
-                labirinto[0][0] = ' ';
-                labirinto[1][0] = ' ';
-                labirinto[0][1] = ' ';
+                labyrinth[0][0] = ' ';
+                labyrinth[1][0] = ' ';
+                labyrinth[0][1] = ' ';
             }
-            else if (riga == 0 && colonna == larghezza-1){
-                labirinto[0][larghezza-1] = ' ';
-                labirinto[0][larghezza-2] = ' ';
-                labirinto[1][larghezza-1] = ' ';
+            else if (row == 0 && column == width -1){
+                labyrinth[0][width -1] = ' ';
+                labyrinth[0][width -2] = ' ';
+                labyrinth[1][width -1] = ' ';
             }
-            else if(riga == altezza-1 && colonna == 0) {
-                labirinto[altezza-1][0] = ' ';
-                labirinto[altezza-1][1] = ' ';
-                labirinto[altezza-2][0] = ' ';
+            else if(row == height -1 && column == 0) {
+                labyrinth[height -1][0] = ' ';
+                labyrinth[height -1][1] = ' ';
+                labyrinth[height -2][0] = ' ';
             }
-            else if(riga == altezza-1 && colonna == larghezza-1) {
-                labirinto[altezza-1][larghezza-1] = ' ';
-                labirinto[altezza-1][larghezza-2] = ' ';
-                labirinto[altezza-2][larghezza-1] = ' ';
+            else if(row == height -1 && column == width -1) {
+                labyrinth[height -1][width -1] = ' ';
+                labyrinth[height -1][width -2] = ' ';
+                labyrinth[height -2][width -1] = ' ';
             }
-            else if(riga == 0 || riga == altezza-1)
+            else if(row == 0 || row == height -1)
             {
-                labirinto[riga][colonna] = ' ';
-                labirinto[riga][colonna+1] = ' ';
-                labirinto[riga][colonna-1] = ' ';
+                labyrinth[row][column] = ' ';
+                labyrinth[row][column+1] = ' ';
+                labyrinth[row][column-1] = ' ';
             }
-            else if(colonna == 0 || colonna == larghezza-1)
+            else if(column == 0 || column == width -1)
             {
-                labirinto[riga][colonna] = ' ';
-                labirinto[riga+1][colonna] = ' ';
-                labirinto[riga-1][colonna] = ' ';
+                labyrinth[row][column] = ' ';
+                labyrinth[row+1][column] = ' ';
+                labyrinth[row-1][column] = ' ';
             }
-            this.portaUscita = riga * labirinto[0].length + colonna;
+            this.exit = row * labyrinth[0].length + column;
             return this;
         }
 
         public Builder setRobotStartXY (int x,int y)
         {
-            if(labirinto[x][y] != '#')
+            if(labyrinth[x][y] != '#')
             {
                 this.robotX = x;
                 this.robotY = y;
@@ -138,7 +138,7 @@ public class Level {
 
         public Builder setRobotStartX(int x)
         {
-            if(labirinto[x][robotY] != '#')
+            if(labyrinth[x][robotY] != '#')
             {
                 robotX = x;
             }
@@ -147,7 +147,7 @@ public class Level {
 
         public Builder setRobotStartY(int y)
         {
-            if(labirinto[robotX][y] != '#')
+            if(labyrinth[robotX][y] != '#')
             {
                 robotY = y;
             }

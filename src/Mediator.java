@@ -1,27 +1,27 @@
 public class Mediator {
-    private Labirinto labirinto;
+    private Labyrinth labyrinth;
     private MainGUI mainGUI;
 
     // Costruttore che inizializza le due classi
-    public Mediator(Labirinto labirinto, MainGUI mainGUI) {
-        this.labirinto = labirinto;
+    public Mediator(Labyrinth labyrinth, MainGUI mainGUI) {
+        this.labyrinth = labyrinth;
         this.mainGUI = mainGUI;
     }
 
     // Metodo che gestisce la richiesta di MainGui per ottenere il Caretaker
     public Caretaker getCaretaker() {
-        return labirinto.getRobotCaretaker();
+        return labyrinth.getRobotCaretaker();
     }
 
     public char[][] getLabyrinth() {
-        return labirinto.getLabyrinth();
+        return labyrinth.getLabyrinth();
     }
 
     public void addObserver(Observer observer) {
-        labirinto.addObserver(observer);
+        labyrinth.addObserver(observer);
     }
 
     public RobotEntity getRobot() {
-        return labirinto.getRobot();
+        return labyrinth.getRobot();
     }
 }
