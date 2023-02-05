@@ -20,7 +20,7 @@ public class ObjectEntity extends Entity {
 }
 
 /**
- * Implementazione della factory per la creazione di un oggetto specifico di colore.
+ * Implementazione della factory per la creazione di un oggetto specifico di colore. 
  */
 
 class ObjectCyanFactory implements ObjectFactory{
