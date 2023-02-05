@@ -13,7 +13,7 @@ import java.util.List;
  *  Dato che il progetto utilizza la libreria FlatLaf per migliorare l'aspetto grafico dei componenti grafici
  *  Swing, l'utilizzo di {@link javax.swing.table.DefaultTableModel} genera eccezioni nel momento in cui vengono aggiornati i dati al suo
  *  interno. Utilizzando un modello personalizzato che estende AbstractTableModel il problema è stato risolto.
- *
+
  *  Inoltre, adottando questa soluzione, è stato possibile estendere questo modello con ulteriori metodi utili
  *  al fine del progetto.
  */
@@ -217,7 +217,7 @@ public class CustomTableModel extends AbstractTableModel {
      */
     @Override
     public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
-        data[rowIndex][columnIndex] = (String) aValue;
+        data[rowIndex][columnIndex] = aValue;
         fireTableCellUpdated(rowIndex, columnIndex);
     }
 }

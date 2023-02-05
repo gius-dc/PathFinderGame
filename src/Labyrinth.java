@@ -22,7 +22,7 @@ public class Labyrinth extends Observable implements Cloneable {
 
     // State
     private RobotState state;
-    private Caretaker caretaker = null;
+    private Caretaker caretaker;
 
     // Observer
     private List<Observer> observers = new ArrayList<>();
@@ -86,8 +86,8 @@ public class Labyrinth extends Observable implements Cloneable {
     public Boolean iterate() {
         state = robot.getState();
 
-        char c = '\u0000';
-        int r, ox = 0, oy = 0;
+        char c;
+        int r, ox, oy;
 
         // A ogni iterazione viene scelto casualmente se aggiungere dei oggetti oppure rimuovere
         if (random.nextInt(100) % 2 == 0) {
@@ -102,7 +102,7 @@ public class Labyrinth extends Observable implements Cloneable {
                     c = 'G';
                 } else if (r == 2) {
                     c = 'Y';
-                } else if (r == 3) {
+                } else {
                     c = 'C';
                 }
 
@@ -125,10 +125,10 @@ public class Labyrinth extends Observable implements Cloneable {
             for (int i = 0; i < n; i++) {
 
                 if (objects.size() > 3) { // elimina un oggetto solo se ce ne sono almeno tre
-                    r = random.nextInt(objects.size()); // viene selezionato randomicamente un oggetto da rimuovere
                     try {
                         removeObject(objects.get(random.nextInt(objects.size())));
                     } catch (Exception e) {
+                        throw new RuntimeException(e);
                     }
 
                 }
@@ -192,13 +192,9 @@ public class Labyrinth extends Observable implements Cloneable {
         if (robot.getX() == exitX && robot.getY() == exitY) {
             return true;
         } else if ((exitX == robot.getX()) && (exitX == 0 || exitX == DIMENSION - 1)) {
-            if (robot.getY() == exitY || robot.getY() == exitY + 1 || robot.getY() == exitY - 1) {
-                return true;
-            }
+            return robot.getY() == exitY || robot.getY() == exitY + 1 || robot.getY() == exitY - 1;
         } else if ((exitY == robot.getY()) && (exitY == 0 || exitY == DIMENSION - 1)) {
-            if (robot.getX() == exitX || robot.getX() == exitX + 1 || robot.getX() == exitX - 1) {
-                return true;
-            }
+            return robot.getX() == exitX || robot.getX() == exitX + 1 || robot.getX() == exitX - 1;
         }
 
         return false;
@@ -223,13 +219,11 @@ public class Labyrinth extends Observable implements Cloneable {
 
         char[][] matrix = new char[DIMENSION][DIMENSION];
         for (int i = 0; i < DIMENSION; i++) {
-            for (int j = 0; j < DIMENSION; j++) {
-                matrix[i][j] = labyrinth[i][j];
-            }
+            System.arraycopy(labyrinth[i], 0, matrix[i], 0, DIMENSION);
         }
 
-        for (int i = 0; i < objects.size(); i++) {
-            matrix[objects.get(i).getX()][objects.get(i).getY()] = '#';
+        for (ObjectEntity object : objects) {
+            matrix[object.getX()][object.getY()] = '#';
         }
 
         // In base alla strategia impostata, effettua il prossimo passo
@@ -299,10 +293,17 @@ public class Labyrinth extends Observable implements Cloneable {
         } else if (color == 'Y') {
             factory = new ObjectYellowFactory();
         }
+
+        if (factory == null) {
+            // Viene gestito il caso in cui il colore non dovesse essere supportato, lanciando un'eccezione
+            throw new IllegalArgumentException("Il colore non è supportato: " + color);
+        }
+
         ObjectEntity newObject = factory.createObject(x, y);
         objects.add(newObject);
         notifyObservers(newObject, OBJECT_ADDED);
     }
+
 
     /**
      * Rimuove un oggetto dalla lista degli oggetti presenti nel labirinto.
@@ -318,7 +319,7 @@ public class Labyrinth extends Observable implements Cloneable {
      * Notifica gli observer (in questo caso MainGUI) che un oggetto è stato modificato.
      *
      * @param object L'oggetto che è stato modificato
-     * @param eventType Il tipo di evento che ha causato la modifica (OBJECT_ADDED o OBJECT_REMOVED)
+     * @param eventType Il tipo di evento che ha causato la modifica (OBJECT_ADDED od OBJECT_REMOVED)
      */
     private void notifyObservers(ObjectEntity object, int eventType) {
         for (Observer observer : observers) {
