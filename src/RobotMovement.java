@@ -1,20 +1,42 @@
 import java.util.Random;
-
+/**
+ * Classe che gestisce il movimento del robot.
+ * Qui è stato applicato il design pattern Strategy.
+ */
 public class RobotMovement {
-    private MovementStrategy strategy;
+    private MovementStrategy strategy; // Variabile che rappresenta la strategia di movimento.
 
+    /**
+     * Imposta la strategia di movimento del robot.
+     *
+     * @param strategy La strategia da impostare
+     */
     public void setStrategy(MovementStrategy strategy) {
         this.strategy = strategy;
     }
 
+    /**
+     * Fa muovere il robot utilizzando la strategia impostata.
+     *
+     * @param robot L'entità del robot
+     * @param matrix La matrice che rappresenta l'ambiente
+     * @param sizeMatrix La dimensione della matrice
+     * @param exitN Il numero identificativo dell'uscita
+     */
     public void move(RobotEntity robot, char[][] matrix, int sizeMatrix, int exitN) {
         strategy.move(robot, matrix, sizeMatrix, exitN);
     }
 
+    /**
+     * Interfaccia che rappresenta una strategia di movimento.
+     */
     interface MovementStrategy {
         void move(RobotEntity robot, char[][] matrix, int sizeMatrix, int exitN);
     }
 
+    /**
+     * Classe che implementa una strategia di movimento casuale.
+     */
     static class RandomMovement implements MovementStrategy {
         private Random random = new Random();
 
@@ -68,11 +90,17 @@ public class RobotMovement {
         }
     }
 
+    /**
+     * Classe che implementa una strategia di movimento ottimale.
+     * Viene utilizzato l'algoritmo Dijkstra per determinare la direzione che consente al robot di effettuare
+     * meno passi possibili per raggiungere l'uscita
+     */
+
     static class OptimalMovement implements MovementStrategy {
         @Override
         public void move(RobotEntity robot, char[][] matrix, int sizeMatrix, int exitN) {
             int x = robot.getX(), y = robot.getY();
-            ShortestPath p = new ShortestPath();
+            Dijkstra p = new Dijkstra();
 
             int[][] graph = p.generateGraph(16, matrix);
             int[] dist;
@@ -80,35 +108,35 @@ public class RobotMovement {
             int[] confr = {Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE};
 
             if (matrix[x - 1][y] != '#' && x >= 0 && x < sizeMatrix && y >= 0 && y < sizeMatrix) {
-                dist = p.dijkstra(graph, ((x - 1) * sizeMatrix) + y, sizeMatrix);
+                dist = p.run(graph, ((x - 1) * sizeMatrix) + y, sizeMatrix);
                 confr[0] = dist[exitN];
             }
             if (matrix[x + 1][y] != '#' && x >= 0 && x < sizeMatrix && y >= 0 && y < sizeMatrix) {
-                dist = p.dijkstra(graph, ((x + 1) * sizeMatrix) + y, sizeMatrix);
+                dist = p.run(graph, ((x + 1) * sizeMatrix) + y, sizeMatrix);
                 confr[1] = dist[exitN];
             }
             if (matrix[x][y - 1] != '#' && x >= 0 && x < sizeMatrix && y >= 0 && y < sizeMatrix) {
-                dist = p.dijkstra(graph, (x * sizeMatrix) + (y - 1), sizeMatrix);
+                dist = p.run(graph, (x * sizeMatrix) + (y - 1), sizeMatrix);
                 confr[2] = dist[exitN];
             }
             if (matrix[x][y + 1] != '#' && x >= 0 && x < sizeMatrix && y >= 0 && y < sizeMatrix) {
-                dist = p.dijkstra(graph, (x * sizeMatrix) + (y + 1), sizeMatrix);
+                dist = p.run(graph, (x * sizeMatrix) + (y + 1), sizeMatrix);
                 confr[3] = dist[exitN];
             }
             if (matrix[x + 1][y - 1] != '#' && x >= 0 && x < sizeMatrix && y >= 0 && y < sizeMatrix) {
-                dist = p.dijkstra(graph, ((x + 1) * sizeMatrix) + (y - 1), sizeMatrix);
+                dist = p.run(graph, ((x + 1) * sizeMatrix) + (y - 1), sizeMatrix);
                 confr[4] = dist[exitN];
             }
             if (matrix[x + 1][y + 1] != '#' && x >= 0 && x < sizeMatrix && y >= 0 && y < sizeMatrix) {
-                dist = p.dijkstra(graph, ((x + 1) * sizeMatrix) + (y + 1), sizeMatrix);
+                dist = p.run(graph, ((x + 1) * sizeMatrix) + (y + 1), sizeMatrix);
                 confr[5] = dist[exitN];
             }
             if (matrix[x - 1][y - 1] != '#' && x >= 0 && x < sizeMatrix && y >= 0 && y < sizeMatrix) {
-                dist = p.dijkstra(graph, ((x - 1) * sizeMatrix) + (y - 1), sizeMatrix);
+                dist = p.run(graph, ((x - 1) * sizeMatrix) + (y - 1), sizeMatrix);
                 confr[6] = dist[exitN];
             }
             if (matrix[x - 1][y + 1] != '#' && x >= 0 && x < sizeMatrix && y >= 0 && y < sizeMatrix) {
-                dist = p.dijkstra(graph, ((x - 1) * sizeMatrix) + (y + 1), sizeMatrix);
+                dist = p.run(graph, ((x - 1) * sizeMatrix) + (y + 1), sizeMatrix);
                 confr[7] = dist[exitN];
             }
 

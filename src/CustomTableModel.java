@@ -7,28 +7,56 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MyTableModel extends AbstractTableModel {
+
+/**
+ *  Questa classe estende la classe {@link AbstractTableModel} per rappresentare il modello utilizzato dalle tabelle dell'interfaccia grafica.
+ *  Dato che il progetto utilizza la libreria FlatLaf per migliorare l'aspetto grafico dei componenti grafici
+ *  Swing, l'utilizzo di {@link javax.swing.table.DefaultTableModel} genera eccezioni nel momento in cui vengono aggiornati i dati al suo
+ *  interno. Utilizzando un modello personalizzato che estende AbstractTableModel il problema è stato risolto.
+ *
+ *  Inoltre, adottando questa soluzione, è stato possibile estendere questo modello con ulteriori metodi utili
+ *  al fine del progetto.
+ */
+
+public class CustomTableModel extends AbstractTableModel {
     private String[] columnNames;
     private Object[][] data = {};
 
-    public MyTableModel(String[] columnNames) {
+
+    /**
+     * Costruttore che inizializza i nomi delle colonne.
+     * @param columnNames i nomi delle colonne
+     */
+    public CustomTableModel(String[] columnNames) {
         this.columnNames = columnNames;
     }
 
-    public int searchRow(String nome, String cognome) {
+    /**
+     * Cerca la riga corrispondente ai valori di una determinata coppia di colonne.
+     * @param firstColumn il valore da cercare nella prima colonna
+     * @param secondColumn il valore da cercare nella seconda colonna
+     * @param firstColumnIndex l'indice della prima colonna
+     * @param secondColumnIndex l'indice della seconda colonna
+     * @return l'indice della riga corrispondente o -1 se non viene trovata
+     */
+    public int searchRow(String firstColumn, String secondColumn, int firstColumnIndex, int secondColumnIndex) {
         int rowCount = getRowCount();
-        int nameColumn = 0;
-        int surnameColumn = 1;
 
         for (int rowIndex = 0; rowIndex < rowCount; rowIndex++) {
-            if (getValueAt(rowIndex, nameColumn).equals(nome) &&
-                    getValueAt(rowIndex, surnameColumn).equals(cognome)) {
+            if (getValueAt(rowIndex, firstColumnIndex).equals(firstColumn) &&
+                    getValueAt(rowIndex, secondColumnIndex).equals(secondColumn)) {
                 return rowIndex;
             }
         }
         return -1;
     }
 
+    /**
+     * Cerca la colonna corrispondente a un determinato valore in una riga specifica.
+     * @param rowIndex l'indice della riga
+     * @param value il valore da cercare
+     * @return l'indice della colonna corrispondente o -1 se non viene trovata
+     */
     public int searchColumn(int rowIndex, Object value) {
         int columnCount = getColumnCount();
 
@@ -40,6 +68,10 @@ public class MyTableModel extends AbstractTableModel {
         return -1;
     }
 
+    /**
+     * Ordina i dati del modello in base ai valori di una determinata colonna.
+     * @param columnIndex l'indice della colonna in base a cui ordinare i dati
+     */
     public void sortByColumn(int columnIndex) {
         List<List<Object>> dataList = new ArrayList<>();
         for (int i = 0; i < getRowCount(); i++) {
@@ -67,7 +99,10 @@ public class MyTableModel extends AbstractTableModel {
         fireTableDataChanged();
     }
 
-
+    /**
+     * Rimuove una riga dal modello.
+     * @param rowIndex indice della riga da rimuovere
+     */
     public void removeRow(int rowIndex) {
         int rowCount = getRowCount();
         if (rowIndex >= 0 && rowIndex < rowCount) {
@@ -82,6 +117,11 @@ public class MyTableModel extends AbstractTableModel {
         }
     }
 
+
+    /**
+     * Aggiunge una riga nel modello.
+     * @param rowData dati della riga da aggiungere
+     */
     public void addRow(Object[] rowData) {
         int rowCount = getRowCount();
         Object[][] newData = new Object[rowCount + 1][getColumnCount()];
@@ -91,6 +131,11 @@ public class MyTableModel extends AbstractTableModel {
         fireTableRowsInserted(rowCount, rowCount);
     }
 
+    /**
+     * Salva i dati del modello in un file csv.
+     * @param file Il file csv su cui salvare i dati
+     * @throws IOException in caso di errore di scrittura sul file
+     */
     public void saveToFile(File file) throws IOException {
         try (FileWriter writer = new FileWriter(file)) {
             for (String columnName : columnNames) {
@@ -106,6 +151,11 @@ public class MyTableModel extends AbstractTableModel {
         }
     }
 
+    /**
+     * Carica i dati da un file csv e li inserisce nel modello.
+     * @param file Il file csv da cui caricare i dati
+     * @throws IOException in caso di errore di lettura dal file
+     */
     public void loadFromFile(File file) throws IOException {
         List<String> lines = Files.readAllLines(Paths.get(file.toURI()));
         columnNames = lines.get(0).split(",");
@@ -120,26 +170,51 @@ public class MyTableModel extends AbstractTableModel {
         fireTableDataChanged();
     }
 
+    /**
+     * Restituisce il numero di righe del modello.
+     * @return Il numero di colonne del modello.
+     */
     @Override
     public int getRowCount() {
         return data.length;
     }
 
+    /**
+     * Restituisce il numero di colonne del modello.
+     * @return Il numero di colonne del modello.
+     */
     @Override
     public int getColumnCount() {
         return columnNames.length;
     }
 
+    /**
+     * Restituisce il valore di una cella a una determinata riga e colonna.
+     * @param rowIndex L'indice della riga della cella.
+     * @param columnIndex L'indice della colonna della cella.
+     * @return Il valore della cella a una determinata riga e colonna.
+     */
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
         return data[rowIndex][columnIndex];
     }
 
+    /**
+     * Restituisce il nome della colonna a un indice specificato.
+     * @param columnIndex L'indice della colonna di cui ottenere il nome.
+     * @return Il nome della colonna a un indice specificato.
+     */
     @Override
     public String getColumnName(int columnIndex) {
         return columnNames[columnIndex];
     }
 
+    /**
+     * Imposta il valore di una cella nella tabella.
+     * @param aValue valore da impostare
+     * @param rowIndex indice della riga
+     * @param columnIndex indice della colonna
+     */
     @Override
     public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
         data[rowIndex][columnIndex] = (String) aValue;

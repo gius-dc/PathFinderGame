@@ -5,26 +5,30 @@ import java.util.Random;
 
 import static java.lang.Math.*;
 
-/*
-    Questa classe Labirinto è il vero e proprio cuore del progetto:
-    - Dato un oggetto di tipo Level (che nella classe MainGUI viene preparata attraverso il design pattern Builder) viene inizializzato il labirinto, ovvero
-    dal livello viene ricavato la matrice del labirinto, la porta d'uscita e la posizione iniziale del robot. Questo viene effettuato dal metodo setLabyrinth().
-    - Questa classe contiene molteplici metodi, tra i più importanti troviamo iterate() e doStepRobot() che implementano la logica di base del labirinto.
+/**
+*    Questa classe Labirinto è il vero e proprio cuore del progetto:
+*    - Dato un oggetto di tipo Level (che nella classe MainGUI viene preparata attraverso il design pattern Builder) viene inizializzato il labirinto, ovvero
+*    dal livello viene ricavato la matrice del labirinto, la porta d'uscita e la posizione iniziale del robot. Questo viene effettuato dal metodo setLabyrinth().
+*    - Questa classe contiene molteplici metodi, tra i più importanti troviamo iterate() e doStepRobot() che implementano la logica di base del labirinto.
 */
 
 public class Labyrinth extends Observable implements Cloneable {
     // Dimensione del labirinto
-    private static int DIMENSION = 0;
-    private RobotEntity robot;
-    private List<ObjectEntity> objects;
-    private Random random;
-    private char[][] labyrinth;
+    private static int DIMENSION = 0; // dimensioni labirinto (quadrato)
+    private RobotEntity robot; // oggetto robot
+    private List<ObjectEntity> objects; // lista di oggetti (del labirinto)
+    private char[][] labyrinth; // matrice del labirinto
+    private int exitN; // un numero intero che corrisponde al numero della cella del labirinto dove è presente l'uscita
+
+    // State
     private RobotState state;
-    private int exitN;
     private Caretaker caretaker = null;
+
+    // Observer
     private List<Observer> observers = new ArrayList<>();
     public static final int OBJECT_ADDED = 1;
     public static final int OBJECT_REMOVED = 2;
+    private Random random;
 
 
     // Metodo per clonare il labirinto (design pattern Prototype)
@@ -71,21 +75,19 @@ public class Labyrinth extends Observable implements Cloneable {
         return caretaker;
     }
 
-    /* Quando viene chiamato questo metodo viene effettuato un'iterazione, che consiste in:
-       - Aggiungere o rimuovere un oggetto nel labirinto
-       - Se il robot non ha già raggiunto l'uscita, effettuare un passo
-       - Aggiornare lo stato del robot in base agli oggetti in prossimità
-
-       Ritorna un valore booleano:
-       - true -> il robot ha raggiunto la destinazione
-       - false -> il robot non ha ancora raggiunto la destinazione
-    */
+    /**
+     *  Il metodo iterate gestisce un'iterazione dell'ambiente di gioco, ciò consiste in:
+     *  - Aggiungere o rimuovere un oggetto nel labirinto
+     *  - Se il robot non ha già raggiunto l'uscita, effettuare un passo (o due)
+     *  - Aggiornare lo stato del robot in base agli oggetti in prossimità
+     *
+     *  @return Boolean: true se il robot ha raggiunto la destinazione, false se non l'ha ancora raggiunta.
+     */
     public Boolean iterate() {
         state = robot.getState();
 
         char c = '\u0000';
         int r, ox = 0, oy = 0;
-        Boolean flag = true;
 
         // Ad ogni iterazione viene scelto casualmente se aggiungere dei oggetti oppure rimuovere
         if (random.nextInt(100) % 2 == 0) {
@@ -178,15 +180,35 @@ public class Labyrinth extends Observable implements Cloneable {
         return true;
     }
 
-    // Metodo per verificare se il robot attualmente si trova alla destinazione
+    /**
+     * Verifica se il robot ha raggiunto la sua destinazione finale.
+     * La destinazione finale è definita dalla cella di uscita del labirinto.
+     *
+     * @return true se il robot ha raggiunto la sua destinazione finale, altrimenti false.
+     */
     private Boolean checkIfRobotGoal() {
         int exitX = exitN / DIMENSION;
         int exitY = exitN % DIMENSION;
-        return (robot.getX() == exitX && robot.getY() == exitY) ||
-                (Math.abs(robot.getX() - exitX) <= 1 && Math.abs(robot.getY() - exitY) <= 1);
+        if (robot.getX() == exitX && robot.getY() == exitY) {
+            return true;
+        } else if ((exitX == robot.getX()) && (exitX == 0 || exitX == DIMENSION - 1)) {
+            if (robot.getY() == exitY || robot.getY() == exitY + 1 || robot.getY() == exitY - 1) {
+                return true;
+            }
+        } else if ((exitY == robot.getY()) && (exitY == 0 || exitY == DIMENSION - 1)) {
+            if (robot.getX() == exitX || robot.getX() == exitX + 1 || robot.getX() == exitX - 1) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
-    // Metodo che effettua un passo del robot
+    /**
+     * Effettua il prossimo passo del robot.
+     *
+     * @param casual Se true, il robot effettua un movimento casuale. Se false, il robot effettua un movimento ottimale.
+     */
     public void doStepRobot(Boolean casual) {
         // Design pattern Strategy
         RobotMovement strategy = new RobotMovement();
@@ -210,6 +232,7 @@ public class Labyrinth extends Observable implements Cloneable {
             matrix[objects.get(i).getX()][objects.get(i).getY()] = '#';
         }
 
+        // In base alla strategia impostata, effettua il prossimo passo
         strategy.move(robot, matrix, DIMENSION, exitN);
 
     }
@@ -224,6 +247,13 @@ public class Labyrinth extends Observable implements Cloneable {
         return ((sqrt - Math.floor(sqrt)) == 0);
     }
 
+    /**
+     * Questo metodo verifica se esiste un oggetto nella posizione x, y specificata.
+     * @param objects La lista di oggetti nell'ambiente
+     * @param x Posizione x
+     * @param y Posizione y
+     * @return L'indice dell'oggetto nella lista se esiste, altrimenti -1.
+     */
     private int checkIfObjectXYExists(List<ObjectEntity> objects, int x, int y) {
         return objects.stream()
                 .filter(o -> o.getX() == x && o.getY() == y)
@@ -232,6 +262,7 @@ public class Labyrinth extends Observable implements Cloneable {
                 .orElse(-1);
     }
 
+    // Metodi pubblici che servono per ottenere il labirinto e le coordinate del robot
     public char[][] getLabyrinth() {
         return labyrinth;
     }
@@ -244,13 +275,20 @@ public class Labyrinth extends Observable implements Cloneable {
         return robot.getY();
     }
 
-
     public RobotEntity getRobot() {
         return robot;
     }
 
 
-    public void addObject(char color, int x, int y) {
+    /**
+     * Aggiunge un oggetto alla lista degli oggetti.
+     *
+     * @param color Il colore dell'oggetto da creare
+     * @param x La posizione X dell'oggetto
+     * @param y La posizione Y dell'oggetto
+     */
+    private void addObject(char color, int x, int y) {
+        // In questo metodo il factory method viene invocato per creare un'istanza dell'oggetto dal colore desiderato
         ObjectFactory factory = null;
         if (color == 'R') {
             factory = new ObjectRedFactory();
@@ -266,19 +304,29 @@ public class Labyrinth extends Observable implements Cloneable {
         notifyObservers(newObject, OBJECT_ADDED);
     }
 
-    public void removeObject(ObjectEntity oggetto) {
+    /**
+     * Rimuove un oggetto dalla lista degli oggetti presenti nel labirinto.
+     * @param oggetto l'oggetto da rimuovere
+     */
+    private void removeObject(ObjectEntity oggetto) {
         objects.remove(oggetto);
         notifyObservers(oggetto, OBJECT_REMOVED);
     }
 
 
-    public void addObserver(Observer observer) {
-        observers.add(observer);
-    }
-
+    /**
+     * Notifica gli observer (in questo caso MainGUI) che un oggetto è stato modificato.
+     *
+     * @param object L'oggetto che è stato modificato
+     * @param eventType Il tipo di evento che ha causato la modifica (OBJECT_ADDED o OBJECT_REMOVED)
+     */
     private void notifyObservers(ObjectEntity object, int eventType) {
         for (Observer observer : observers) {
             observer.update(object, eventType);
         }
+    }
+
+    public void addObserver(Observer observer) {
+        observers.add(observer);
     }
 }

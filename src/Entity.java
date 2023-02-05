@@ -7,6 +7,7 @@
 public abstract class Entity {
     private int x,y; // coordinate
 
+    // setters
     public void setX(int x) {
         this.x = x;
     }
@@ -15,6 +16,7 @@ public abstract class Entity {
         this.y = y;
     }
 
+    // getters
     public int getX() {
         return x;
     }
@@ -22,8 +24,5 @@ public abstract class Entity {
     public int getY() {
         return y;
     }
-
-
-
 
 }

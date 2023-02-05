@@ -1,11 +1,8 @@
 import com.formdev.flatlaf.FlatLightLaf;
-
 import javax.sound.sampled.*;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import javax.swing.table.TableModel;
-import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -21,7 +18,6 @@ import java.util.concurrent.Executors;
 public class MainGUI extends JFrame implements Observer {
     private JPanel mainPanel;
     private JPanel labirintoPanel;
-
     private JButton avviaButton;
     private JLabel stateLabel;
     private JTable table1;
@@ -34,21 +30,19 @@ public class MainGUI extends JFrame implements Observer {
     private JSlider volumeSlider;
     private JLabel muteButton;
     private JPanel topPanel;
-    MyTableModel modelLevelRank;
-    Labyrinth l;
-    int row = 16, col = 16;
-    Boolean firstRun = true;
-    RobotState state;
-    MyTableModel fullRankModel;
-    int level = 0, maxLevels = 5;
-    int[] scores = new int[maxLevels];
-    Level livello;
-
-    Caretaker caretaker = null;
-    File fileClassifica;
-    String inputName, inputSurname;
-    RankGUI rankGUI = null;
-
+    private Labyrinth l;
+    private int row = 16, col = 16; // Dimensioni labirinto
+    private Boolean firstRun = true;
+    private RobotState state;
+    private CustomTableModel fullRankModel;
+    private CustomTableModel modelLevelRank;
+    private int currentLevel = 0, maxLevels = 5;
+    private int[] scores = new int[maxLevels];
+    private Level level;
+    private Caretaker caretaker = null;
+    private File fileClassifica;
+    private String inputName, inputSurname;
+    private RankGUI rankGUI = null;
     private Mediator mediator;
 
     public MainGUI() throws IllegalAccessException {
@@ -60,7 +54,7 @@ public class MainGUI extends JFrame implements Observer {
 
 
         setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/img/robot.png").getPath()));
-        modelLevelRank = new MyTableModel(new String[]{"Nome", "Cognome", "Punteggio"});
+        modelLevelRank = new CustomTableModel(new String[]{"Nome", "Cognome", "Punteggio"});
 
         try {
             prepareFile();
@@ -93,8 +87,8 @@ public class MainGUI extends JFrame implements Observer {
                 executor.execute(new Runnable() {
                     @Override
                     public void run() {
-                        level++;
-                        if (level < maxLevels) {
+                        currentLevel++;
+                        if (currentLevel < maxLevels) {
                             try {
                                 prepareLabyrinth();
                             } catch (IllegalAccessException ex) {
@@ -105,7 +99,7 @@ public class MainGUI extends JFrame implements Observer {
                             Icon imgIcon = new ImageIcon(getClass().getResource("/img/blank.png").toString().substring(5));
                             labelImg.setIcon(imgIcon);
                             labelImg.setIcon(null);
-                            stateLabel.setText("Livello " + (level + 1) + " - Avvia  per iniziare");
+                            stateLabel.setText("Livello " + (currentLevel + 1) + " - Avvia  per iniziare");
                         } else {
                             nextLevelButton.setEnabled(false);
                             avviaButton.setEnabled(false);
@@ -261,7 +255,7 @@ public class MainGUI extends JFrame implements Observer {
             row[6] = '?';
             row[7] = '?';
             fullRankModel.addRow(row);
-            level = 0;
+            currentLevel = 0;
         } else if (exists[0] == 1) {
             Object[] options = {"Elimina e inizia da zero", "Aggiungi 'nuovo' al nome", "Specifica nome"};
 //
@@ -289,7 +283,7 @@ public class MainGUI extends JFrame implements Observer {
                     JOptionPane.WARNING_MESSAGE);
 
             if (result == JOptionPane.YES_OPTION) {
-                level = (exists[2] - 2);
+                currentLevel = (exists[2] - 2);
                 //nextLevelButton.setVisible(false);
                 avviaButton.setVisible(true);
                 prepareLabyrinth();
@@ -313,7 +307,7 @@ public class MainGUI extends JFrame implements Observer {
                     row[6] = '?';
                     row[7] = '?';
                     fullRankModel.addRow(row);
-                    level = 0;
+                    currentLevel = 0;
                 } else if (result == JOptionPane.NO_OPTION) {
                     inputName = inputName + " (nuovo)";
                     newGame();
@@ -332,7 +326,7 @@ public class MainGUI extends JFrame implements Observer {
     }
 
     private int[] checkIfGameAlreadyExists(String name, String surname) {
-        int rowIndex = fullRankModel.searchRow(inputName, inputSurname);
+        int rowIndex = fullRankModel.searchRow(inputName, inputSurname, 0, 1);
         int result[] = new int[maxLevels];
         result[0] = 0;
         if (rowIndex != -1) {
@@ -362,8 +356,7 @@ public class MainGUI extends JFrame implements Observer {
 
     public void prepareLabyrinth() throws IllegalAccessException {
         Level.Builder builder = new Level.Builder(16, 16);
-        System.out.println(level);
-        if(level == maxLevels)
+        if(currentLevel == maxLevels)
         {
             builder.addVerticalWall(0,3,11);
             builder.addHorizontalWall(3,1,4);
@@ -382,7 +375,7 @@ public class MainGUI extends JFrame implements Observer {
             drawLabyrinth(builder.build());
         }
         else {
-            if (level == 0) {
+            if (currentLevel == 0) {
                 builder.addWalls();
                 builder.addVerticalWall(3, 2, 9);
                 builder.addVerticalWall(7, 8, 14);
@@ -390,7 +383,7 @@ public class MainGUI extends JFrame implements Observer {
                 builder.addHorizontalWall(10, 11, 13);
                 builder.setExit(12, 0);
                 builder.setRobotStartXY(1, 14);
-            } else if (level == 1) {
+            } else if (currentLevel == 1) {
                 builder.addWalls();
                 builder.addVerticalWall(6, 1, 7);
                 builder.addVerticalWall(9, 2, 10);
@@ -402,7 +395,7 @@ public class MainGUI extends JFrame implements Observer {
                 builder.addHorizontalWall(13, 7, 12);
                 builder.setExit(13, 15);
                 builder.setRobotStartXY(1, 1);
-            } else if (level == 2) {
+            } else if (currentLevel == 2) {
                 builder.addWalls();
                 builder.setExit(0, 8);
                 builder.addVerticalWall(8, 2, 12);
@@ -434,7 +427,7 @@ public class MainGUI extends JFrame implements Observer {
                 builder.addHorizontalWall(6, 10, 12);
                 builder.addDotWall(3, 13);
                 builder.setRobotStartXY(14, 8);
-            } else if (level == 3) {
+            } else if (currentLevel == 3) {
                 builder.addWalls();
                 builder.addHorizontalWall(11, 1, 11);
                 builder.addHorizontalWall(8, 1, 3);
@@ -447,7 +440,7 @@ public class MainGUI extends JFrame implements Observer {
                 builder.addVerticalWall(10, 1, 6);
                 builder.setExit(0, 0);
                 builder.setRobotStartXY(14, 1);
-            } else if (level == 4) {
+            } else if (currentLevel == 4) {
                 builder.addWalls();
                 builder.addVerticalWall(11, 1, 10);
                 builder.addDotWall(1, 12);
@@ -477,31 +470,31 @@ public class MainGUI extends JFrame implements Observer {
             }
 
 
-            livello = builder.build();
+            level = builder.build();
             if (l == null) {
                 try {
-                    l = new Labyrinth(livello);
+                    l = new Labyrinth(level);
                 } catch (IllegalAccessException e) {
                     throw new RuntimeException(e);
                 }
             } else {
                 l = l.clone();
-                l.resetLabyrinth(livello);
+                l.resetLabyrinth(level);
             }
 
 
             Mediator mediator = new Mediator(l, this);
             this.setMediator(mediator);
 
-            drawLabyrinth(livello);
+            drawLabyrinth(level);
 
             mediator.addObserver(this);
 
             updateRank();
             //if (avviaButton.isEnabled()) {
-                stateLabel.setText("Livello " + (level + 1) + " - Avvia per iniziare");
+                stateLabel.setText("Livello " + (currentLevel + 1) + " - Avvia per iniziare");
             //}
-            scores[level] = 0;
+            scores[currentLevel] = 0;
 
         }
 
@@ -517,15 +510,15 @@ public class MainGUI extends JFrame implements Observer {
             modelLevelRank.removeRow(0);
         }
 
-        if (level == maxLevels) {
+        if (currentLevel == maxLevels) {
             rankLabel.setText("Classifica finale");
         } else {
-            rankLabel.setText("Classifica - Livello " + (level + 1));
+            rankLabel.setText("Classifica - Livello " + (currentLevel + 1));
         }
 
         for (int i = 0; i < fullRankModel.getRowCount(); i++) {
-            if (!fullRankModel.getValueAt(i, level + 2).toString().equals("?")) {
-                modelLevelRank.addRow(new Object[]{fullRankModel.getValueAt(i, 0), fullRankModel.getValueAt(i, 1), fullRankModel.getValueAt(i, level + 2)});
+            if (!fullRankModel.getValueAt(i, currentLevel + 2).toString().equals("?")) {
+                modelLevelRank.addRow(new Object[]{fullRankModel.getValueAt(i, 0), fullRankModel.getValueAt(i, 1), fullRankModel.getValueAt(i, currentLevel + 2)});
             }
         }
 
@@ -588,7 +581,7 @@ public class MainGUI extends JFrame implements Observer {
 
         for (int i = 0; i < 16; i++) {
             for (int j = 0; j < 16; j++) {
-                if (livello.getLabyrinth()[i][j] != '#') {
+                if (level.getLabyrinth()[i][j] != '#') {
                     setImagePanelXY("/img/sand.png", i, j);
                 } else {
                     setImagePanelXY("/img/wall.png", i, j);
@@ -613,7 +606,6 @@ public class MainGUI extends JFrame implements Observer {
 
 
             state = mediator.getRobot().getState();
-            System.out.println(state);
             if (state instanceof PursuitState) {
                 // esegui l'azione per lo stato pursuit
                 stateRobotLabel.setText("Stato robot: pursuit");
@@ -638,7 +630,7 @@ public class MainGUI extends JFrame implements Observer {
             setImagePanelXY("/img/robot.png", l.getRobotX(), l.getRobotY());
 
             try {
-                Thread.sleep(150);
+                Thread.sleep(300);
             } catch (InterruptedException ex) {
                 throw new RuntimeException(ex);
             }
@@ -672,25 +664,25 @@ public class MainGUI extends JFrame implements Observer {
 
         for (int i = 0; i < caretaker.sizeMemento(); i++) {
             if (i > 0 && ((caretaker.getMemento(i).getX() != caretaker.getMemento(i - 1).getX()) || (caretaker.getMemento(i).getY() != caretaker.getMemento(i - 1).getY()))) {
-                scores[level]++;
+                scores[currentLevel]++;
             }
         }
         //scores[level] = caretaker.sizeMemento();
-        stateLabel.setText("Il robot ha raggiunto la destinazione con " + scores[level] + " passi!");
-        if (level < maxLevels) {
+        stateLabel.setText("Il robot ha raggiunto la destinazione con " + scores[currentLevel] + " passi!");
+        if (currentLevel < maxLevels) {
             nextLevelButton.setEnabled(true);
         }
 
 
         for (int i = 0; i < fullRankModel.getRowCount(); i++) {
             if (fullRankModel.getValueAt(i, 0).equals(inputName) && fullRankModel.getValueAt(i, 1).equals(inputSurname)) {
-                fullRankModel.setValueAt(Integer.toString(scores[level]), i, level + 2);
+                fullRankModel.setValueAt(Integer.toString(scores[currentLevel]), i, currentLevel + 2);
                     /*if (level == 1) {
                         fullRankModel.setValueAt(Integer.toString((scores[0] + scores[1])), i, level + 3);
                     }*/
                 //sorter.sort();
 
-                if (level == maxLevels - 1) {
+                if (currentLevel == maxLevels - 1) {
                     int totalScore = 0;
                     for (int j = 2; j < fullRankModel.getColumnCount() - 1; j++) {
                         totalScore = totalScore + Integer.parseInt(fullRankModel.getValueAt(i, j).toString());
@@ -737,7 +729,7 @@ public class MainGUI extends JFrame implements Observer {
     private void prepareFile() throws URISyntaxException, MalformedURLException {
         Boolean fileCreatedOrRead = false;
 
-        modelLevelRank = new MyTableModel(new String[]{"Nome", "Cognome", "Punteggio"});
+        modelLevelRank = new CustomTableModel(new String[]{"Nome", "Cognome", "Punteggio"});
         //table1 = new JTable();
         while (!fileCreatedOrRead) {
             if (createFile()) {
@@ -748,7 +740,7 @@ public class MainGUI extends JFrame implements Observer {
                     columnsText[i] = ("Passi LV." + (i - 1));
                 }
                 columnsText[maxLevels + 2] = "Totale passi";
-                fullRankModel = new MyTableModel(columnsText);
+                fullRankModel = new CustomTableModel(columnsText);
                 //table1.setModel(modelLevelRank);
                 fileCreatedOrRead = true;
             } else {
@@ -757,7 +749,7 @@ public class MainGUI extends JFrame implements Observer {
                     columnsText[i] = ("Passi LV." + i);
                 }
                 columnsText[maxLevels + 2] = "Totale passi";
-                fullRankModel = new MyTableModel(columnsText);
+                fullRankModel = new CustomTableModel(columnsText);
                 try {
                     fullRankModel.loadFromFile(fileClassifica);
                     //table1.setModel(modelLevelRank);
