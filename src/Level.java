@@ -5,9 +5,7 @@
 
 public class Level {
     private char[][] labyrinth;
-    private int height;
-    private int width;
-    private int exit = -1;
+    private int exit;
 
     private int robotX, robotY;
 
@@ -19,8 +17,6 @@ public class Level {
     private Level(Builder builder) {
         this.labyrinth = builder.labyrinth;
         this.exit = builder.exit;
-        this.height = builder.height;
-        this.width = builder.width;
         this.robotX = builder.robotX;
         this.robotY = builder.robotY;
     }
@@ -90,7 +86,6 @@ public class Level {
             for (int i = startingColumn; i <= endingColumn; i++) {
                 this.labyrinth[row][i] = '#';
             }
-            return this;
         }
 
         /**
@@ -104,7 +99,6 @@ public class Level {
             for (int i = startingRow; i <= endingRow; i++) {
                 this.labyrinth[i][column] = '#';
             }
-            return this;
         }
 
         /**
@@ -115,7 +109,6 @@ public class Level {
          */
         public void addDotWall(int x, int y) {
             this.labyrinth[x][y] = '#';
-            return this;
         }
 
 
@@ -131,7 +124,6 @@ public class Level {
                     }
                 }
             }
-            return this;
         }
 
         /**
@@ -169,7 +161,6 @@ public class Level {
                 labyrinth[row - 1][column] = ' ';
             }
             this.exit = row * labyrinth[0].length + column;
-            return this;
         }
 
         /**
@@ -183,28 +174,12 @@ public class Level {
                 this.robotX = x;
                 this.robotY = y;
             }
-            return this;
         }
 
-        public Builder setRobotStartX(int x)
-        {
-            if(labyrinth[x][robotY] != '#')
-            {
-                robotX = x;
-            }
-            return this;
-        }
-
-        public Builder setRobotStartY(int y)
-        {
-            if(labyrinth[robotX][y] != '#')
-            {
-                robotY = y;
-            }
-            return this;
-        }
-
-
+        /**
+         * Costruisce e restituisce un oggetto Level con le proprietà specificate nel Builder corrente.
+         * @return Oggetto Level con le proprietà specificate nel Builder corrente.
+         */
         public Level build() {
             return new Level(this);
         }

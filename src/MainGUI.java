@@ -11,6 +11,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
+import java.util.Objects;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
@@ -32,11 +33,10 @@ public class MainGUI extends JFrame implements Observer {
     private JLabel rankLabel;
     private JSlider volumeSlider;
     private JLabel muteButton;
-    private JPanel topPanel;
     private Labyrinth l;
-    private int row = 16, col = 16; // Dimensioni labirinto
+    private final int row = 16;
+    private final int col = 16; // Dimensioni labirinto
     private Boolean firstRun = true;
-    private RobotState state;
     private CustomTableModel fullRankModel;
     private CustomTableModel modelLevelRank;
     private int currentLevel = 0, maxLevels = 5;
@@ -62,7 +62,7 @@ public class MainGUI extends JFrame implements Observer {
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setVisible(true);
         setResizable(false);
-        setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/img/robot.png").getPath()));
+        setIconImage(Toolkit.getDefaultToolkit().getImage(Objects.requireNonNull(getClass().getResource("/img/robot.png")).getPath()));
         modelLevelRank = new CustomTableModel(new String[]{"Nome", "Cognome", "Punteggio"});
         prepareModelFile();
         if (!fileClassifica.exists()) {
@@ -144,12 +144,11 @@ public class MainGUI extends JFrame implements Observer {
         @Override
         public void actionPerformed(ActionEvent e) {
             Executor executor = Executors.newSingleThreadExecutor();
-            executor.execute(new Runnable() {
-                @Override
-                public void run() {
-                    avviaButton.setEnabled(false);
-                    startLabyrinth();
-                }
+            /* Poiché Runnable è un'interfaccia funzionale (ha un solo metodo astratto, "run"), l'implementazione di questa
+               può essere semplificata con una funzione lambda. */
+            executor.execute(() -> {
+                avviaButton.setEnabled(false);
+                startLabyrinth();
             });
         }
     }
@@ -212,9 +211,9 @@ public class MainGUI extends JFrame implements Observer {
             volume.setValue(dB);
 
             if (volumeSlider.getValue() != 0) {
-                muteButton.setIcon(new ImageIcon(getClass().getResource("/img/volume.png").toString().substring(5)));
+                muteButton.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("/img/volume.png")).toString().substring(5)));
             } else {
-                muteButton.setIcon(new ImageIcon(getClass().getResource("/img/volume_mute.png").toString().substring(5)));
+                muteButton.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("/img/volume_mute.png")).toString().substring(5)));
             }
         }
     }
@@ -225,7 +224,7 @@ public class MainGUI extends JFrame implements Observer {
      * Questo è stato fatto per rendere più responsivo il cambio volume.
      */
     private void startMusic() {
-        String filePath = getClass().getResource("/sounds/pathfinderTrack.wav").getPath();
+        String filePath = Objects.requireNonNull(getClass().getResource("/sounds/pathfinderTrack.wav")).getPath();
 
         try {
             File audioFile = new File(filePath);
@@ -238,21 +237,19 @@ public class MainGUI extends JFrame implements Observer {
 
             volume = (FloatControl) audioLine.getControl(FloatControl.Type.MASTER_GAIN);
 
-
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    int bufferSize = (int) format.getSampleRate() * format.getFrameSize();
-                    byte[] buffer = new byte[bufferSize];
-                    int bytesRead = 0;
-                    while (true) {
-                        try (AudioInputStream audioStream = AudioSystem.getAudioInputStream(audioFile)) {
-                            while ((bytesRead = audioStream.read(buffer, 0, buffer.length)) != -1) {
-                                audioLine.write(buffer, 0, bytesRead);
-                            }
-                        } catch (Exception e) {
-                            e.printStackTrace();
+            /* Poiché Runnable è un'interfaccia funzionale (ha un solo metodo astratto, "run"), l'implementazione di questa
+               può essere semplificata con una funzione lambda. */
+            new Thread(() -> {
+                int bufferSize = (int) format.getSampleRate() * format.getFrameSize();
+                byte[] buffer = new byte[bufferSize];
+                int bytesRead;
+                while (true) {
+                    try (AudioInputStream audioStream1 = AudioSystem.getAudioInputStream(audioFile)) {
+                        while ((bytesRead = audioStream1.read(buffer, 0, buffer.length)) != -1) {
+                            audioLine.write(buffer, 0, bytesRead);
                         }
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
                 }
             }).start();
@@ -268,7 +265,7 @@ public class MainGUI extends JFrame implements Observer {
      * per proseguire.
      */
     private void newGame() {
-        int exists[] = checkIfGameAlreadyExists(inputName, inputSurname);
+        int[] exists = checkIfGameAlreadyExists();
         if (exists[0] == 0) {
             Object[] row = new Object[maxLevels + 3];
             row[0] = inputName;
@@ -356,9 +353,9 @@ public class MainGUI extends JFrame implements Observer {
      * Inoltre, fornisce l'indice della riga del gioco nella delle partite e, se necessario, l'indice della colonna che rappresenta il livello incompleto.
      */
 
-    private int[] checkIfGameAlreadyExists(String name, String surname) {
+    private int[] checkIfGameAlreadyExists() {
         int rowIndex = fullRankModel.searchRow(inputName, inputSurname, 0, 1);
-        int result[] = new int[maxLevels];
+        int[] result = new int[maxLevels];
         result[0] = 0;
         if (rowIndex != -1) {
             int columnIndex = fullRankModel.searchColumn(rowIndex, "?");
@@ -588,9 +585,9 @@ public class MainGUI extends JFrame implements Observer {
                         checker = Color.WHITE;
                     }
 
-                    ImagePanel panel = new ImagePanel(new ImageIcon(getClass().getResource("/img/sand.png").toString().substring(5)).getImage());
+                    ImagePanel panel = new ImagePanel(new ImageIcon(Objects.requireNonNull(getClass().getResource("/img/sand.png")).toString().substring(5)).getImage());
                     if (checker == Color.BLACK) {
-                        panel.setImage(new ImageIcon(getClass().getResource("/img/wall.png").toString().substring(5)).getImage());
+                        panel.setImage(new ImageIcon(Objects.requireNonNull(getClass().getResource("/img/wall.png")).toString().substring(5)).getImage());
                     }
                     panel.setMaximumSize(new Dimension(30, 30));
                     panel.setBackground(Color.WHITE);
@@ -623,7 +620,7 @@ public class MainGUI extends JFrame implements Observer {
      */
     public void startLabyrinth() {
         int differenceSizeMemento = 0;
-        char lab[][] = mediator.getLabyrinth();
+        char[][] lab = mediator.getLabyrinth();
         newGameButton.setEnabled(false);
         labirintoPanel.setBackground(Color.WHITE);
 
@@ -656,7 +653,7 @@ public class MainGUI extends JFrame implements Observer {
             }
 
 
-            state = mediator.getRobot().getState(); // Attraverso il Mediator, chiama il metodo di Labyrinth che restituisce l'istanza State del robot
+            RobotState state = mediator.getRobot().getState(); // Attraverso il Mediator, chiama il metodo di Labyrinth che restituisce l'istanza State del robot
             // In base allo stato del robot imposta il testo della label che segnala graficamente lo stato attuale del robot
             if (state instanceof PursuitState) {
                 stateRobotLabel.setText("Stato robot: pursuit");
@@ -679,7 +676,7 @@ public class MainGUI extends JFrame implements Observer {
         }
 
         // Finita la partita
-        imgIcon = new ImageIcon(getClass().getResource("/img/finish.png").toString().substring(5));
+        imgIcon = new ImageIcon(Objects.requireNonNull(getClass().getResource("/img/finish.png")).toString().substring(5));
         labelImg.setIcon(imgIcon);
         stateRobotLabel.setText("");
 
@@ -826,7 +823,7 @@ public class MainGUI extends JFrame implements Observer {
      * @param y         La posizione y nella quale impostare l'immagine.
      */
     private void setImagePanelXY(String imagePath, int x, int y) {
-        ((ImagePanel) labirintoPanel.getComponent((x * 16) + y)).setImage(new ImageIcon(getClass().getResource(imagePath).getPath()).getImage());
+        ((ImagePanel) labirintoPanel.getComponent((x * 16) + y)).setImage(new ImageIcon(Objects.requireNonNull(getClass().getResource(imagePath)).getPath()).getImage());
     }
 
     /**
