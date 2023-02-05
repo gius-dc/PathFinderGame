@@ -4,18 +4,35 @@
  */
 
 
-public class RobotEntity extends Entity {
-    /* La classe Robot estende la classe Entity e mantiene un riferimento allo stato attuale del robot utilizzando
-    una variabile d'istanza della classe RobotState. Inizialmente, lo stato del robot è impostato su PursuitState.
-    Il metodo updateState viene chiamato per cambiare lo stato del robot in base all'oggetto più vicino e la classe
-    setState viene utilizzata per impostare il nuovo stato. */
-
+public class RobotEntity implements Entity {
     private RobotState state;
+    private int x;
+    private int y;
 
     public RobotEntity(int x, int y) {
         setX(x);
         setY(y);
         state = new PursuitState();
+    }
+
+    @Override
+    public int getX() {
+        return x;
+    }
+
+    @Override
+    public void setX(int x) {
+        this.x = x;
+    }
+
+    @Override
+    public int getY() {
+        return y;
+    }
+
+    @Override
+    public void setY(int y) {
+        this.y = y;
     }
 
     public void updateState(ObjectEntity nearestObj) {
@@ -39,6 +56,7 @@ public class RobotEntity extends Entity {
         setY(memento.getY());
     }
 }
+
 
 abstract class RobotState {
     /* La classe astratta RobotState è la classe base per tutti gli stati del robot e ha un metodo
