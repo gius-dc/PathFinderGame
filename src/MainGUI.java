@@ -1,4 +1,5 @@
 import com.formdev.flatlaf.FlatLightLaf;
+
 import javax.sound.sampled.*;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -12,6 +13,10 @@ import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+
+/**
+ * Questa classe è responsabile dell'avvio del programma e della gestione dell'interfaccia grafica
+ */
 
 public class MainGUI extends JFrame implements Observer {
     private JPanel mainPanel;
@@ -59,7 +64,7 @@ public class MainGUI extends JFrame implements Observer {
         setResizable(false);
         setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/img/robot.png").getPath()));
         modelLevelRank = new CustomTableModel(new String[]{"Nome", "Cognome", "Punteggio"});
-        prepareFile();
+        prepareModelFile();
         if (!fileClassifica.exists()) {
             try {
                 fileClassifica.createNewFile();
@@ -196,9 +201,9 @@ public class MainGUI extends JFrame implements Observer {
 
     private class VolumeSliderHandler implements ChangeListener {
         /**
-         *  Questo metodo viene chiamato ogni volta che lo stato del volume cambia.
-         *  Il volume viene regolato in base alla posizione del cursore del volumeSlider e l'immagine del bottone mute viene cambiata
-         *  in base allo stato del volume (muto o non).
+         * Questo metodo viene chiamato ogni volta che lo stato del volume cambia.
+         * Il volume viene regolato in base alla posizione del cursore del volumeSlider e l'immagine del bottone mute viene cambiata
+         * in base allo stato del volume (muto o non).
          */
         @Override
         public void stateChanged(ChangeEvent e) {
@@ -265,7 +270,7 @@ public class MainGUI extends JFrame implements Observer {
     private void newGame() {
         int exists[] = checkIfGameAlreadyExists(inputName, inputSurname);
         if (exists[0] == 0) {
-            Object[] row = new Object[maxLevels+3];
+            Object[] row = new Object[maxLevels + 3];
             row[0] = inputName;
             row[1] = inputSurname;
             row[2] = '?';
@@ -315,7 +320,7 @@ public class MainGUI extends JFrame implements Observer {
 
                 if (result == JOptionPane.YES_OPTION) {
                     fullRankModel.removeRow(exists[1]);
-                    Object[] row = new Object[maxLevels+3];
+                    Object[] row = new Object[maxLevels + 3];
                     row[0] = inputName;
                     row[1] = inputSurname;
                     row[2] = '?';
@@ -346,8 +351,7 @@ public class MainGUI extends JFrame implements Observer {
 
     /**
      * Questo metodo verifica se un gioco con il nome e il cognome specificati esiste già nella lista dei giochi.
-     * @param name Il nome del gioco da verificare.
-     * @param surname Il cognome del gioco da verificare.
+     *
      * @return Un array di interi che indica se il gioco esiste (1), se esiste ma non è stato completato (2), o se non esiste (0).
      * Inoltre, fornisce l'indice della riga del gioco nella delle partite e, se necessario, l'indice della colonna che rappresenta il livello incompleto.
      */
@@ -505,7 +509,8 @@ public class MainGUI extends JFrame implements Observer {
             if (l == null) {
                 try {
                     l = new Labyrinth(level);
-                } catch (Exception e) { // Genera un eccezione se il livello creato non è rappresentato da una matrice quadrata
+                } catch (
+                        Exception e) { // Genera un eccezione se il livello creato non è rappresentato da una matrice quadrata
                     throw new RuntimeException(e);
                 }
             } else {
@@ -611,8 +616,10 @@ public class MainGUI extends JFrame implements Observer {
 
 
     /**
-     * Questo metodo da il via al labirinto. Esegue le iterazioni attraverso il metodo di Labyrinth e ad ogni ciclo aggiorna graficamente
-     * lo stato attuale del gioco (il robot, il suo stato, gli oggetti)
+     * Il metodo startLabyrinth inizia il gioco del labirinto. Utilizza il metodo iterate() della classe Labyrinth per eseguire le iterazioni e ad ogni ciclo,
+     * aggiorna graficamente lo stato attuale del gioco (posizione del robot, stato del robot e posizione degli oggetti).
+     * Il metodo imposta anche l'immagine e il testo per visualizzare lo stato del robot durante il gioco. Alla fine del gioco, il labirinto viene pulito e viene
+     * visualizzato il percorso effettuato dal robot.
      */
     public void startLabyrinth() {
         int differenceSizeMemento = 0;
@@ -621,8 +628,7 @@ public class MainGUI extends JFrame implements Observer {
         labirintoPanel.setBackground(Color.WHITE);
 
 
-
-        Icon imgIcon = new ImageIcon(getClass().getResource("/img/loading30x30.gif").toString().substring(5));
+        Icon imgIcon = new ImageIcon(Objects.requireNonNull(getClass().getResource("/img/loading30x30.gif")).toString().substring(5));
         labelImg.setIcon(imgIcon);
         labelImg.setVisible(true);
         stateLabel.setText("Labirinto in esecuzione...");
@@ -740,7 +746,11 @@ public class MainGUI extends JFrame implements Observer {
     }
 
 
-    // Metodo che crea un file "classifica.csv"
+    /**
+     * Questo metodo crea un file "classifica.csv" nella directory dove è presente il file della classe in esecuzione.
+     *
+     * @return un valore booleano che indica se il file è stato creato o meno
+     */
     private Boolean createFile() {
         fileClassifica = new File(getClass().getProtectionDomain().getCodeSource().getLocation().getPath() + "classifica.csv");
         if (!fileClassifica.exists()) {
@@ -754,11 +764,16 @@ public class MainGUI extends JFrame implements Observer {
         return false;
     }
 
-    private void prepareFile() {
-        Boolean fileCreatedOrRead = false;
+    /**
+     * Metodo che prepara il modello da utilizzare per conservare tutte le partite nel file
+     * Il metodo cerca di creare il file se non esiste, in caso contrario tenta di leggere il file esistente.
+     * Nel caso in cui il file non possa essere letto correttamente, viene mostrata una finestra di dialogo che chiede
+     * all'utente se eliminare il file e crearne uno nuovo oppure se non farlo.
+     */
+    private void prepareModelFile() {
+        boolean fileCreatedOrRead = false;
 
         modelLevelRank = new CustomTableModel(new String[]{"Nome", "Cognome", "Punteggio"});
-        //table1 = new JTable();
         while (!fileCreatedOrRead) {
             if (createFile()) {
                 String[] columnsText = new String[maxLevels + 3];
@@ -803,27 +818,42 @@ public class MainGUI extends JFrame implements Observer {
         }
     }
 
+    /**
+     * Questo metodo si occupa di impostare l'immagine del pannello nella posizione specificata.
+     *
+     * @param imagePath Il percorso dell'immagine da impostare.
+     * @param x         La posizione x nella quale impostare l'immagine.
+     * @param y         La posizione y nella quale impostare l'immagine.
+     */
     private void setImagePanelXY(String imagePath, int x, int y) {
         ((ImagePanel) labirintoPanel.getComponent((x * 16) + y)).setImage(new ImageIcon(getClass().getResource(imagePath).getPath()).getImage());
     }
 
+    /**
+     * Questo metodo viene utilizzato per gestire gli eventi di aggiunta e rimozione degli oggetti nel labirinto.
+     * È stato utilizzato il design pattern Observer, poiché l'oggetto viene notificato dalla classe Labyrinth
+     * e viene eseguita l'azione appropriata in base all'evento (OBJECT_ADDED o OBJECT_REMOVED).
+     *
+     * @param obj       rappresenta l'oggetto che è stato modificato
+     * @param eventType rappresenta il tipo di evento legato all'oggetto (aggiunto o rimosso)
+     */
     @Override
-    public void update(ObjectEntity entita, int eventType) {
+    public void update(ObjectEntity obj, int eventType) {
         if (eventType == Labyrinth.OBJECT_ADDED) {
             // Aggiungi graficamente l'oggetto al labirinto
-            if (entita.getColor() == 'R') {
-                setImagePanelXY("/img/red_stone.png", entita.getX(), entita.getY());
-            } else if (entita.getColor() == 'Y') {
-                setImagePanelXY("/img/yellow_lemon.png", entita.getX(), entita.getY());
-            } else if (entita.getColor() == 'C') {
-                setImagePanelXY("/img/cyan_bucket.png", entita.getX(), entita.getY());
-            } else if (entita.getColor() == 'G') {
-                setImagePanelXY("/img/green_cactus.png", entita.getX(), entita.getY());
+            if (obj.getColor() == 'R') {
+                setImagePanelXY("/img/red_stone.png", obj.getX(), obj.getY());
+            } else if (obj.getColor() == 'Y') {
+                setImagePanelXY("/img/yellow_lemon.png", obj.getX(), obj.getY());
+            } else if (obj.getColor() == 'C') {
+                setImagePanelXY("/img/cyan_bucket.png", obj.getX(), obj.getY());
+            } else if (obj.getColor() == 'G') {
+                setImagePanelXY("/img/green_cactus.png", obj.getX(), obj.getY());
             }
 
         } else if (eventType == Labyrinth.OBJECT_REMOVED) {
             // Rimuovi graficamente l'oggetto dal labirinto
-            setImagePanelXY("/img/sand.png", entita.getX(), entita.getY());
+            setImagePanelXY("/img/sand.png", obj.getX(), obj.getY());
         }
     }
 
