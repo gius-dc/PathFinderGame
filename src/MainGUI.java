@@ -343,6 +343,15 @@ public class MainGUI extends JFrame implements Observer {
                 "Informazione", JOptionPane.INFORMATION_MESSAGE);
     }
 
+
+    /**
+     * Questo metodo verifica se un gioco con il nome e il cognome specificati esiste già nella lista dei giochi.
+     * @param name Il nome del gioco da verificare.
+     * @param surname Il cognome del gioco da verificare.
+     * @return Un array di interi che indica se il gioco esiste (1), se esiste ma non è stato completato (2), o se non esiste (0).
+     * Inoltre, fornisce l'indice della riga del gioco nella delle partite e, se necessario, l'indice della colonna che rappresenta il livello incompleto.
+     */
+
     private int[] checkIfGameAlreadyExists(String name, String surname) {
         int rowIndex = fullRankModel.searchRow(inputName, inputSurname, 0, 1);
         int result[] = new int[maxLevels];
@@ -372,9 +381,14 @@ public class MainGUI extends JFrame implements Observer {
     }
 
 
+    /**
+     * Questo metodo prepara il labirinto, ovvero crea il livello (oggetto di tipo Level) che verrà poi utilizzato dalla classe Labirinto.
+     * Il livello viene costruito andando a chiamare i metodi della classe Builder (design pattern) che consente facilmente di creare pareti,
+     * impostare la via d'uscita e la posizione iniziale del robot.
+     */
     public void prepareLabyrinth() {
         Level.Builder builder = new Level.Builder(16, 16);
-        if (currentLevel == maxLevels) {
+        if (currentLevel == maxLevels) { // Non è un vero e proprio livello, serve solo per visualizzare "END" alla fine della partita
             builder.addVerticalWall(0, 3, 11);
             builder.addHorizontalWall(3, 1, 4);
             builder.addHorizontalWall(7, 1, 3);
@@ -391,7 +405,7 @@ public class MainGUI extends JFrame implements Observer {
             builder.setRobotStartXY(13, 8);
             drawLabyrinth(builder.build());
         } else {
-            if (currentLevel == 0) {
+            if (currentLevel == 0) { // Primo livello
                 builder.addWalls();
                 builder.addVerticalWall(3, 2, 9);
                 builder.addVerticalWall(7, 8, 14);
@@ -399,7 +413,7 @@ public class MainGUI extends JFrame implements Observer {
                 builder.addHorizontalWall(10, 11, 13);
                 builder.setExit(12, 0);
                 builder.setRobotStartXY(1, 14);
-            } else if (currentLevel == 1) {
+            } else if (currentLevel == 1) { // Secondo livello
                 builder.addWalls();
                 builder.addVerticalWall(6, 1, 7);
                 builder.addVerticalWall(9, 2, 10);
@@ -411,7 +425,7 @@ public class MainGUI extends JFrame implements Observer {
                 builder.addHorizontalWall(13, 7, 12);
                 builder.setExit(13, 15);
                 builder.setRobotStartXY(1, 1);
-            } else if (currentLevel == 2) {
+            } else if (currentLevel == 2) { // Terzo livello
                 builder.addWalls();
                 builder.setExit(0, 8);
                 builder.addVerticalWall(8, 2, 12);
@@ -443,7 +457,7 @@ public class MainGUI extends JFrame implements Observer {
                 builder.addHorizontalWall(6, 10, 12);
                 builder.addDotWall(3, 13);
                 builder.setRobotStartXY(14, 8);
-            } else if (currentLevel == 3) {
+            } else if (currentLevel == 3) { // Quarto livello
                 builder.addWalls();
                 builder.addHorizontalWall(11, 1, 11);
                 builder.addHorizontalWall(8, 1, 3);
@@ -456,7 +470,7 @@ public class MainGUI extends JFrame implements Observer {
                 builder.addVerticalWall(10, 1, 6);
                 builder.setExit(0, 0);
                 builder.setRobotStartXY(14, 1);
-            } else if (currentLevel == 4) {
+            } else if (currentLevel == 4) { // Quinto livello
                 builder.addWalls();
                 builder.addVerticalWall(11, 1, 10);
                 builder.addDotWall(1, 12);
@@ -482,50 +496,49 @@ public class MainGUI extends JFrame implements Observer {
                 builder.addHorizontalWall(2, 2, 4);
                 builder.setExit(0, 15);
                 builder.setRobotStartXY(1, 10);
-
             }
 
 
-            level = builder.build();
+            level = builder.build(); // Costruisci il livello
+
+            // Inizializza il labirinto con il livello appena costruito
             if (l == null) {
                 try {
                     l = new Labyrinth(level);
-                } catch (IllegalAccessException e) {
+                } catch (Exception e) { // Genera un eccezione se il livello creato non è rappresentato da una matrice quadrata
                     throw new RuntimeException(e);
                 }
             } else {
                 l = l.clone();
                 try {
                     l.resetLabyrinth(level);
-                } catch (IllegalAccessException e) {
+                } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
             }
 
 
             Mediator mediator = new Mediator(l, this);
-            this.setMediator(mediator);
-
+            this.setMediator(mediator); // Imposta il mediatore tra MainGUI e Labyrinth per poter utilizzare mediante esso i metodi di Labyrinth
             drawLabyrinth(level);
-
             mediator.addObserver(this);
 
-            updateRank();
-            //if (avviaButton.isEnabled()) {
+            updateRank(); // Aggiorna la classifica su schermo in base al livello corrente
             stateLabel.setText("Livello " + (currentLevel + 1) + " - Avvia per iniziare");
-            //}
             scores[currentLevel] = 0;
-
         }
 
 
     }
 
-    public void setMediator(Mediator mediator) {
-        this.mediator = mediator;
-    }
 
+    /**
+     * Questo metodo si occupa di aggiornare su schermo la classifica.
+     * In base al livello corrente, va a filtrare i dati presenti nel modello della tabella per visualizzare solo i punteggi
+     * di tutte le partite effettuate di quel livello.
+     */
     private void updateRank() {
+        // Elimina tutte le righe presenti nella tabella
         while (modelLevelRank.getRowCount() > 0) {
             modelLevelRank.removeRow(0);
         }
@@ -536,17 +549,26 @@ public class MainGUI extends JFrame implements Observer {
             rankLabel.setText("Classifica - Livello " + (currentLevel + 1));
         }
 
-        for (int i = 0; i < fullRankModel.getRowCount(); i++) {
-            if (!fullRankModel.getValueAt(i, currentLevel + 2).toString().equals("?")) {
-                modelLevelRank.addRow(new Object[]{fullRankModel.getValueAt(i, 0), fullRankModel.getValueAt(i, 1), fullRankModel.getValueAt(i, currentLevel + 2)});
+        for (int i = 0; i < fullRankModel.getRowCount(); i++) { // Per ogni riga nel modello
+            if (!fullRankModel.getValueAt(i, currentLevel + 2).toString().equals("?")) { // Se nella colonna corrispondente al livello corrente è diverso da '?' (che indica partita non effettuata)
+                modelLevelRank.addRow(new Object[]{fullRankModel.getValueAt(i, 0), fullRankModel.getValueAt(i, 1), fullRankModel.getValueAt(i, currentLevel + 2)}); // Allora aggiungi nel modello filtrato il nome, il cognome e il punteggio per quel livello
             }
         }
 
+        // La terza colonna rappresenta il punteggio, quindi viene ordinato in senso crescente tutte le righe in base a questa colonna
         modelLevelRank.sortByColumn(2);
         table1.setModel(modelLevelRank);
     }
 
+    public void setMediator(Mediator mediator) {
+        this.mediator = mediator;
+    }
 
+    /**
+     * Questo metodo si occupa di aggiornare su schermo la classifica.
+     * In base al livello corrente, va a filtrare i dati presenti nel modello della tabella per visualizzare solo i punteggi
+     * di tutte le partite effettuate di quel livello.
+     */
     public void drawLabyrinth(Level l) {
 
         char[][] labirinto = l.getLabyrinth();
@@ -560,7 +582,7 @@ public class MainGUI extends JFrame implements Observer {
                     } else {
                         checker = Color.WHITE;
                     }
-                    //JPanel panel = new JPanel();
+
                     ImagePanel panel = new ImagePanel(new ImageIcon(getClass().getResource("/img/sand.png").toString().substring(5)).getImage());
                     if (checker == Color.BLACK) {
                         panel.setImage(new ImageIcon(getClass().getResource("/img/wall.png").toString().substring(5)).getImage());
@@ -587,11 +609,17 @@ public class MainGUI extends JFrame implements Observer {
         setImagePanelXY("/img/robot.png", l.getRobotX(), l.getRobotY());
     }
 
+
+    /**
+     * Questo metodo da il via al labirinto. Esegue le iterazioni attraverso il metodo di Labyrinth e ad ogni ciclo aggiorna graficamente
+     * lo stato attuale del gioco (il robot, il suo stato, gli oggetti)
+     */
     public void startLabyrinth() {
-        newGameButton.setEnabled(false);
         int differenceSizeMemento = 0;
-        labirintoPanel.setBackground(Color.WHITE);
         char lab[][] = mediator.getLabyrinth();
+        newGameButton.setEnabled(false);
+        labirintoPanel.setBackground(Color.WHITE);
+
 
 
         Icon imgIcon = new ImageIcon(getClass().getResource("/img/loading30x30.gif").toString().substring(5));
@@ -599,72 +627,59 @@ public class MainGUI extends JFrame implements Observer {
         labelImg.setVisible(true);
         stateLabel.setText("Labirinto in esecuzione...");
 
-        for (int i = 0; i < 16; i++) {
-            for (int j = 0; j < 16; j++) {
+        // Pulisce il labirinto graficamente e disegna il livello
+        for (int i = 0; i < row; i++) {
+            for (int j = 0; j < col; j++) {
                 if (level.getLabyrinth()[i][j] != '#') {
-                    setImagePanelXY("/img/sand.png", i, j);
+                    setImagePanelXY("/img/sand.png", i, j); // Disegna cella vuota
                 } else {
-                    setImagePanelXY("/img/wall.png", i, j);
+                    setImagePanelXY("/img/wall.png", i, j); // Altrimenti disegna la parete
                 }
             }
         }
 
-        while (!l.iterate()) {
-            if (caretaker != null) {
+        while (!l.iterate()) { // Itera fino a quando il metodo iterate() segnala che il robot ancora non ha raggiunto la destinazione
+            if (caretaker != null) { // Gestisce la stampa alla prima iterazione andando a controllare se ci sono stati precedenti del robot
                 if (caretaker.sizeMemento() > 1) {
                     setImagePanelXY("/img/sand.png", caretaker.getMemento(caretaker.sizeMemento() - 2).getX(), caretaker.getMemento(caretaker.sizeMemento() - 2).getY());
-
-
                     if (caretaker.sizeMemento() > 3 && (caretaker.sizeMemento() - differenceSizeMemento == 2)) {
                         setImagePanelXY("/img/sand.png", caretaker.getMemento(caretaker.sizeMemento() - 3).getX(), caretaker.getMemento(caretaker.sizeMemento() - 3).getY());
-
                     }
-
                 }
                 differenceSizeMemento = caretaker.sizeMemento();
             }
 
 
-            state = mediator.getRobot().getState();
+            state = mediator.getRobot().getState(); // Attraverso il Mediator, chiama il metodo di Labyrinth che restituisce l'istanza State del robot
+            // In base allo stato del robot imposta il testo della label che segnala graficamente lo stato attuale del robot
             if (state instanceof PursuitState) {
-                // esegui l'azione per lo stato pursuit
                 stateRobotLabel.setText("Stato robot: pursuit");
             } else if (state instanceof SeekState) {
-                // esegui l'azione per lo stato seek
                 stateRobotLabel.setText("Stato robot: seek");
             } else if (state instanceof FleeState) {
-                // esegui l'azione per lo stato flee
                 stateRobotLabel.setText("Stato robot: flee");
             } else if (state instanceof EvadeState) {
-                // esegui l'azione per lo stato evade
                 stateRobotLabel.setText("Stato robot: evade");
             }
-
-
-            //if (caretaker.sizeMemento() > 0) {
-            //    Memento memento = caretaker.getMemento(caretaker.sizeMemento() - 1);
-            //    setImagePanelXY("/img/sand.png", memento.getX(), memento.getY());
-            //}
 
             caretaker = mediator.getCaretaker();
             setImagePanelXY("/img/robot.png", l.getRobotX(), l.getRobotY());
 
             try {
-                Thread.sleep(300);
+                Thread.sleep(300); // Per rallentare, dare una pausa tra un iterazione e un'altra
             } catch (InterruptedException ex) {
                 throw new RuntimeException(ex);
             }
-            //caretaker.addMemento(l.getRobot().saveToMemento()); // salva il nuovo stato del robot (design pattern Memento)
         }
 
-
+        // Finita la partita
         imgIcon = new ImageIcon(getClass().getResource("/img/finish.png").toString().substring(5));
         labelImg.setIcon(imgIcon);
         stateRobotLabel.setText("");
 
-
-        for (int x = 0; x < 16; x++) {
-            for (int y = 0; y < 16; y++) {
+        // Pulisci il labirinto
+        for (int x = 0; x < row; x++) {
+            for (int y = 0; y < col; y++) {
                 if (lab[x][y] == '#') {
                     setImagePanelXY("/img/wall.png", x, y);
                 } else {
@@ -674,63 +689,54 @@ public class MainGUI extends JFrame implements Observer {
         }
 
 
-        // Il programma visualizza il percorso che il robot ha effettuato (Memento)
+        // Visualizza il percorso effettuato dal robot
         for (int i = 0; i < caretaker.sizeMemento(); i++) {
             Memento memento = caretaker.getMemento(i);
-            l.getRobot().restoreFromMemento(memento);
-            setImagePanelXY("/img/footprints.png", l.getRobot().getX(), l.getRobot().getY());
+            l.getRobot().restoreFromMemento(memento); // Viene ricavando andando a scorrere tutti gli stati precedenti del robot
+            setImagePanelXY("/img/footprints.png", l.getRobot().getX(), l.getRobot().getY()); // Imposta l'immagine del passo sul percorso
         }
 
-
+        // Viene calcolato il punteggio, ovvero andando a contare il numero di passi effettuati dal robot (con lo stesso metodo)
         for (int i = 0; i < caretaker.sizeMemento(); i++) {
             if (i > 0 && ((caretaker.getMemento(i).getX() != caretaker.getMemento(i - 1).getX()) || (caretaker.getMemento(i).getY() != caretaker.getMemento(i - 1).getY()))) {
                 scores[currentLevel]++;
             }
         }
-        //scores[level] = caretaker.sizeMemento();
+
         stateLabel.setText("Il robot ha raggiunto la destinazione con " + scores[currentLevel] + " passi!");
         if (currentLevel < maxLevels) {
             nextLevelButton.setEnabled(true);
         }
 
 
+        // Alla fine della partita, viene aggiornato il file con la nuova partita
         for (int i = 0; i < fullRankModel.getRowCount(); i++) {
-            if (fullRankModel.getValueAt(i, 0).equals(inputName) && fullRankModel.getValueAt(i, 1).equals(inputSurname)) {
-                fullRankModel.setValueAt(Integer.toString(scores[currentLevel]), i, currentLevel + 2);
-                    /*if (level == 1) {
-                        fullRankModel.setValueAt(Integer.toString((scores[0] + scores[1])), i, level + 3);
-                    }*/
-                //sorter.sort();
+            if (fullRankModel.getValueAt(i, 0).equals(inputName) && fullRankModel.getValueAt(i, 1).equals(inputSurname)) { // Trova la riga dove è presente la partita attuale (nome e cognome devono corrispondere)
+                fullRankModel.setValueAt(Integer.toString(scores[currentLevel]), i, currentLevel + 2); // Imposta la colonna del corrispettivo livello con il punteggio ottenuto dal robot
 
-                if (currentLevel == maxLevels - 1) {
+                if (currentLevel == maxLevels - 1) { // Se si tratta dell'ultimo livello
                     int totalScore = 0;
                     for (int j = 2; j < fullRankModel.getColumnCount() - 1; j++) {
-                        totalScore = totalScore + Integer.parseInt(fullRankModel.getValueAt(i, j).toString());
+                        totalScore = totalScore + Integer.parseInt(fullRankModel.getValueAt(i, j).toString()); // Somma i punteggi ottenuti in tutti i livelli
                     }
-
-                    fullRankModel.setValueAt(Integer.toString(totalScore), i, maxLevels + 2);
+                    fullRankModel.setValueAt(Integer.toString(totalScore), i, maxLevels + 2); // E salvalo come punteggio finale
                 }
                 try {
-                    fullRankModel.saveToFile(fileClassifica);
+                    fullRankModel.saveToFile(fileClassifica); // Salva il modello aggiornato sul file
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
         }
 
-        updateRank();
-        newGameButton.setEnabled(true);
+        updateRank(); // Aggiorna la classifica su schermo
+        newGameButton.setEnabled(true); // Abilita il pulsante per avviare una nuova partita
     }
 
 
     public static void main(String[] args) throws IllegalAccessException {
-
-
         FlatLightLaf.setup();
-
-        MainGUI myMainGUI = new MainGUI();
-
-
+        MainGUI myMainGUI = new MainGUI(); // Avvia il costruttore di questa classe che estende JForm, quindi avvia l'interfaccia grafica
     }
 
     private Boolean createFile() {

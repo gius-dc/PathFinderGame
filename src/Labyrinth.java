@@ -42,13 +42,13 @@ public class Labyrinth extends Observable implements Cloneable {
     }
 
     // Costruttore
-    public Labyrinth(Level l) throws IllegalAccessException {
+    public Labyrinth(Level l) throws Exception {
         caretaker = Caretaker.getInstance();
         setLabyrinth(l);
 
     }
 
-    private void setLabyrinth(Level l) throws IllegalAccessException {
+    private void setLabyrinth(Level l) throws Exception {
         objects = new ArrayList<>();
         random = new Random();
         labyrinth = l.getLabyrinth();
@@ -56,7 +56,7 @@ public class Labyrinth extends Observable implements Cloneable {
         caretaker.resetMemento();
 
         if (!checkIfMatrixIsSquare(labyrinth)) {
-            throw new IllegalAccessException("Il livello contiene una matrice non quadrata.");
+            throw new Exception("Il livello contiene una matrice non quadrata.");
         }
 
         DIMENSION = (int) sqrt(getSizeMatrix(labyrinth));
@@ -66,7 +66,7 @@ public class Labyrinth extends Observable implements Cloneable {
     }
 
 
-    public void resetLabyrinth(Level l) throws IllegalAccessException {
+    public void resetLabyrinth(Level l) throws Exception {
         setLabyrinth(l);
     }
 
@@ -89,7 +89,7 @@ public class Labyrinth extends Observable implements Cloneable {
         char c = '\u0000';
         int r, ox = 0, oy = 0;
 
-        // Ad ogni iterazione viene scelto casualmente se aggiungere dei oggetti oppure rimuovere
+        // A ogni iterazione viene scelto casualmente se aggiungere dei oggetti oppure rimuovere
         if (random.nextInt(100) % 2 == 0) {
             // Aggiungi oggetti, il numero di oggetti da aggiungere viene scelto casualmente da 0 a 4
             int n = random.nextInt(5);
