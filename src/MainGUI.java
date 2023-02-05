@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.util.Objects;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Questa classe è responsabile dell'avvio del programma e della gestione dell'interfaccia grafica
@@ -182,7 +183,7 @@ public class MainGUI extends JFrame implements Observer {
          */
         @Override
         public void actionPerformed(ActionEvent e) {
-            Boolean showMessage = false;
+            boolean showMessage = false;
             do {
                 if (showMessage) {
                     JFrame currentFrame = (JFrame) SwingUtilities.getWindowAncestor((Component) e.getSource());
@@ -669,7 +670,7 @@ public class MainGUI extends JFrame implements Observer {
             setImagePanelXY("/img/robot.png", l.getRobotX(), l.getRobotY());
 
             try {
-                Thread.sleep(300); // Per rallentare, dare una pausa tra un iterazione e un'altra
+                TimeUnit.MILLISECONDS.sleep(300); // Per rallentare, dare una pausa tra un iterazione e un'altra
             } catch (InterruptedException ex) {
                 throw new RuntimeException(ex);
             }

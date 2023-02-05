@@ -5,7 +5,6 @@
  */
 public class Mediator {
     private Labyrinth labyrinth;
-    private MainGUI mainGUI;
 
     /**
      * Costruttore che inizializza le due classi.
@@ -14,7 +13,6 @@ public class Mediator {
      */
     public Mediator(Labyrinth labyrinth, MainGUI mainGUI) {
         this.labyrinth = labyrinth;
-        this.mainGUI = mainGUI;
     }
 
     /**
