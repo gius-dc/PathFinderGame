@@ -1,28 +1,6 @@
-/**
- * Classe astratta che rappresenta un'entità con coordinate x e y.
- * Tali entità possono essere un oggetto o un robot, rappresentati dalle loro rispettive classi concrete
- */
-
-
-public abstract class Entity {
-    private int x,y; // coordinate
-
-    // setters
-    public void setX(int x) {
-        this.x = x;
-    }
-
-    public void setY(int y) {
-        this.y = y;
-    }
-
-    // getters
-    public int getX() {
-        return x;
-    }
-
-    public int getY() {
-        return y;
-    }
-
+public interface Entity {
+    int getX();
+    int getY();
+    void setX(int x);
+    void setY(int y);
 }
