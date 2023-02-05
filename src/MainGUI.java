@@ -23,7 +23,7 @@ import java.util.concurrent.TimeUnit;
 public class MainGUI extends JFrame implements Observer {
     private JPanel mainPanel;
     private JPanel labirintoPanel;
-    private JButton avviaButton;
+    private JButton startButton;
     private JLabel stateLabel;
     private JTable table1;
     private JLabel labelImg;
@@ -48,7 +48,6 @@ public class MainGUI extends JFrame implements Observer {
     private String inputName, inputSurname;
     private RankGUI rankGUI = null;
     private Mediator mediator;
-
     private FloatControl volume;
 
     /**
@@ -80,7 +79,7 @@ public class MainGUI extends JFrame implements Observer {
         setLocationRelativeTo(null);
         nextLevelButton.addActionListener(new NextLevelButtonHandler());
         muteButton.addMouseListener(new MuteButtonHandler());
-        avviaButton.addActionListener(new AvviaButtonHandler());
+        startButton.addActionListener(new StartButtonHandler());
         showRankButton.addActionListener(new ShowRankButtonHandler());
         newGameButton.addActionListener(new NewGameButtonHandler());
         startMusic();
@@ -102,12 +101,12 @@ public class MainGUI extends JFrame implements Observer {
             if (currentLevel < maxLevels) {
                 prepareLabyrinth();
                 nextLevelButton.setEnabled(false);
-                avviaButton.setEnabled(true);
+                startButton.setEnabled(true);
                 labelImg.setIcon(null);
                 stateLabel.setText("Livello " + (currentLevel + 1) + " - Avvia per iniziare");
             } else {
                 nextLevelButton.setEnabled(false);
-                avviaButton.setEnabled(false);
+                startButton.setEnabled(false);
                 newGameButton.setEnabled(true);
                 stateLabel.setText("Complimenti, hai finito tutti i livelli! ☺");
                 updateRank();
@@ -134,7 +133,7 @@ public class MainGUI extends JFrame implements Observer {
         }
     }
 
-    private class AvviaButtonHandler implements ActionListener {
+    private class StartButtonHandler implements ActionListener {
         /**
          * Metodo che viene eseguito quando viene premuto il pulsante "Avvia".
          * Viene avviato un thread separato che esegue il metodo startLabyrinth.
@@ -148,7 +147,7 @@ public class MainGUI extends JFrame implements Observer {
             /* Poiché Runnable è un'interfaccia funzionale (ha un solo metodo astratto, "run"), l'implementazione di questa
                può essere semplificata con una funzione lambda. */
             executor.execute(() -> {
-                avviaButton.setEnabled(false);
+                startButton.setEnabled(false);
                 startLabyrinth();
             });
         }
@@ -307,7 +306,7 @@ public class MainGUI extends JFrame implements Observer {
             if (result == JOptionPane.YES_OPTION) {
                 currentLevel = (exists[2] - 2);
                 //nextLevelButton.setVisible(false);
-                avviaButton.setVisible(true);
+                startButton.setVisible(true);
                 prepareLabyrinth();
             } else if (result == JOptionPane.NO_OPTION) {
 
@@ -341,7 +340,7 @@ public class MainGUI extends JFrame implements Observer {
         }
 
         prepareLabyrinth();
-        avviaButton.setEnabled(true);
+        startButton.setEnabled(true);
         JOptionPane.showMessageDialog(this, "Puoi avviare la partita cliccando 'Avvia' in ogni livello",
                 "Informazione", JOptionPane.INFORMATION_MESSAGE);
     }
@@ -626,10 +625,12 @@ public class MainGUI extends JFrame implements Observer {
         labirintoPanel.setBackground(Color.WHITE);
 
 
-        Icon imgIcon = new ImageIcon(Objects.requireNonNull(getClass().getResource("/img/loading30x30.gif")).toString().substring(5));
+        Icon imgIcon = new ImageIcon(Objects.requireNonNull(getClass().getResource("/img/loading.gif")).toString().substring(5));
         labelImg.setIcon(imgIcon);
         labelImg.setVisible(true);
         stateLabel.setText("Labirinto in esecuzione...");
+
+
 
         // Pulisce il labirinto graficamente e disegna il livello
         for (int i = 0; i < row; i++) {
