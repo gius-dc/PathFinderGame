@@ -784,7 +784,6 @@ public class MainGUI extends JFrame implements Observer {
                 }
                 columnsText[maxLevels + 2] = "Totale passi";
                 fullRankModel = new CustomTableModel(columnsText);
-                //table1.setModel(modelLevelRank);
                 fileCreatedOrRead = true;
             } else {
                 String[] columnsText = new String[maxLevels + 3];
