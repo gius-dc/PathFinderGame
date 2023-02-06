@@ -661,7 +661,7 @@ public class MainGUI extends JFrame implements Observer {
             }
 
 
-            RobotState state = mediator.getRobot().getState(); // Attraverso il Mediator, chiama il metodo di Labyrinth che restituisce l'istanza State del robot
+            RobotState state = ((RobotEntity) mediator.getRobot()).getState(); // Attraverso il Mediator, chiama il metodo di Labyrinth che restituisce l'istanza State del robot
             // In base allo stato del robot imposta il testo della label che segnala graficamente lo stato attuale del robot
             if (state instanceof PursuitState) {
                 stateRobotLabel.setText("Stato robot: pursuit");
@@ -703,7 +703,7 @@ public class MainGUI extends JFrame implements Observer {
         // Visualizza il percorso effettuato dal robot
         for (int i = 0; i < caretaker.sizeMemento(); i++) {
             Memento memento = caretaker.getMemento(i);
-            l.getPlayer().restoreFromMemento(memento); // Viene ricavando andando a scorrere tutti gli stati precedenti del robot
+            ((RobotEntity) l.getPlayer()).restoreFromMemento(memento); // Viene ricavando andando a scorrere tutti gli stati precedenti del robot
             setImagePanelXY("/img/footprints.png", l.getPlayer().getX(), l.getPlayer().getY()); // Imposta l'immagine del passo sul percorso
         }
 

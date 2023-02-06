@@ -34,7 +34,7 @@ public class Mediator {
         labyrinthGame.addObserver(observer);
     }
 
-    public RobotEntity getRobot() {
+    public Entity getRobot() {
         return labyrinthGame.getPlayer();
     }
 }

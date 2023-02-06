@@ -8,9 +8,7 @@ import java.util.Random;
 
 public class LabyrinthGame extends Labyrinth implements Cloneable {
     private Level l;
-    private RobotEntity player; // oggetto robot
     private List<ObjectEntity> objects; // lista di oggetti (del labirinto)
-
     // State
     private RobotState state;
     private Caretaker caretaker;
@@ -61,8 +59,7 @@ public class LabyrinthGame extends Labyrinth implements Cloneable {
      *  @return Boolean: true se il robot ha raggiunto la destinazione, false se non l'ha ancora raggiunta.
      */
     public Boolean iterate() {
-        state = player.getState();
-
+        state = ((RobotEntity) player).getState();
         char c;
         int r, ox, oy;
 
@@ -117,23 +114,23 @@ public class LabyrinthGame extends Labyrinth implements Cloneable {
         if (!checkIfRobotGoal()) { // Se il robot non ha raggiunto ancora la destinazione effettua il prossimo passo
 
 
-            state = player.getState(); // Design pattern state, ottiene lo stato del robot (istanza di una sottoclasse di RobotState)
+            state = ((RobotEntity) player).getState(); // Design pattern state, ottiene lo stato del robot (istanza di una sottoclasse di RobotState)
             if (state instanceof PursuitState) {
                 doStepRobot(false); // Pursuit -> effettua un passo
-                caretaker.addMemento(player.saveToMemento()); // dato che il robot ha cambiato coordinate, salva il suo nuovo stato (Memento)
+                caretaker.addMemento(((RobotEntity) player).saveToMemento()); // dato che il robot ha cambiato coordinate, salva il suo nuovo stato (Memento)
             } else if (state instanceof SeekState) {
                 doStepRobot(false); // Seek -> effettua un passo
-                caretaker.addMemento(player.saveToMemento());
+                caretaker.addMemento(((RobotEntity) player).saveToMemento());
             } else if (state instanceof FleeState) {
                 for (int i = 0; i < 2; i++) {
                     if (!checkIfRobotGoal()) {
                         doStepRobot(false); // Flee -> effettua due passi (ciclo for)
-                        caretaker.addMemento(player.saveToMemento());
+                        caretaker.addMemento(((RobotEntity) player).saveToMemento());
                     }
                 }
             } else if (state instanceof EvadeState) {
                 doStepRobot(true); // Evade -> effettua un passo casuale
-                caretaker.addMemento(player.saveToMemento());
+                caretaker.addMemento(((RobotEntity) player).saveToMemento());
             }
 
 
@@ -150,7 +147,7 @@ public class LabyrinthGame extends Labyrinth implements Cloneable {
             }
             for (ObjectEntity adjacentObject : adjacentObjects) {
                 // Per ogni oggetto in prossimità aggiorna lo stato del robot
-                player.updateState(adjacentObject);
+                ((RobotEntity) player).updateState(adjacentObject);
             }
             return false;
         }
@@ -204,7 +201,7 @@ public class LabyrinthGame extends Labyrinth implements Cloneable {
         }
 
         // In base alla strategia impostata, effettua il prossimo passo
-        strategy.move(player, matrix, DIMENSION, exitN);
+        strategy.move(((RobotEntity) player), matrix, DIMENSION, exitN);
 
     }
 
@@ -290,7 +287,7 @@ public class LabyrinthGame extends Labyrinth implements Cloneable {
         return player.getY();
     }
 
-    public RobotEntity getPlayer() {
+    public Entity getPlayer() {
         return player;
     }
 
