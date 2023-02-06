@@ -24,7 +24,13 @@ public class LabyrinthGame extends Labyrinth implements Cloneable {
     @Override
     public LabyrinthGame clone() {
         try {
-            return (LabyrinthGame) super.clone();
+            LabyrinthGame clone = (LabyrinthGame) super.clone();
+            clone.objects = new ArrayList<>(this.objects.size());
+            for (ObjectEntity object : this.objects) {
+                clone.objects.add(object);
+            }
+            clone.state = this.state;
+            return clone;
         } catch (CloneNotSupportedException e) {
             return null;
         }
