@@ -511,16 +511,13 @@ public class MainGUI extends JFrame implements Observer {
                 }
             } else {
 
-                l = new LabyrinthGame(level);
-
-                /*
-                l = l.clone();
+                labGame = labGame.clone();
                 try {
-                    l.resetLabyrinth(level);
+                    labGame.setLabyrinth(level);
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
-                */
+
 
             }
 
