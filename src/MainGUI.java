@@ -53,10 +53,9 @@ public class MainGUI extends JFrame implements Observer {
     /**
      * Costruttore della classe MainGUI che inizializza la GUI del gioco e prepara il file (motivo per il quale può generare un eccezione).
      *
-     * @throws IllegalAccessException
      */
 
-    public MainGUI() throws IllegalAccessException {
+    public MainGUI() {
         setContentPane(mainPanel);
         setTitle("Labirinto");
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -745,7 +744,7 @@ public class MainGUI extends JFrame implements Observer {
     }
 
 
-    public static void main(String[] args) throws IllegalAccessException {
+    public static void main(String[] args) {
         FlatLightLaf.setup();
         MainGUI myMainGUI = new MainGUI(); // Avvia il costruttore di questa classe che estende JForm, quindi avvia l'interfaccia grafica
     }

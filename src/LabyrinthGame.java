@@ -59,6 +59,7 @@ public class LabyrinthGame extends Labyrinth implements Cloneable {
      *  @return Boolean: true se il robot ha raggiunto la destinazione, false se non l'ha ancora raggiunta.
      */
     public Boolean iterate() {
+        // Questo oggetto è stato dichiarato con un casting esplicito per rispettare il dependency inversion principle
         state = ((RobotEntity) player).getState();
         char c;
         int r, ox, oy;
