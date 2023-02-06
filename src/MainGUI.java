@@ -615,7 +615,7 @@ public class MainGUI extends JFrame implements Observer {
 
 
     /**
-     * Il metodo startLabyrinth inizia il gioco del labirinto. Utilizza il metodo iterate() della classe Labyrinth per eseguire le iterazioni e ad ogni ciclo,
+     * Il metodo startLabyrinth inizia il gioco del labirinto. Utilizza il metodo iterate() della classe LabyrinthGame per eseguire le iterazioni e ad ogni ciclo,
      * aggiorna graficamente lo stato attuale del gioco (posizione del robot, stato del robot e posizione degli oggetti).
      * Il metodo imposta anche l'immagine e il testo per visualizzare lo stato del robot durante il gioco. Alla fine del gioco, il labirinto viene pulito e viene
      * visualizzato il percorso effettuato dal robot.
