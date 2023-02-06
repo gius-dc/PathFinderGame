@@ -58,7 +58,7 @@ public class RobotEntity implements Entity {
 }
 
 
-abstract class RobotState {
+interface RobotState {
     /* La classe astratta RobotState è la classe base per tutti gli stati del robot e ha un metodo
     astratto updateState che deve essere implementato da tutte le sue classi estese. */
     public abstract void updateState(RobotEntity robot, ObjectEntity nearestObj);
@@ -70,7 +70,7 @@ Il metodo è astratto e la sua implementazione viene effettuata nelle classi Pur
 Nei metodi updateState() vengono utilizzati i switch case per controllare il tipo dell'oggetto più vicino e impostare lo stato corretto
 del robot in base a questo. Ad esempio, se l'oggetto più vicino è di tipo 'R', il robot passerà allo stato SeekState. */
 
-class PursuitState extends RobotState {
+class PursuitState implements RobotState {
     public void updateState(RobotEntity robot, ObjectEntity nearestObj) {
         if (nearestObj != null) {
             switch (nearestObj.getColor()) {
@@ -82,7 +82,7 @@ class PursuitState extends RobotState {
     }
 }
 
-class SeekState extends RobotState {
+class SeekState implements RobotState {
     public void updateState(RobotEntity robot, ObjectEntity nearestObj) {
         if (nearestObj != null) {
             switch (nearestObj.getColor()) {
@@ -94,7 +94,7 @@ class SeekState extends RobotState {
     }
 }
 
-class FleeState extends RobotState {
+class FleeState implements RobotState {
     public void updateState(RobotEntity robot, ObjectEntity nearestObj) {
         if (nearestObj != null) {
             switch (nearestObj.getColor()) {
@@ -106,7 +106,7 @@ class FleeState extends RobotState {
     }
 }
 
-class EvadeState extends RobotState {
+class EvadeState implements RobotState {
     public void updateState(RobotEntity robot, ObjectEntity nearestObj) {
         if (nearestObj != null) {
             switch (nearestObj.getColor()) {
