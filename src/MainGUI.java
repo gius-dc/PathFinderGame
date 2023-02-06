@@ -569,17 +569,16 @@ public class MainGUI extends JFrame implements Observer {
     }
 
     /**
-     * Questo metodo si occupa di aggiornare su schermo la classifica.
-     * In base al livello corrente, va a filtrare i dati presenti nel modello della tabella per visualizzare solo i punteggi
-     * di tutte le partite effettuate di quel livello.
-     */
+     *  Questo metodo si occupa di disegnare il labirinto nell'interfaccia grafica.
+     *  @param l Il livello che contiene le informazioni sul labirinto
+    */
     public void drawLabyrinth(Level l) {
 
         char[][] labirinto = l.getLabyrinth();
-        if (firstRun) {
+        if (firstRun) { // Se è la prima volta che viene disegnato il labirinto
             Color checker;
             labirintoPanel.setLayout(new GridLayout(row, col));
-            for (int x = 0; x < 16; x++) {
+            for (int x = 0; x < 16; x++) { // Popola il pannello in piccoli sottopannelli disposti in matrice e imposta le immagini corrispondenti alla cella vuota o alla parete
                 for (int y = 0; y < 16; y++) {
                     if (labirinto[x][y] == '#') {
                         checker = Color.BLACK;
@@ -598,7 +597,7 @@ public class MainGUI extends JFrame implements Observer {
             }
 
             firstRun = false;
-        } else {
+        } else { // Altrimenti non crea i sottopannelli, cambia solo la loro immagine
             for (int x = 0; x < 16; x++) {
                 for (int y = 0; y < 16; y++) {
                     if (labirinto[x][y] == '#') {
