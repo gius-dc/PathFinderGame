@@ -830,7 +830,7 @@ public class MainGUI extends JFrame implements Observer {
 
     /**
      * Questo metodo viene utilizzato per gestire gli eventi di aggiunta e rimozione degli oggetti nel labirinto.
-     * È stato utilizzato il design pattern Observer, poiché l'oggetto viene notificato dalla classe Labyrinth
+     * È stato utilizzato il design pattern Observer, poiché l'oggetto viene notificato dalla classe LabyrinthGame
      * e viene eseguita l'azione appropriata in base all'evento (OBJECT_ADDED o OBJECT_REMOVED).
      *
      * @param obj       rappresenta l'oggetto che è stato modificato
