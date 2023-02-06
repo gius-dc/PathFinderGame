@@ -656,7 +656,7 @@ public class MainGUI extends JFrame implements Observer {
             }
 
 
-            RobotState state = ((RobotEntity) mediator.getRobot()).getState(); // Attraverso il Mediator, chiama il metodo di Labyrinth che restituisce l'istanza State del robot
+            RobotState state = ((RobotEntity) mediator.getRobot()).getState(); // Attraverso il Mediator, chiama il metodo di LabyrinthGame che restituisce l'istanza State del robot
             // In base allo stato del robot imposta il testo della label che segnala graficamente lo stato attuale del robot
             if (state instanceof PursuitState) {
                 stateRobotLabel.setText("Stato robot: pursuit");
