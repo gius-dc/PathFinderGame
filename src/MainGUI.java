@@ -34,7 +34,7 @@ public class MainGUI extends JFrame implements Observer {
     private JLabel rankLabel;
     private JSlider volumeSlider;
     private JLabel muteButton;
-    private Labyrinth l;
+    private LabyrinthGame l;
     private final int row = 16;
     private final int col = 16; // Dimensioni labirinto
     private Boolean firstRun = true;
@@ -505,18 +505,24 @@ public class MainGUI extends JFrame implements Observer {
             // Inizializza il labirinto con il livello appena costruito
             if (l == null) {
                 try {
-                    l = new Labyrinth(level);
+                    l = new LabyrinthGame(level);
                 } catch (
                         Exception e) { // Genera un eccezione se il livello creato non è rappresentato da una matrice quadrata
                     throw new RuntimeException(e);
                 }
             } else {
+
+                l = new LabyrinthGame(level);
+
+                /*
                 l = l.clone();
                 try {
                     l.resetLabyrinth(level);
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
+                */
+
             }
 
 
@@ -620,7 +626,7 @@ public class MainGUI extends JFrame implements Observer {
      */
     public void startLabyrinth() {
         int differenceSizeMemento = 0;
-        char[][] lab = mediator.getLabyrinth();
+        char[][] lab = mediator.getLabyrinthGame();
         newGameButton.setEnabled(false);
         labirintoPanel.setBackground(Color.WHITE);
 
@@ -697,8 +703,8 @@ public class MainGUI extends JFrame implements Observer {
         // Visualizza il percorso effettuato dal robot
         for (int i = 0; i < caretaker.sizeMemento(); i++) {
             Memento memento = caretaker.getMemento(i);
-            l.getRobot().restoreFromMemento(memento); // Viene ricavando andando a scorrere tutti gli stati precedenti del robot
-            setImagePanelXY("/img/footprints.png", l.getRobot().getX(), l.getRobot().getY()); // Imposta l'immagine del passo sul percorso
+            l.getPlayer().restoreFromMemento(memento); // Viene ricavando andando a scorrere tutti gli stati precedenti del robot
+            setImagePanelXY("/img/footprints.png", l.getPlayer().getX(), l.getPlayer().getY()); // Imposta l'immagine del passo sul percorso
         }
 
         // Viene calcolato il punteggio, ovvero andando a contare il numero di passi effettuati dal robot (con lo stesso metodo)
@@ -838,7 +844,7 @@ public class MainGUI extends JFrame implements Observer {
      */
     @Override
     public void update(ObjectEntity obj, int eventType) {
-        if (eventType == Labyrinth.OBJECT_ADDED) {
+        if (eventType == LabyrinthGame.OBJECT_ADDED) {
             // Aggiungi graficamente l'oggetto al labirinto
             if (obj.getColor() == 'R') {
                 setImagePanelXY("/img/red_stone.png", obj.getX(), obj.getY());
@@ -850,7 +856,7 @@ public class MainGUI extends JFrame implements Observer {
                 setImagePanelXY("/img/green_cactus.png", obj.getX(), obj.getY());
             }
 
-        } else if (eventType == Labyrinth.OBJECT_REMOVED) {
+        } else if (eventType == LabyrinthGame.OBJECT_REMOVED) {
             // Rimuovi graficamente l'oggetto dal labirinto
             setImagePanelXY("/img/sand.png", obj.getX(), obj.getY());
         }

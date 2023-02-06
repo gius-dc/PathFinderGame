@@ -4,15 +4,17 @@
  * presenti in Labyrinth che possono essere invocati attraverso il Mediator.
  */
 public class Mediator {
-    private Labyrinth labyrinth;
+    private LabyrinthGame labyrinthGame;
+    private MainGUI mainGUI;
 
     /**
      * Costruttore che inizializza le due classi.
-     * @param labyrinth La classe {@link Labyrinth} che rappresenta il labirinto.
+     * @param labyrinthGame La classe {@link Labyrinth} che rappresenta il labirinto.
      * @param mainGUI La classe {@link MainGUI} che rappresenta l'interfaccia grafica principale.
      */
-    public Mediator(Labyrinth labyrinth, MainGUI mainGUI) {
-        this.labyrinth = labyrinth;
+    public Mediator(LabyrinthGame labyrinthGame, MainGUI mainGUI) {
+        this.labyrinthGame = labyrinthGame;
+        this.mainGUI = mainGUI;
     }
 
     /**
@@ -21,18 +23,18 @@ public class Mediator {
      */
 
     public Caretaker getCaretaker() {
-        return labyrinth.getRobotCaretaker();
+        return labyrinthGame.getRobotCaretaker();
     }
 
-    public char[][] getLabyrinth() {
-        return labyrinth.getLabyrinth();
+    public char[][] getLabyrinthGame() {
+        return labyrinthGame.getLabyrinth();
     }
 
     public void addObserver(Observer observer) {
-        labyrinth.addObserver(observer);
+        labyrinthGame.addObserver(observer);
     }
 
     public RobotEntity getRobot() {
-        return labyrinth.getRobot();
+        return labyrinthGame.getPlayer();
     }
 }
