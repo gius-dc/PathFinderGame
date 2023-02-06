@@ -34,7 +34,7 @@ public class MainGUI extends JFrame implements Observer {
     private JLabel rankLabel;
     private JSlider volumeSlider;
     private JLabel muteButton;
-    private LabyrinthGame l;
+    private LabyrinthGame labGame;
     private final int row = 16;
     private final int col = 16; // Dimensioni labirinto
     private Boolean firstRun = true;
@@ -502,9 +502,9 @@ public class MainGUI extends JFrame implements Observer {
             level = builder.build(); // Costruisci il livello
 
             // Inizializza il labirinto con il livello appena costruito
-            if (l == null) {
+            if (labGame == null) {
                 try {
-                    l = new LabyrinthGame(level);
+                    labGame = new LabyrinthGame(level);
                 } catch (
                         Exception e) { // Genera un eccezione se il livello creato non è rappresentato da una matrice quadrata
                     throw new RuntimeException(e);
@@ -522,7 +522,7 @@ public class MainGUI extends JFrame implements Observer {
             }
 
 
-            Mediator mediator = new Mediator(l, this);
+            Mediator mediator = new Mediator(labGame, this);
             this.setMediator(mediator); // Imposta il mediatore tra MainGUI e Labyrinth per poter utilizzare mediante esso i metodi di Labyrinth
             drawLabyrinth(level);
             mediator.addObserver(this);
@@ -645,7 +645,7 @@ public class MainGUI extends JFrame implements Observer {
             }
         }
 
-        while (!l.iterate()) { // Itera fino a quando il metodo iterate() segnala che il robot ancora non ha raggiunto la destinazione
+        while (!labGame.iterate()) { // Itera fino a quando il metodo iterate() segnala che il robot ancora non ha raggiunto la destinazione
             if (caretaker != null) { // Gestisce la stampa alla prima iterazione andando a controllare se ci sono stati precedenti del robot
                 if (caretaker.sizeMemento() > 1) {
                     setImagePanelXY("/img/sand.png", caretaker.getMemento(caretaker.sizeMemento() - 2).getX(), caretaker.getMemento(caretaker.sizeMemento() - 2).getY());
@@ -670,7 +670,7 @@ public class MainGUI extends JFrame implements Observer {
             }
 
             caretaker = mediator.getCaretaker();
-            setImagePanelXY("/img/robot.png", l.getRobotX(), l.getRobotY());
+            setImagePanelXY("/img/robot.png", labGame.getRobotX(), labGame.getRobotY());
 
             try {
                 TimeUnit.MILLISECONDS.sleep(300); // Per rallentare, dare una pausa tra un iterazione e un'altra
@@ -699,8 +699,8 @@ public class MainGUI extends JFrame implements Observer {
         // Visualizza il percorso effettuato dal robot
         for (int i = 0; i < caretaker.sizeMemento(); i++) {
             Memento memento = caretaker.getMemento(i);
-            ((RobotEntity) l.getPlayer()).restoreFromMemento(memento); // Viene ricavando andando a scorrere tutti gli stati precedenti del robot
-            setImagePanelXY("/img/footprints.png", l.getPlayer().getX(), l.getPlayer().getY()); // Imposta l'immagine del passo sul percorso
+            ((RobotEntity) labGame.getPlayer()).restoreFromMemento(memento); // Viene ricavando andando a scorrere tutti gli stati precedenti del robot
+            setImagePanelXY("/img/footprints.png", labGame.getPlayer().getX(), labGame.getPlayer().getY()); // Imposta l'immagine del passo sul percorso
         }
 
         // Viene calcolato il punteggio, ovvero andando a contare il numero di passi effettuati dal robot (con lo stesso metodo)

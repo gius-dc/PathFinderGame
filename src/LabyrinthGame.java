@@ -1,7 +1,7 @@
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-
+import static java.lang.Math.sqrt;
 /**
  *    Questa classe LabyrinthGame gestisce la logica di gioco.
  */
@@ -33,16 +33,30 @@ public class LabyrinthGame extends Labyrinth implements Cloneable {
     // Costruttore
     public LabyrinthGame(Level l) {
         this.l = l;
+
         try {
             setLabyrinth(l);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public void setLabyrinth(Level l) throws Exception {
         caretaker = Caretaker.getInstance();
         objects = new ArrayList<>();
         random = new Random();
         caretaker.resetMemento();
-        player = new RobotEntity(l.getRobotX(), l.getRobotY()); 
+        player = new RobotEntity(l.getRobotX(), l.getRobotY());
+        labyrinth = l.getLabyrinth();
+        ((RobotEntity) player).setX(l.getRobotX());
+        ((RobotEntity) player).setY(l.getRobotY());
+        exitN = l.getExit();
+        if (!checkIfMatrixIsSquare(labyrinth)) {
+            throw new Exception("Il livello contiene una matrice non quadrata.");
+        }
+        DIMENSION = (int) sqrt(getSizeMatrix(labyrinth));
+
     }
 
     // Metodo per ottenere il Caretaker del Robot. Serve alla classe MainGUI() per ricostruire il percorso effettuato dal robot, andando a visitare tutti gli stati precedenti
