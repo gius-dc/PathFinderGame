@@ -81,7 +81,7 @@ public class RobotMovement {
                     robot.setX(x - 1);
                     robot.setY(y - 1);
                 }
-            } else if (min == 7) {
+            } else {
                 if (matrix[x - 1][y + 1] != '#') {
                     robot.setX(x - 1);
                     robot.setY(y + 1);
@@ -107,35 +107,35 @@ public class RobotMovement {
 
             int[] confr = {Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE};
 
-            if (matrix[x - 1][y] != '#' && x >= 0 && x < sizeMatrix && y >= 0 && y < sizeMatrix) {
+            if (matrix[x - 1][y] != '#' && x > 0 && x < sizeMatrix && y < sizeMatrix) {
                 dist = p.run(graph, ((x - 1) * sizeMatrix) + y, sizeMatrix);
                 confr[0] = dist[exitN];
             }
-            if (matrix[x + 1][y] != '#' && x >= 0 && x < sizeMatrix && y >= 0 && y < sizeMatrix) {
+            if (matrix[x + 1][y] != '#' && x < sizeMatrix && y < sizeMatrix) {
                 dist = p.run(graph, ((x + 1) * sizeMatrix) + y, sizeMatrix);
                 confr[1] = dist[exitN];
             }
-            if (matrix[x][y - 1] != '#' && x >= 0 && x < sizeMatrix && y >= 0 && y < sizeMatrix) {
+            if (matrix[x][y - 1] != '#' && x < sizeMatrix && y > 0 && y < sizeMatrix) {
                 dist = p.run(graph, (x * sizeMatrix) + (y - 1), sizeMatrix);
                 confr[2] = dist[exitN];
             }
-            if (matrix[x][y + 1] != '#' && x >= 0 && x < sizeMatrix && y >= 0 && y < sizeMatrix) {
+            if (matrix[x][y + 1] != '#' && x < sizeMatrix && y < sizeMatrix) {
                 dist = p.run(graph, (x * sizeMatrix) + (y + 1), sizeMatrix);
                 confr[3] = dist[exitN];
             }
-            if (matrix[x + 1][y - 1] != '#' && x >= 0 && x < sizeMatrix && y >= 0 && y < sizeMatrix) {
+            if (matrix[x + 1][y - 1] != '#' && x < sizeMatrix && y > 0 && y < sizeMatrix) {
                 dist = p.run(graph, ((x + 1) * sizeMatrix) + (y - 1), sizeMatrix);
                 confr[4] = dist[exitN];
             }
-            if (matrix[x + 1][y + 1] != '#' && x >= 0 && x < sizeMatrix && y >= 0 && y < sizeMatrix) {
+            if (matrix[x + 1][y + 1] != '#' && x < sizeMatrix && y < sizeMatrix) {
                 dist = p.run(graph, ((x + 1) * sizeMatrix) + (y + 1), sizeMatrix);
                 confr[5] = dist[exitN];
             }
-            if (matrix[x - 1][y - 1] != '#' && x >= 0 && x < sizeMatrix && y >= 0 && y < sizeMatrix) {
+            if (matrix[x - 1][y - 1] != '#' && x > 0 && x < sizeMatrix && y > 0 && y < sizeMatrix) {
                 dist = p.run(graph, ((x - 1) * sizeMatrix) + (y - 1), sizeMatrix);
                 confr[6] = dist[exitN];
             }
-            if (matrix[x - 1][y + 1] != '#' && x >= 0 && x < sizeMatrix && y >= 0 && y < sizeMatrix) {
+            if (matrix[x - 1][y + 1] != '#' && x > 0 && x < sizeMatrix && y < sizeMatrix) {
                 dist = p.run(graph, ((x - 1) * sizeMatrix) + (y + 1), sizeMatrix);
                 confr[7] = dist[exitN];
             }

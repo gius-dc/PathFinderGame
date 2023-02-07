@@ -40,7 +40,8 @@ public class MainGUI extends JFrame implements Observer {
     private Boolean firstRun = true;
     private CustomTableModel fullRankModel;
     private CustomTableModel modelLevelRank;
-    private int currentLevel = 0, maxLevels = 5;
+    private int currentLevel = 0;
+    private final int maxLevels = 5;
     private int[] scores = new int[maxLevels];
     private Level level;
     private Caretaker caretaker = null;
@@ -359,14 +360,13 @@ public class MainGUI extends JFrame implements Observer {
         if (rowIndex != -1) {
             int columnIndex = fullRankModel.searchColumn(rowIndex, "?");
             if (columnIndex != -1) {
+                result[1] = rowIndex;
                 if (!(columnIndex == maxLevels + 2)) {
                     result[0] = 2;
-                    result[1] = rowIndex;
                     result[2] = columnIndex;
                     return result;
                 } else {
                     result[0] = 1;
-                    result[1] = rowIndex;
                     return result;
                 }
 
@@ -742,7 +742,7 @@ public class MainGUI extends JFrame implements Observer {
 
     public static void main(String[] args) {
         FlatLightLaf.setup();
-        MainGUI myMainGUI = new MainGUI(); // Avvia il costruttore di questa classe che estende JForm, quindi avvia l'interfaccia grafica
+        new MainGUI(); // Avvia il costruttore di questa classe che estende JForm, quindi avvia l'interfaccia grafica
     }
 
 

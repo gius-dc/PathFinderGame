@@ -7,7 +7,6 @@ import static java.lang.Math.sqrt;
  */
 
 public class LabyrinthGame extends Labyrinth implements Cloneable {
-    private Level l;
     private List<ObjectEntity> objects; // lista di oggetti (del labirinto)
     // State
     private RobotState state;
@@ -32,8 +31,6 @@ public class LabyrinthGame extends Labyrinth implements Cloneable {
 
     // Costruttore
     public LabyrinthGame(Level l) {
-        this.l = l;
-
         try {
             setLabyrinth(l);
         } catch (Exception e) {
