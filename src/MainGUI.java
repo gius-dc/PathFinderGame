@@ -58,6 +58,7 @@ public class MainGUI extends JFrame implements Observer {
      */
 
     public MainGUI() {
+        int ciao; // prova commit
         setContentPane(mainPanel);
         setTitle("Labirinto");
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
