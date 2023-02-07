@@ -15,7 +15,6 @@ import java.util.Objects;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import java.awt.Taskbar;
 
 /**
  * Questa classe è responsabile dell'avvio del programma e della gestione dell'interfaccia grafica
@@ -23,7 +22,7 @@ import java.awt.Taskbar;
 
 public class MainGUI extends JFrame implements Observer {
     private JPanel mainPanel;
-    private JPanel labirintoPanel;
+    private JPanel labyrinthPanel;
     private JButton startButton;
     private JLabel stateLabel;
     private JTable table1;
@@ -63,10 +62,9 @@ public class MainGUI extends JFrame implements Observer {
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setVisible(true);
         setResizable(false);
-        // Imposta l'icona dell'applicazione su Windows
+        // Imposta l'icona dell'applicazione su Windows e Linux
         setIconImage(Toolkit.getDefaultToolkit().getImage(Objects.requireNonNull(getClass().getResource("/img/robot.png")).getPath()));
         // Imposta l'icona dell'applicazione su MacOS (ed altri sistemi operativi che supportano questo metodo)
-
         try {
             // Imposta l'icona dell'applicazione su MacOS (ed altri sistemi operativi che supportano questo metodo)
          } catch (final UnsupportedOperationException e) {
@@ -589,7 +587,7 @@ public class MainGUI extends JFrame implements Observer {
         char[][] labirinto = l.getLabyrinth();
         if (firstRun) { // Se è la prima volta che viene disegnato il labirinto
             Color checker;
-            labirintoPanel.setLayout(new GridLayout(row, col));
+            labyrinthPanel.setLayout(new GridLayout(row, col));
             for (int x = 0; x < 16; x++) { // Popola il pannello in piccoli sottopannelli disposti in matrice e imposta le immagini corrispondenti alla cella vuota o alla parete
                 for (int y = 0; y < 16; y++) {
                     if (labirinto[x][y] == '#') {
@@ -604,7 +602,7 @@ public class MainGUI extends JFrame implements Observer {
                     }
                     panel.setMaximumSize(new Dimension(30, 30));
                     panel.setBackground(Color.WHITE);
-                    labirintoPanel.add(panel);
+                    labyrinthPanel.add(panel);
                 }
             }
 
@@ -635,7 +633,7 @@ public class MainGUI extends JFrame implements Observer {
         int differenceSizeMemento = 0;
         char[][] lab = mediator.getLabyrinthGame();
         newGameButton.setEnabled(false);
-        labirintoPanel.setBackground(Color.WHITE);
+        labyrinthPanel.setBackground(Color.WHITE);
 
 
         Icon imgIcon = new ImageIcon(Objects.requireNonNull(getClass().getResource("/img/loading.gif")).toString().substring(5));
@@ -837,7 +835,7 @@ public class MainGUI extends JFrame implements Observer {
      * @param y         La posizione y nella quale impostare l'immagine.
      */
     private void setImagePanelXY(String imagePath, int x, int y) {
-        ((ImagePanel) labirintoPanel.getComponent((x * 16) + y)).setImage(new ImageIcon(Objects.requireNonNull(getClass().getResource(imagePath)).getPath()).getImage());
+        ((ImagePanel) labyrinthPanel.getComponent((x * 16) + y)).setImage(new ImageIcon(Objects.requireNonNull(getClass().getResource(imagePath)).getPath()).getImage());
     }
 
     /**
