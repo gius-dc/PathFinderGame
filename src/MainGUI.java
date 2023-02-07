@@ -67,9 +67,9 @@ public class MainGUI extends JFrame implements Observer {
         // Imposta l'icona dell'applicazione su MacOS (ed altri sistemi operativi che supportano questo metodo)
         try {
             // Imposta l'icona dell'applicazione su MacOS (ed altri sistemi operativi che supportano questo metodo)
-         } catch (final UnsupportedOperationException e) {
-            e.printStackTrace();
-        } catch (final SecurityException e) {
+            final Taskbar taskbar = Taskbar.getTaskbar();
+            taskbar.setIconImage(Toolkit.getDefaultToolkit().getImage(Objects.requireNonNull(getClass().getResource("/img/robot.png")).getPath()));
+        } catch (final UnsupportedOperationException | SecurityException e) {
             e.printStackTrace();
         }
 
@@ -196,13 +196,19 @@ public class MainGUI extends JFrame implements Observer {
             do {
                 if (showMessage) {
                     JFrame currentFrame = (JFrame) SwingUtilities.getWindowAncestor((Component) e.getSource());
-                    JOptionPane.showMessageDialog(currentFrame, "Entrambi i campi non possono essere vuoti, riprova",
+                    JOptionPane.showMessageDialog(currentFrame, "I campi non possono essere vuoti, riprova",
                             "Errore", JOptionPane.ERROR_MESSAGE);
                 }
                 inputName = JOptionPane.showInputDialog("Inserisci il nome del robot:");
+                if (inputName == null) {
+                    return;
+                }
                 inputSurname = JOptionPane.showInputDialog("Inserisci il cognome del robot:");
+                if (inputSurname == null) {
+                    return;
+                }
                 showMessage = true;
-            } while (inputName == null || inputName.equals("") || inputName.equals(" ") || inputSurname == null || inputSurname.equals("") || inputSurname.equals(" "));
+            } while (inputName == null || inputName.equals("") || inputName.equals(" ") || inputSurname.equals("") || inputSurname.equals(" "));
 
             newGame();
         }
