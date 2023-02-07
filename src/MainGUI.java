@@ -65,15 +65,14 @@ public class MainGUI extends JFrame implements Observer {
         setResizable(false);
         // Imposta l'icona dell'applicazione su Windows
         setIconImage(Toolkit.getDefaultToolkit().getImage(Objects.requireNonNull(getClass().getResource("/img/robot.png")).getPath()));
+        // Imposta l'icona dell'applicazione su MacOS (ed altri sistemi operativi che supportano questo metodo)
 
         try {
             // Imposta l'icona dell'applicazione su MacOS (ed altri sistemi operativi che supportano questo metodo)
-            final Taskbar taskbar = Taskbar.getTaskbar();
-            taskbar.setIconImage(Toolkit.getDefaultToolkit().getImage(Objects.requireNonNull(getClass().getResource("/img/robot.png")).getPath()));
-        } catch (final UnsupportedOperationException e) {
-            System.out.println("Il sistema operativo non supporta: 'taskbar.setIconImage'");
+         } catch (final UnsupportedOperationException e) {
+            e.printStackTrace();
         } catch (final SecurityException e) {
-            System.out.println("C'è stato un errore di sicurezza per: 'taskbar.setIconImage'");
+            e.printStackTrace();
         }
 
         modelLevelRank = new CustomTableModel(new String[]{"Nome", "Cognome", "Punteggio"});
