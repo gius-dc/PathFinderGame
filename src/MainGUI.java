@@ -15,6 +15,7 @@ import java.util.Objects;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.awt.Taskbar;
 
 /**
  * Questa classe è responsabile dell'avvio del programma e della gestione dell'interfaccia grafica
@@ -62,7 +63,18 @@ public class MainGUI extends JFrame implements Observer {
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setVisible(true);
         setResizable(false);
+        // Imposta l'icona dell'applicazione su Windows
         setIconImage(Toolkit.getDefaultToolkit().getImage(Objects.requireNonNull(getClass().getResource("/img/robot.png")).getPath()));
+        final Taskbar taskbar = Taskbar.getTaskbar();
+        try {
+            // Imposta l'icona dell'applicazione su MacOS (ed altri sistemi operativi che supportano questo metodo)
+            taskbar.setIconImage(Toolkit.getDefaultToolkit().getImage(Objects.requireNonNull(getClass().getResource("/img/robot.png")).getPath()));
+        } catch (final UnsupportedOperationException e) {
+            System.out.println("Il sistema operativo non supporta: 'taskbar.setIconImage'");
+        } catch (final SecurityException e) {
+            System.out.println("C'è stato un errore di sicurezza per: 'taskbar.setIconImage'");
+        }
+
         modelLevelRank = new CustomTableModel(new String[]{"Nome", "Cognome", "Punteggio"});
         prepareModelFile();
         if (!fileClassifica.exists()) {
