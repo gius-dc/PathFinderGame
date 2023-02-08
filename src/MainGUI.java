@@ -810,7 +810,14 @@ public class MainGUI extends JFrame implements Observer {
                 fullRankModel = new CustomTableModel(columnsText);
                 try {
                     fullRankModel.loadFromFile(fileClassifica);
-                    //table1.setModel(modelLevelRank);
+                    // Testa il file per verificare se tutti i dati vengono letti correttamente
+                    for(int i = 0; i < fullRankModel.getRowCount(); i++)
+                    {
+                        for(int j = 0; j < fullRankModel.getColumnCount(); i++)
+                        {
+                            fullRankModel.getValueAt(i,j);
+                        }
+                    }
                     fileCreatedOrRead = true;
                 } catch (IOException | IndexOutOfBoundsException e) {
                     JOptionPane.showMessageDialog(this, "Errore nella lettura del file 'classifica.csv', la classifica non è stata caricata.",
