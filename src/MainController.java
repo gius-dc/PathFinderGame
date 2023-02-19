@@ -20,20 +20,9 @@ import java.util.concurrent.TimeUnit;
  * Questa classe è responsabile dell'avvio del programma e della gestione dell'interfaccia grafica
  */
 
-public class MainGUI extends JFrame implements Observer {
-    private JPanel mainPanel;
-    private JPanel labyrinthPanel;
-    private JButton startButton;
-    private JLabel stateLabel;
-    private JTable table1;
-    private JLabel labelImg;
-    private JLabel stateRobotLabel;
-    private JButton nextLevelButton;
-    private JButton showRankButton;
-    private JButton newGameButton;
-    private JLabel rankLabel;
-    private JSlider volumeSlider;
-    private JLabel muteButton;
+public class MainController {
+
+    private GUIView view;
     private LabyrinthGame labGame;
     private final int row = 16;
     private final int col = 16; // Dimensioni labirinto
@@ -56,23 +45,7 @@ public class MainGUI extends JFrame implements Observer {
      *
      */
 
-    public MainGUI() {
-        setContentPane(mainPanel);
-        setTitle("Labirinto");
-        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        setVisible(true);
-        setResizable(false);
-        // Imposta l'icona dell'applicazione su Windows e Linux
-        setIconImage(Toolkit.getDefaultToolkit().getImage(Objects.requireNonNull(getClass().getResource("/img/robot.png")).getPath()));
-        // Imposta l'icona dell'applicazione su MacOS (ed altri sistemi operativi che supportano questo metodo)
-        try {
-            // Imposta l'icona dell'applicazione su MacOS (ed altri sistemi operativi che supportano questo metodo)
-            final Taskbar taskbar = Taskbar.getTaskbar();
-            taskbar.setIconImage(Toolkit.getDefaultToolkit().getImage(Objects.requireNonNull(getClass().getResource("/img/robot.png")).getPath()));
-        } catch (final UnsupportedOperationException | SecurityException e) {
-            e.printStackTrace();
-        }
-
+    public MainController() {
         modelLevelRank = new CustomTableModel(new String[]{"Nome", "Cognome", "Punteggio"});
         prepareModelFile();
         if (!fileClassifica.exists()) {
@@ -82,18 +55,18 @@ public class MainGUI extends JFrame implements Observer {
                 e.printStackTrace();
             }
         }
+        view = new GUIView();
         prepareLabyrinth();
         updateRank();
         firstRun = false;
-        setSize(900, 600);
-        setLocationRelativeTo(null);
-        nextLevelButton.addActionListener(new NextLevelButtonHandler());
-        muteButton.addMouseListener(new MuteButtonHandler());
-        startButton.addActionListener(new StartButtonHandler());
-        showRankButton.addActionListener(new ShowRankButtonHandler());
-        newGameButton.addActionListener(new NewGameButtonHandler());
+        view.getNextLevelButton().addActionListener(new NextLevelButtonHandler());
+        view.getMuteButton().addMouseListener(new MuteButtonHandler());
+        view.getStartButton().addActionListener(new StartButtonHandler());
+        view.getShowRankButton().addActionListener(new ShowRankButtonHandler());
+        view.getNewGameButton().addActionListener(new NewGameButtonHandler());
         startMusic();
-        volumeSlider.addChangeListener(new VolumeSliderHandler());
+        view.getVolumeSlider().addChangeListener(new VolumeSliderHandler());
+        view.setSize(900,600);
     }
 
     /**
@@ -110,15 +83,15 @@ public class MainGUI extends JFrame implements Observer {
             currentLevel++;
             if (currentLevel < maxLevels) {
                 prepareLabyrinth();
-                nextLevelButton.setEnabled(false);
-                startButton.setEnabled(true);
-                labelImg.setIcon(null);
-                stateLabel.setText("Livello " + (currentLevel + 1) + " - Avvia per iniziare");
+                view.getNextLevelButton().setEnabled(false);
+                view.getStartButton().setEnabled(true);
+                view.getLabelImg().setIcon(null);
+                view.getStateLabel().setText("Livello " + (currentLevel + 1) + " - Avvia per iniziare");
             } else {
-                nextLevelButton.setEnabled(false);
-                startButton.setEnabled(false);
-                newGameButton.setEnabled(true);
-                stateLabel.setText("Complimenti, hai finito tutti i livelli! ☺");
+                view.getNextLevelButton().setEnabled(false);
+                view.getStartButton().setEnabled(false);
+                view.getNewGameButton().setEnabled(true);
+                view.getStateLabel().setText("Complimenti, hai finito tutti i livelli! ☺");
                 updateRank();
                 prepareLabyrinth();
             }
@@ -133,12 +106,12 @@ public class MainGUI extends JFrame implements Observer {
          */
         @Override
         public void mouseClicked(MouseEvent e) {
-            if (volumeSlider.getValue() != 0) {
+            if (view.getVolumeSlider().getValue() != 0) {
                 /* Quando viene cambiato il valore dello slider, il thread che gestisce l'audio in background
                    va a leggere il valore e cambia di conseguenza il volume */
-                volumeSlider.setValue(0);
+                view.getVolumeSlider().setValue(0);
             } else {
-                volumeSlider.setValue(50);
+                view.getVolumeSlider().setValue(50);
             }
         }
     }
@@ -157,7 +130,7 @@ public class MainGUI extends JFrame implements Observer {
             /* Poiché Runnable è un'interfaccia funzionale (ha un solo metodo astratto, "run"), l'implementazione di questa
                può essere semplificata con una funzione lambda. */
             executor.execute(() -> {
-                startButton.setEnabled(false);
+                view.getStartButton().setEnabled(false);
                 startLabyrinth();
             });
         }
@@ -222,14 +195,14 @@ public class MainGUI extends JFrame implements Observer {
          */
         @Override
         public void stateChanged(ChangeEvent e) {
-            float gain = (float) volumeSlider.getValue() / 100;
+            float gain = (float) view.getVolumeSlider().getValue() / 100;
             float dB = (float) (Math.log(gain) / Math.log(10.0) * 20.0);
             volume.setValue(dB);
 
-            if (volumeSlider.getValue() != 0) {
-                muteButton.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("/img/volume.png")).toString().substring(5)));
+            if (view.getVolumeSlider().getValue() != 0) {
+                view.getMuteButton().setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("/img/volume.png")).toString().substring(5)));
             } else {
-                muteButton.setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("/img/volume_mute.png")).toString().substring(5)));
+                view.getMuteButton().setIcon(new ImageIcon(Objects.requireNonNull(getClass().getResource("/img/volume_mute.png")).toString().substring(5)));
             }
         }
     }
@@ -296,7 +269,7 @@ public class MainGUI extends JFrame implements Observer {
             currentLevel = 0;
         } else if (exists[0] == 1) {
             Object[] options = {"Elimina e inizia da zero", "Aggiungi 'nuovo' al nome", "Specifica nome"};
-            int result = JOptionPane.showOptionDialog(this, ("Il robot " + inputName + " " + inputSurname + " già esiste ed ha completato tutti i livelli. Come desideri procedere? Puoi eliminare la partita attualmente salvata e iniziare da zero, creare una nuova partita aggiungendo '(nuovo)' alla fine del nome oppure creare una nuova partita specificando il nome."), "Scegli",
+            int result = JOptionPane.showOptionDialog(view, ("Il robot " + inputName + " " + inputSurname + " già esiste ed ha completato tutti i livelli. Come desideri procedere? Puoi eliminare la partita attualmente salvata e iniziare da zero, creare una nuova partita aggiungendo '(nuovo)' alla fine del nome oppure creare una nuova partita specificando il nome."), "Scegli",
                     JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE,
                     null, options, null);
 
@@ -311,23 +284,23 @@ public class MainGUI extends JFrame implements Observer {
                 newGame();
                 return;
             } else {
-                newGameButton.doClick();
+                view.getNewGameButton().doClick();
                 return;
             }
         } else if (exists[0] == 2) {
-            int result = JOptionPane.showConfirmDialog(this, ("Il robot " + inputName + " " + inputSurname + " già esiste ed ha una partita in sospeso fino al livello " + (exists[2] - 1) + ". Desideri riprendere quella partita?"), "Partita in sospeso già esistente",
+            int result = JOptionPane.showConfirmDialog(view, ("Il robot " + inputName + " " + inputSurname + " già esiste ed ha una partita in sospeso fino al livello " + (exists[2] - 1) + ". Desideri riprendere quella partita?"), "Partita in sospeso già esistente",
                     JOptionPane.YES_NO_OPTION,
                     JOptionPane.WARNING_MESSAGE);
 
             if (result == JOptionPane.YES_OPTION) {
                 currentLevel = (exists[2] - 2);
                 //nextLevelButton.setVisible(false);
-                startButton.setVisible(true);
+                view.getStartButton().setVisible(true);
                 prepareLabyrinth();
             } else if (result == JOptionPane.NO_OPTION) {
 
                 Object[] options = {"Elimina e inizia da zero", "Aggiungi 'nuovo' al nome", "Specifica nome"};
-                result = JOptionPane.showOptionDialog(this, ("Se non vuoi riprendere la partita, scegli in che modo vuoi iniziare una nuova partita. Puoi avviare una nuova partita di " + inputName + " " + inputSurname + " eliminando quella corrente, creare una nuova partita aggiungendo '(nuovo)' al nome, oppure creare una nuova partita specificando il nome"), "Scegli",
+                result = JOptionPane.showOptionDialog(view, ("Se non vuoi riprendere la partita, scegli in che modo vuoi iniziare una nuova partita. Puoi avviare una nuova partita di " + inputName + " " + inputSurname + " eliminando quella corrente, creare una nuova partita aggiungendo '(nuovo)' al nome, oppure creare una nuova partita specificando il nome"), "Scegli",
                         JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE,
                         null, options, null);
 
@@ -349,15 +322,15 @@ public class MainGUI extends JFrame implements Observer {
                     newGame();
                     return;
                 } else {
-                    newGameButton.doClick();
+                    view.getNewGameButton().doClick();
                     return;
                 }
             }
         }
 
         prepareLabyrinth();
-        startButton.setEnabled(true);
-        JOptionPane.showMessageDialog(this, "Puoi avviare la partita cliccando 'Avvia' in ogni livello",
+        view.getStartButton().setEnabled(true);
+        JOptionPane.showMessageDialog(view, "Puoi avviare la partita cliccando 'Avvia' in ogni livello",
                 "Informazione", JOptionPane.INFORMATION_MESSAGE);
     }
 
@@ -541,10 +514,10 @@ public class MainGUI extends JFrame implements Observer {
             Mediator mediator = new Mediator(labGame, this);
             this.setMediator(mediator); // Imposta il mediatore tra MainGUI e Labyrinth per poter utilizzare mediante esso i metodi di Labyrinth
             drawLabyrinth(level);
-            mediator.addObserver(this);
+            mediator.addObserver(view);
 
             updateRank(); // Aggiorna la classifica su schermo in base al livello corrente
-            stateLabel.setText("Livello " + (currentLevel + 1) + " - Avvia per iniziare");
+            view.getStateLabel().setText("Livello " + (currentLevel + 1) + " - Avvia per iniziare");
             scores[currentLevel] = 0;
         }
 
@@ -564,9 +537,9 @@ public class MainGUI extends JFrame implements Observer {
         }
 
         if (currentLevel == maxLevels) {
-            rankLabel.setText("Classifica finale");
+            view.getRankLabel().setText("Classifica finale");
         } else {
-            rankLabel.setText("Classifica - Livello " + (currentLevel + 1));
+            view.getRankLabel().setText("Classifica - Livello " + (currentLevel + 1));
         }
 
         for (int i = 0; i < fullRankModel.getRowCount(); i++) { // Per ogni riga nel modello
@@ -577,7 +550,7 @@ public class MainGUI extends JFrame implements Observer {
 
         // La terza colonna rappresenta il punteggio, quindi viene ordinato in senso crescente tutte le righe in base a questa colonna
         modelLevelRank.sortByColumn(2);
-        table1.setModel(modelLevelRank);
+        view.getRankTable().setModel(modelLevelRank);
     }
 
     public void setMediator(Mediator mediator) {
@@ -593,7 +566,7 @@ public class MainGUI extends JFrame implements Observer {
         char[][] labirinto = l.getLabyrinth();
         if (firstRun) { // Se è la prima volta che viene disegnato il labirinto
             Color checker;
-            labyrinthPanel.setLayout(new GridLayout(row, col));
+            view.getLabyrinthPanel().setLayout(new GridLayout(row, col));
             for (int x = 0; x < 16; x++) { // Popola il pannello in piccoli sottopannelli disposti in matrice e imposta le immagini corrispondenti alla cella vuota o alla parete
                 for (int y = 0; y < 16; y++) {
                     if (labirinto[x][y] == '#') {
@@ -608,7 +581,7 @@ public class MainGUI extends JFrame implements Observer {
                     }
                     panel.setMaximumSize(new Dimension(30, 30));
                     panel.setBackground(Color.WHITE);
-                    labyrinthPanel.add(panel);
+                    view.getLabyrinthPanel().add(panel);
                 }
             }
 
@@ -617,15 +590,14 @@ public class MainGUI extends JFrame implements Observer {
             for (int x = 0; x < 16; x++) {
                 for (int y = 0; y < 16; y++) {
                     if (labirinto[x][y] == '#') {
-                        setImagePanelXY("/img/wall.png", x, y);
+                        view.setImagePanelXY("/img/wall.png", x, y);
                     } else {
-                        setImagePanelXY("/img/sand.png", x, y);
-
+                        view.setImagePanelXY("/img/sand.png", x, y);
                     }
                 }
             }
         }
-        setImagePanelXY("/img/robot.png", l.getRobotX(), l.getRobotY());
+        view.setImagePanelXY("/img/robot.png", l.getRobotX(), l.getRobotY());
     }
 
 
@@ -638,14 +610,14 @@ public class MainGUI extends JFrame implements Observer {
     public void startLabyrinth() {
         int differenceSizeMemento = 0;
         char[][] lab = mediator.getLabyrinthGame();
-        newGameButton.setEnabled(false);
-        labyrinthPanel.setBackground(Color.WHITE);
+        view.getNewGameButton().setEnabled(false);
+        view.getLabyrinthPanel().setBackground(Color.WHITE);
 
 
         Icon imgIcon = new ImageIcon(Objects.requireNonNull(getClass().getResource("/img/loading.gif")).toString().substring(5));
-        labelImg.setIcon(imgIcon);
-        labelImg.setVisible(true);
-        stateLabel.setText("Labirinto in esecuzione...");
+        view.getLabelImg().setIcon(imgIcon);
+        view.getLabelImg().setVisible(true);
+        view.getStateLabel().setText("Labirinto in esecuzione...");
 
 
 
@@ -653,9 +625,9 @@ public class MainGUI extends JFrame implements Observer {
         for (int i = 0; i < row; i++) {
             for (int j = 0; j < col; j++) {
                 if (level.getLabyrinth()[i][j] != '#') {
-                    setImagePanelXY("/img/sand.png", i, j); // Disegna cella vuota
+                    view.setImagePanelXY("/img/sand.png", i, j); // Disegna cella vuota
                 } else {
-                    setImagePanelXY("/img/wall.png", i, j); // Altrimenti disegna la parete
+                    view.setImagePanelXY("/img/wall.png", i, j); // Altrimenti disegna la parete
                 }
             }
         }
@@ -663,9 +635,9 @@ public class MainGUI extends JFrame implements Observer {
         while (!labGame.iterate()) { // Itera fino a quando il metodo iterate() segnala che il robot ancora non ha raggiunto la destinazione
             if (caretaker != null) { // Gestisce la stampa alla prima iterazione andando a controllare se ci sono stati precedenti del robot
                 if (caretaker.sizeMemento() > 1) {
-                    setImagePanelXY("/img/sand.png", caretaker.getMemento(caretaker.sizeMemento() - 2).getX(), caretaker.getMemento(caretaker.sizeMemento() - 2).getY());
+                    view.setImagePanelXY("/img/sand.png", caretaker.getMemento(caretaker.sizeMemento() - 2).getX(), caretaker.getMemento(caretaker.sizeMemento() - 2).getY());
                     if (caretaker.sizeMemento() > 3 && (caretaker.sizeMemento() - differenceSizeMemento == 2)) {
-                        setImagePanelXY("/img/sand.png", caretaker.getMemento(caretaker.sizeMemento() - 3).getX(), caretaker.getMemento(caretaker.sizeMemento() - 3).getY());
+                        view.setImagePanelXY("/img/sand.png", caretaker.getMemento(caretaker.sizeMemento() - 3).getX(), caretaker.getMemento(caretaker.sizeMemento() - 3).getY());
                     }
                 }
                 differenceSizeMemento = caretaker.sizeMemento();
@@ -675,17 +647,17 @@ public class MainGUI extends JFrame implements Observer {
             RobotState state = ((RobotEntity) mediator.getRobot()).getState(); // Attraverso il Mediator, chiama il metodo di LabyrinthGame che restituisce l'istanza State del robot
             // In base allo stato del robot imposta il testo della label che segnala graficamente lo stato attuale del robot
             if (state instanceof PursuitState) {
-                stateRobotLabel.setText("Stato robot: pursuit");
+                view.getStateRobotLabel().setText("Stato robot: pursuit");
             } else if (state instanceof SeekState) {
-                stateRobotLabel.setText("Stato robot: seek");
+                view.getStateRobotLabel().setText("Stato robot: seek");
             } else if (state instanceof FleeState) {
-                stateRobotLabel.setText("Stato robot: flee");
+                view.getStateRobotLabel().setText("Stato robot: flee");
             } else if (state instanceof EvadeState) {
-                stateRobotLabel.setText("Stato robot: evade");
+                view.getStateRobotLabel().setText("Stato robot: evade");
             }
 
             caretaker = mediator.getCaretaker();
-            setImagePanelXY("/img/robot.png", labGame.getRobotX(), labGame.getRobotY());
+            view.setImagePanelXY("/img/robot.png", labGame.getRobotX(), labGame.getRobotY());
 
             try {
                 TimeUnit.MILLISECONDS.sleep(300); // Per rallentare, dare una pausa tra un iterazione e un'altra
@@ -696,16 +668,16 @@ public class MainGUI extends JFrame implements Observer {
 
         // Finita la partita
         imgIcon = new ImageIcon(Objects.requireNonNull(getClass().getResource("/img/finish.png")).toString().substring(5));
-        labelImg.setIcon(imgIcon);
-        stateRobotLabel.setText("");
+        view.getLabelImg().setIcon(imgIcon);
+        view.getStateRobotLabel().setText("");
 
         // Pulisci il labirinto
         for (int x = 0; x < row; x++) {
             for (int y = 0; y < col; y++) {
                 if (lab[x][y] == '#') {
-                    setImagePanelXY("/img/wall.png", x, y);
+                    view.setImagePanelXY("/img/wall.png", x, y);
                 } else {
-                    setImagePanelXY("/img/sand.png", x, y);
+                    view.setImagePanelXY("/img/sand.png", x, y);
                 }
             }
         }
@@ -715,7 +687,7 @@ public class MainGUI extends JFrame implements Observer {
         for (int i = 0; i < caretaker.sizeMemento(); i++) {
             Memento memento = caretaker.getMemento(i);
             ((RobotEntity) labGame.getPlayer()).restoreFromMemento(memento); // Viene ricavando andando a scorrere tutti gli stati precedenti del robot
-            setImagePanelXY("/img/footprints.png", labGame.getPlayer().getX(), labGame.getPlayer().getY()); // Imposta l'immagine del passo sul percorso
+            view.setImagePanelXY("/img/footprints.png", labGame.getPlayer().getX(), labGame.getPlayer().getY()); // Imposta l'immagine del passo sul percorso
         }
 
         // Viene calcolato il punteggio, ovvero andando a contare il numero di passi effettuati dal robot (con lo stesso metodo)
@@ -725,9 +697,9 @@ public class MainGUI extends JFrame implements Observer {
             }
         }
 
-        stateLabel.setText("Il robot ha raggiunto la destinazione con " + scores[currentLevel] + " passi!");
+        view.getStateLabel().setText("Il robot ha raggiunto la destinazione con " + scores[currentLevel] + " passi!");
         if (currentLevel < maxLevels) {
-            nextLevelButton.setEnabled(true);
+            view.getNextLevelButton().setEnabled(true);
         }
 
 
@@ -752,13 +724,13 @@ public class MainGUI extends JFrame implements Observer {
         }
 
         updateRank(); // Aggiorna la classifica su schermo
-        newGameButton.setEnabled(true); // Abilita il pulsante per avviare una nuova partita
+        view.getNewGameButton().setEnabled(true); // Abilita il pulsante per avviare una nuova partita
     }
 
 
     public static void main(String[] args) {
         FlatLightLaf.setup();
-        new MainGUI(); // Avvia il costruttore di questa classe che estende JForm, quindi avvia l'interfaccia grafica
+        new MainController(); // Avvia il costruttore di questa classe che estende JForm, quindi avvia l'interfaccia grafica
     }
 
 
@@ -811,6 +783,7 @@ public class MainGUI extends JFrame implements Observer {
                 try {
                     fullRankModel.loadFromFile(fileClassifica);
                     // Testa il file per verificare se tutti i dati vengono letti correttamente
+                    /*
                     for(int i = 0; i < fullRankModel.getRowCount(); i++)
                     {
                         for(int j = 0; j < fullRankModel.getColumnCount(); i++)
@@ -818,20 +791,21 @@ public class MainGUI extends JFrame implements Observer {
                             fullRankModel.getValueAt(i,j);
                         }
                     }
+                    */
                     fileCreatedOrRead = true;
                 } catch (IOException | IndexOutOfBoundsException e) {
-                    JOptionPane.showMessageDialog(this, "Errore nella lettura del file 'classifica.csv', la classifica non è stata caricata.",
+                    JOptionPane.showMessageDialog(view, "Errore nella lettura del file 'classifica.csv', la classifica non è stata caricata.",
                             "Errore file", JOptionPane.ERROR_MESSAGE);
 
-                    int result = JOptionPane.showConfirmDialog(this, "Si consiglia di eliminare il file 'classifica.csv', procedere?", "Eliminare il file?",
+                    int result = JOptionPane.showConfirmDialog(view, "Si consiglia di eliminare il file 'classifica.csv', procedere?", "Eliminare il file?",
                             JOptionPane.YES_NO_OPTION,
                             JOptionPane.QUESTION_MESSAGE);
                     if (result == JOptionPane.YES_OPTION) {
                         fileClassifica.delete();
-                        JOptionPane.showMessageDialog(this, "Il file è stato eliminato e ne verrà creato uno nuovo.",
+                        JOptionPane.showMessageDialog(view, "Il file è stato eliminato e ne verrà creato uno nuovo.",
                                 "Avviso", JOptionPane.INFORMATION_MESSAGE);
                     } else if (result == JOptionPane.NO_OPTION) {
-                        JOptionPane.showMessageDialog(this, "Il file non è stato eliminato, potrebbero sorgere problemi durante l'esecuzione del programma.",
+                        JOptionPane.showMessageDialog(view, "Il file non è stato eliminato, potrebbero sorgere problemi durante l'esecuzione del programma.",
                                 "Avviso", JOptionPane.WARNING_MESSAGE);
                         fileCreatedOrRead = true;
                     }
@@ -840,43 +814,8 @@ public class MainGUI extends JFrame implements Observer {
         }
     }
 
-    /**
-     * Questo metodo si occupa di impostare l'immagine del pannello nella posizione specificata.
-     *
-     * @param imagePath Il percorso dell'immagine da impostare.
-     * @param x         La posizione x nella quale impostare l'immagine.
-     * @param y         La posizione y nella quale impostare l'immagine.
-     */
-    private void setImagePanelXY(String imagePath, int x, int y) {
-        ((ImagePanel) labyrinthPanel.getComponent((x * 16) + y)).setImage(new ImageIcon(Objects.requireNonNull(getClass().getResource(imagePath)).getPath()).getImage());
-    }
 
-    /**
-     * Questo metodo viene utilizzato per gestire gli eventi di aggiunta e rimozione degli oggetti nel labirinto.
-     * È stato utilizzato il design pattern Observer, poiché l'oggetto viene notificato dalla classe LabyrinthGame
-     * e viene eseguita l'azione appropriata in base all'evento (OBJECT_ADDED o OBJECT_REMOVED).
-     *
-     * @param obj       rappresenta l'oggetto che è stato modificato
-     * @param eventType rappresenta il tipo di evento legato all'oggetto (aggiunto o rimosso)
-     */
-    @Override
-    public void update(ObjectEntity obj, int eventType) {
-        if (eventType == LabyrinthGame.OBJECT_ADDED) {
-            // Aggiungi graficamente l'oggetto al labirinto
-            if (obj.getColor() == 'R') {
-                setImagePanelXY("/img/red_stone.png", obj.getX(), obj.getY());
-            } else if (obj.getColor() == 'Y') {
-                setImagePanelXY("/img/yellow_lemon.png", obj.getX(), obj.getY());
-            } else if (obj.getColor() == 'C') {
-                setImagePanelXY("/img/cyan_bucket.png", obj.getX(), obj.getY());
-            } else if (obj.getColor() == 'G') {
-                setImagePanelXY("/img/green_cactus.png", obj.getX(), obj.getY());
-            }
 
-        } else if (eventType == LabyrinthGame.OBJECT_REMOVED) {
-            // Rimuovi graficamente l'oggetto dal labirinto
-            setImagePanelXY("/img/sand.png", obj.getX(), obj.getY());
-        }
-    }
+
 
 }

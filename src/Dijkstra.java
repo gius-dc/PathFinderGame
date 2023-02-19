@@ -6,14 +6,14 @@ e per il recupero del nodo con distanza minima non ancora visitato.
 
 /**
  * Classe che implementa l'algoritmo di Dijkstra per il calcolo del percorso più breve in un grafo.
- * */
+ */
 
- public class Dijkstra {
+public class Dijkstra {
     /**
      * Metodo che restituisce il vertice con la distanza minima non ancora selezionata.
      *
      * @param dist Array che contiene le distanze dal vertice di origine a ogni vertice
-     * @param b Array che indica se un vertice è stato selezionato o meno
+     * @param b    Array che indica se un vertice è stato selezionato o meno
      * @param size Dimensione della griglia
      * @return Indice del vertice con distanza minima non ancora selezionata
      */
@@ -33,8 +33,8 @@ e per il recupero del nodo con distanza minima non ancora visitato.
      * Metodo che calcola le distanze minime da una sorgente a tutti gli altri vertici in un grafo.
      *
      * @param graph Matrice di adiacenza rappresentante il grafo
-     * @param src Indice del vertice sorgente
-     * @param size Dimensione della griglia
+     * @param src   Indice del vertice sorgente
+     * @param size  Dimensione della griglia
      * @return Array che contiene le distanze minime dalla sorgente a tutti gli altri vertici
      */
 
@@ -93,6 +93,4 @@ e per il recupero del nodo con distanza minima non ancora visitato.
 
         return graph;
     }
-
-
 }
