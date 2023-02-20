@@ -784,15 +784,11 @@ public class MainController {
                 try {
                     fullRankModel.loadFromFile(fileClassifica);
                     // Testa il file per verificare se tutti i dati vengono letti correttamente
-                    /*
-                    for(int i = 0; i < fullRankModel.getRowCount(); i++)
-                    {
-                        for(int j = 0; j < fullRankModel.getColumnCount(); i++)
-                        {
+                    for(int i = 0; i < fullRankModel.getRowCount(); i++) {
+                        for(int j = 0; j < fullRankModel.getColumnCount(); j++) {
                             fullRankModel.getValueAt(i,j);
                         }
                     }
-                    */
                     fileCreatedOrRead = true;
                 } catch (IOException | IndexOutOfBoundsException e) {
                     JOptionPane.showMessageDialog(view, "Errore nella lettura del file 'classifica.csv', la classifica non è stata caricata.",
