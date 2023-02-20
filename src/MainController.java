@@ -67,6 +67,7 @@ public class MainController {
         startMusic();
         view.getVolumeSlider().addChangeListener(new VolumeSliderHandler());
         view.setSize(900,600);
+        view.setLocationRelativeTo(null);
     }
 
     /**
