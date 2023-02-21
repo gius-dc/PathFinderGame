@@ -1,8 +1,14 @@
-import java.util.Random;
 /**
  * Classe che gestisce il movimento del robot.
  * Qui è stato applicato il design pattern Strategy.
+ *
+ *  @author Giuseppe Della Corte
+ *  @author Anna Greco
+ *  @author Sara Flauto
  */
+
+import java.util.Random;
+
 public class RobotMovement {
     private MovementStrategy strategy; // Variabile che rappresenta la strategia di movimento.
 
