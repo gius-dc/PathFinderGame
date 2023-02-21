@@ -8,5 +8,5 @@
  */
 
 public interface RobotState {
-    public abstract void updateState(RobotEntity robot, ObjectEntity nearestObj);
+    void updateState(RobotEntity robot, ObjectEntity nearestObj);
 }
