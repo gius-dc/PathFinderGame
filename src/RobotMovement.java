@@ -36,13 +36,6 @@ public class RobotMovement {
     }
 
     /**
-     * Interfaccia che rappresenta una strategia di movimento.
-     */
-    interface MovementStrategy {
-        void move(RobotEntity robot, char[][] matrix, int sizeMatrix, int exitN);
-    }
-
-    /**
      * Classe che implementa una strategia di movimento casuale.
      */
     static class RandomMovement implements MovementStrategy {
