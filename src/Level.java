@@ -9,7 +9,6 @@
 public class Level {
     private char[][] labyrinth;
     private int exit;
-
     private int robotX, robotY;
 
     /**
