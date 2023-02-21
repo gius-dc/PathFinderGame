@@ -1,11 +1,7 @@
-/*
-Questa classe implementa l'algoritmo di Dijkstra per il calcolo del percorso più breve in un grafo.
-Include metodi per la generazione del grafo a partire da un labirinto, per il calcolo della distanza minima tra un nodo sorgente e tutti gli altri nodi,
-e per il recupero del nodo con distanza minima non ancora visitato.
- */
-
 /**
  * Classe che implementa l'algoritmo di Dijkstra per il calcolo del percorso più breve in un grafo.
+ * Include metodi per la generazione del grafo a partire da un labirinto, per il calcolo della distanza minima tra un nodo sorgente e tutti gli altri nodi,
+ * e per il recupero del nodo con distanza minima non ancora visitato.
  *
  *  @author Giuseppe Della Corte
  *  @author Anna Greco
@@ -79,22 +75,30 @@ public class Dijkstra {
      * @return Matrice di adiacenza che rappresenta il grafo
      */
     public int[][] generateGraph(int size, char[][] labyrinth) {
+        // Inizializzo la matrice di adiacenza del grafo
         int[][] graph = new int[size * size][size * size];
+        // Definisco gli offset per le otto direzioni possibili
         int[] xOffsets = {-1, 0, 1, -1, 1, -1, 0, 1};
         int[] yOffsets = {-1, -1, -1, 0, 0, 1, 1, 1};
-
+        // Scorro la matrice del labirinto
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
-                for (int k = 0; k < 8; k++) {
-                    int cX = i + xOffsets[k];
-                    int cY = j + yOffsets[k];
-                    if (cX >= 0 && cX < size && cY >= 0 && cY < size && labyrinth[cX][cY] != '#') {
-                        graph[(i * size) + j][(cX * size) + cY] = 1;
+                // Per ogni cella non muro...
+                if (labyrinth[i][j] != '#') {
+                    // ...controllo le otto celle adiacenti...
+                    for (int k = 0; k < 8; k++) {
+                        int cX = i + xOffsets[k];
+                        int cY = j + yOffsets[k];
+                        // ...e se sono valide e non muro...
+                        if (cX >= 0 && cX < size && cY >= 0 && cY < size && labyrinth[cX][cY] != '#') {
+                            // ...aggiungo un arco nel grafo tra le due celle
+                            graph[(i * size) + j][(cX * size) + cY] = 1;
+                        }
                     }
                 }
             }
         }
-
+        // Restituisco la matrice di adiacenza del grafo
         return graph;
     }
 }

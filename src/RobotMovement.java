@@ -7,6 +7,8 @@
  *  @author Sara Flauto
  */
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 public class RobotMovement {
@@ -48,50 +50,65 @@ public class RobotMovement {
 
         @Override
         public void move(RobotEntity robot, char[][] matrix, int sizeMatrix, int exitN) {
-            int min = random.nextInt(8);
             int x = robot.getX();
             int y = robot.getY();
+            List<Integer> availableDirections = new ArrayList<>();
 
-            if (min == 0) {
-                if (matrix[x - 1][y] != '#') {
-                    robot.setX(x - 1);
-                    robot.setY(y);
-                }
-            } else if (min == 1) {
-                if (matrix[x + 1][y] != '#') {
-                    robot.setX(x + 1);
-                    robot.setY(y);
-                }
-            } else if (min == 2) {
-                if (matrix[x][y - 1] != '#') {
-                    robot.setX(x);
-                    robot.setY(y - 1);
-                }
-            } else if (min == 3) {
-                if (matrix[x][y + 1] != '#') {
-                    robot.setX(x);
-                    robot.setY(y + 1);
-                }
-            } else if (min == 4) {
-                if (matrix[x + 1][y - 1] != '#') {
-                    robot.setX(x + 1);
-                    robot.setY(y - 1);
-                }
-            } else if (min == 5) {
-                if (matrix[x + 1][y + 1] != '#') {
-                    robot.setX(x + 1);
-                    robot.setY(y + 1);
-                }
-            } else if (min == 6) {
-                if (matrix[x - 1][y - 1] != '#') {
-                    robot.setX(x - 1);
-                    robot.setY(y - 1);
-                }
+            if (x > 0 && matrix[x - 1][y] != '#') {
+                availableDirections.add(0);
+            }
+            if (x < sizeMatrix - 1 && matrix[x + 1][y] != '#') {
+                availableDirections.add(1);
+            }
+            if (y > 0 && matrix[x][y - 1] != '#') {
+                availableDirections.add(2);
+            }
+            if (y < sizeMatrix - 1 && matrix[x][y + 1] != '#') {
+                availableDirections.add(3);
+            }
+            if (x < sizeMatrix - 1 && y > 0 && matrix[x + 1][y - 1] != '#') {
+                availableDirections.add(4);
+            }
+            if (x < sizeMatrix - 1 && y < sizeMatrix - 1 && matrix[x + 1][y + 1] != '#') {
+                availableDirections.add(5);
+            }
+            if (x > 0 && y > 0 && matrix[x - 1][y - 1] != '#') {
+                availableDirections.add(6);
+            }
+            if (x > 0 && y < sizeMatrix - 1 && matrix[x - 1][y + 1] != '#') {
+                availableDirections.add(7);
+            }
+
+            if (availableDirections.isEmpty()) {
+                return;
+            }
+
+            int chosenDirection = availableDirections.get(random.nextInt(availableDirections.size()));
+
+            if (chosenDirection == 0) {
+                robot.setX(x - 1);
+                robot.setY(y);
+            } else if (chosenDirection == 1) {
+                robot.setX(x + 1);
+                robot.setY(y);
+            } else if (chosenDirection == 2) {
+                robot.setX(x);
+                robot.setY(y - 1);
+            } else if (chosenDirection == 3) {
+                robot.setX(x);
+                robot.setY(y + 1);
+            } else if (chosenDirection == 4) {
+                robot.setX(x + 1);
+                robot.setY(y - 1);
+            } else if (chosenDirection == 5) {
+                robot.setX(x + 1);
+                robot.setY(y + 1);
+            } else if (chosenDirection == 6) {
+                robot.setX(x - 1);
+                robot.setY(y - 1);
             } else {
-                if (matrix[x - 1][y + 1] != '#') {
-                    robot.setX(x - 1);
-                    robot.setY(y + 1);
-                }
+                robot.setX(x - 1);
+                robot.setY(y + 1);
             }
         }
     }

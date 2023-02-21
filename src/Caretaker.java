@@ -1,6 +1,5 @@
 /**
  * Questa classe implementa il pattern Memento.
- *
  * Costruttore privato per implementare il pattern Singleton.
  *
  *  @author Giuseppe Della Corte

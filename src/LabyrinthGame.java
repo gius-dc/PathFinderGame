@@ -1,5 +1,6 @@
 /**
  *  Questa classe LabyrinthGame gestisce la logica di gioco.
+ *
  *  @author Giuseppe Della Corte
  *  @author Anna Greco
  *  @author Sara Flauto
@@ -42,6 +43,13 @@ public class LabyrinthGame extends Labyrinth implements Cloneable {
         }
     }
 
+    /**
+     * Imposta il labirinto con un oggetto Level che contiene il livello.
+     * Il livello contiene la matrice del labirinto, la porta d'uscita e la posizione iniziale del robot.
+     *
+     * @param l oggetto Level contenente il labirinto e l'uscita
+     * @throws Exception se il labirinto non è quadrato
+     */
     @Override
     public void setLabyrinth(Level l) throws Exception {
         caretaker = Caretaker.getInstance();
@@ -60,7 +68,13 @@ public class LabyrinthGame extends Labyrinth implements Cloneable {
 
     }
 
-    // Metodo per ottenere il Caretaker del Robot. Serve alla classe MainGUI() per ricostruire il percorso effettuato dal robot, andando a visitare tutti gli stati precedenti
+    /**
+     * Restituisce il caretaker del robot.
+     * Questo metodo è utilizzato dalla classe {@link MainController}  per ricostruire il percorso effettuato dal robot,
+     * visitando tutti gli stati precedenti.
+     *
+     * @return il caretaker del robot.
+     */
     public Caretaker getRobotCaretaker() {
         return caretaker;
     }
@@ -218,23 +232,26 @@ public class LabyrinthGame extends Labyrinth implements Cloneable {
 
         // In base alla strategia impostata, effettua il prossimo passo
         strategy.move(((RobotEntity) player), matrix, DIMENSION, exitN);
-
     }
 
     /**
-     * Questo metodo verifica se esiste un oggetto nella posizione x, y specificata.
-     * @param objects La lista di oggetti nell'ambiente
+     * Questo metodo verifica se esiste un oggetto nella posizione (x, y) specificata.
+     *
+     * @param objects La lista di oggetti
      * @param x Posizione x
      * @param y Posizione y
      * @return L'indice dell'oggetto nella lista se esiste, altrimenti -1.
      */
     private int checkIfObjectXYExists(List<ObjectEntity> objects, int x, int y) {
-        return objects.stream()
-                .filter(o -> o.getX() == x && o.getY() == y)
-                .findFirst()
-                .map(objects::indexOf)
-                .orElse(-1);
+        for (int i = 0; i < objects.size(); i++) {
+            ObjectEntity o = objects.get(i);
+            if (o.getX() == x && o.getY() == y) {
+                return i;
+            }
+        }
+        return -1;
     }
+
 
     /**
      * Aggiunge un oggetto alla lista degli oggetti.
@@ -279,7 +296,7 @@ public class LabyrinthGame extends Labyrinth implements Cloneable {
 
 
     /**
-     * Notifica gli observer (in questo caso MainGUI) che un oggetto è stato modificato.
+     * Notifica gli observer (in questo caso {@link GUIView}) che un oggetto è stato modificato.
      *
      * @param object    L'oggetto che è stato modificato
      * @param eventType Il tipo di evento che ha causato la modifica (OBJECT_ADDED od OBJECT_REMOVED)

@@ -1,6 +1,6 @@
 /**
- * La classe Mediator serve come intermediario tra la classe {@link Labyrinth} e la classe {@link MainController}.
- * Questa classe contiene i metodi per gestire le richieste di MainGUI per ottenere il Caretaker e altri metodi
+ * La classe Mediator serve come intermediario tra la classe {@link LabyrinthGame} e la classe {@link MainController}.
+ * Questa classe contiene i metodi per gestire le richieste di MainController per ottenere il Caretaker e altri metodi
  * presenti in Labyrinth che possono essere invocati attraverso il Mediator.
  *
  *  @author Giuseppe Della Corte
@@ -13,7 +13,7 @@ public class Mediator {
 
     /**
      * Costruttore che inizializza le due classi.
-     * @param labyrinthGame La classe {@link Labyrinth} che rappresenta il labirinto.
+     * @param labyrinthGame La classe {@link LabyrinthGame} che rappresenta il labirinto.
      * @param mainController La classe {@link MainController} che rappresenta l'interfaccia grafica principale.
      */
     public Mediator(LabyrinthGame labyrinthGame, MainController mainController) {

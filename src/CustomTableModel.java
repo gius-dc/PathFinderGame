@@ -10,10 +10,10 @@ import java.util.List;
 
 /**
  *  Questa classe estende la classe {@link AbstractTableModel} per rappresentare il modello utilizzato dalle tabelle dell'interfaccia grafica.
- *  Dato che il progetto utilizza la libreria FlatLaf per migliorare l'aspetto grafico dei componenti grafici
- *  Swing, l'utilizzo di {@link javax.swing.table.DefaultTableModel} genera eccezioni nel momento in cui vengono aggiornati i dati al suo
+ *  Dato che il progetto utilizza la libreria FlatLaf per migliorare l'aspetto grafico dei componenti grafici Swing,
+ *  l'utilizzo di {@link javax.swing.table.DefaultTableModel} genera eccezioni nel momento in cui vengono aggiornati i dati al suo
  *  interno. Utilizzando un modello personalizzato che estende AbstractTableModel il problema è stato risolto.
-
+ *
  *  Inoltre, adottando questa soluzione, è stato possibile estendere questo modello con ulteriori metodi utili
  *  al fine del progetto.
  *

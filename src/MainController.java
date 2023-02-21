@@ -45,8 +45,7 @@ public class MainController {
     private FloatControl volume;
 
     /**
-     * Costruttore della classe MainGUI che inizializza la GUI del gioco e prepara il file (motivo per il quale può generare un eccezione).
-     *
+     * Costruttore che inizializza la GUI del gioco {@link GUIView} e prepara il file (motivo per il quale può generare un eccezione).
      */
 
     public MainController() {
@@ -517,7 +516,7 @@ public class MainController {
 
 
             Mediator mediator = new Mediator(labGame, this);
-            this.setMediator(mediator); // Imposta il mediatore tra MainGUI e Labyrinth per poter utilizzare mediante esso i metodi di Labyrinth
+            this.setMediator(mediator); // Imposta il mediatore tra MainController e LabyrinthGame per poter utilizzare mediante esso i metodi di Labyrinth
             drawLabyrinth(level);
             mediator.addObserver(view);
 

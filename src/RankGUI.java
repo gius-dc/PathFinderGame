@@ -8,6 +8,10 @@ import java.awt.event.ActionListener;
  * Questa classe crea un'interfaccia grafica per visualizzare la classifica.
  * Utilizza una JTable per visualizzare la classifica, con la possibilità di passare da un livello all'altro
  * tramite i pulsanti "Avanti" e "Indietro".
+ *
+ *   @author Giuseppe Della Corte
+ *   @author Anna Greco
+ *   @author Sara Flauto
  */
 
 public class RankGUI extends JFrame {

@@ -7,7 +7,9 @@ import java.io.File;
 import java.util.Objects;
 
 /**
- * Questa classe è responsabile dell'avvio del programma e della gestione dell'interfaccia grafica
+ *  Questa classe gestisce l'interfaccia grafica dell'applicazione
+ *  Estende la classe JFrame per l'interfaccia grafica (Swing) e implementa l'interfaccia Observer
+ *  per applicare il rispettivo design pattern per la gestione degli oggetti mostrati.
  *
  *  @author Giuseppe Della Corte
  *  @author Anna Greco
@@ -46,6 +48,9 @@ public class GUIView extends JFrame implements Observer {
     private Mediator mediator;
     private FloatControl volume;
 
+    /**
+     * Costruttore di default che inizializza l'interfaccia grafica e imposta l'icona dell'applicazione.
+     */
     public GUIView() {
         setContentPane(mainPanel);
         setTitle("Labirinto");
@@ -77,6 +82,7 @@ public class GUIView extends JFrame implements Observer {
         ((ImagePanel) labyrinthPanel.getComponent((x * 16) + y)).setImage(new ImageIcon(Objects.requireNonNull(getClass().getResource(imagePath)).getPath()).getImage());
     }
 
+    // Getters utilizzati da MainController per ottenere i singoli componenti dell'interfaccia grafica
     public JButton getNewGameButton() {
         return newGameButton;
     }
