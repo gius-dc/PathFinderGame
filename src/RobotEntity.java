@@ -60,12 +60,17 @@ public class RobotEntity implements Entity {
 }
 
 
-/** Il design pattern State consente di alterare il comportamento dei metodi della classe in base al suo stato interno.
+/**
+ * Il design pattern State consente di alterare il comportamento dei metodi della classe in base al suo stato interno.
 In questo caso nella classe Robot il metodo updateState() deve variare in base allo stato in cui si trova il Robot.
 Il metodo è astratto e la sua implementazione viene effettuata nelle classi PursuitState, SeekState, FleeState ed EvadeState che estendono la classe RobotState.
 Nei metodi updateState() vengono utilizzati i switch case per controllare il tipo dell'oggetto più vicino e impostare lo stato corretto
-del robot in base a questo. Ad esempio, se l'oggetto più vicino è di tipo 'R', il robot passerà allo stato SeekState. */
+del robot in base a questo. Ad esempio, se l'oggetto più vicino è di tipo 'R', il robot passerà allo stato SeekState.
+ */
 
+/**
+ * Stato Pursuit
+ */
 class PursuitState implements RobotState {
     public void updateState(RobotEntity robot, ObjectEntity nearestObj) {
         if (nearestObj != null) {
@@ -77,7 +82,9 @@ class PursuitState implements RobotState {
         }
     }
 }
-
+/**
+ * Stato Seek
+ */
 class SeekState implements RobotState {
     public void updateState(RobotEntity robot, ObjectEntity nearestObj) {
         if (nearestObj != null) {
@@ -89,7 +96,9 @@ class SeekState implements RobotState {
         }
     }
 }
-
+/**
+ * Stato Flee
+ */
 class FleeState implements RobotState {
     public void updateState(RobotEntity robot, ObjectEntity nearestObj) {
         if (nearestObj != null) {
@@ -101,7 +110,9 @@ class FleeState implements RobotState {
         }
     }
 }
-
+/**
+ * Stato Evade
+ */
 class EvadeState implements RobotState {
     public void updateState(RobotEntity robot, ObjectEntity nearestObj) {
         if (nearestObj != null) {
@@ -115,7 +126,9 @@ class EvadeState implements RobotState {
 }
 
 
-// Memento
+/**
+ * Implementazione del Design Pattern Memento
+ */
 class Memento {
     private int x;
     private int y;

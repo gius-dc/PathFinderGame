@@ -59,6 +59,9 @@ public class Level {
         return robotY;
     }
 
+    /**
+     * Implementazione del Design Pattern Builder.
+     */
     public static class Builder {
         private char[][] labyrinth;
         private int exit = -1;
