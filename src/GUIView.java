@@ -1,3 +1,5 @@
+import com.formdev.flatlaf.FlatLightLaf;
+
 import javax.sound.sampled.*;
 import javax.swing.*;
 import java.awt.*;
@@ -58,8 +60,6 @@ public class GUIView extends JFrame implements Observer {
         } catch (final UnsupportedOperationException | SecurityException e) {
             e.printStackTrace();
         }
-
-
     }
 
     /**
