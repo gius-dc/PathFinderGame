@@ -1,3 +1,7 @@
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+import static java.lang.Math.sqrt;
 /**
  *  Questa classe LabyrinthGame gestisce la logica di gioco.
  *
@@ -5,12 +9,6 @@
  *  @author Anna Greco
  *  @author Sara Flauto
  */
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import static java.lang.Math.sqrt;
-
 public class LabyrinthGame extends Labyrinth implements Cloneable {
     private List<ObjectEntity> objects; // lista di oggetti (del labirinto)
     // State

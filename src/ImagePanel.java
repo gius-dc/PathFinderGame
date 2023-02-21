@@ -1,3 +1,6 @@
+import javax.swing.*;
+import java.awt.*;
+import java.awt.image.BufferedImage;
 /**
  *  Questa classe estende JPanel e fornisce un modello personalizzato che visualizza un'immagine ridimensionata all'interno del pannello.
  *  È utilizzato per rappresentare la matrice del labirinto, dove ogni ImagePanel visualizza uno sprite.
@@ -6,11 +9,6 @@
  *  @author Anna Greco
  *  @author Sara Flauto
  */
-
-import javax.swing.*;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-
 public class ImagePanel extends JPanel {
 
     private Image img;

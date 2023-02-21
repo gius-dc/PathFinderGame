@@ -7,7 +7,6 @@
  *  @author Anna Greco
  *  @author Sara Flauto
  */
-
 public class Dijkstra {
     /**
      * Metodo che restituisce il vertice con la distanza minima non ancora selezionata.

@@ -6,7 +6,6 @@
  * @author Anna Greco
  * @author Sara Flauto
  */
-
 public interface RobotState {
     void updateState(RobotEntity robot, ObjectEntity nearestObj);
 }

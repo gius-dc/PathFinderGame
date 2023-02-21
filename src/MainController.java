@@ -1,5 +1,4 @@
 import com.formdev.flatlaf.FlatLightLaf;
-
 import javax.sound.sampled.*;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -23,7 +22,6 @@ import java.util.concurrent.TimeUnit;
  *  @author Anna Greco
  *  @author Sara Flauto
  */
-
 public class MainController {
 
     private GUIView view;

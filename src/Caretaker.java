@@ -1,3 +1,6 @@
+
+import java.util.ArrayList;
+import java.util.List;
 /**
  * Questa classe implementa il pattern Memento.
  * Costruttore privato per implementare il pattern Singleton.
@@ -6,11 +9,6 @@
  *  @author Anna Greco
  *  @author Sara Flauto
  */
-
-import java.util.ArrayList;
-import java.util.List;
-
-
 public class Caretaker {
     private static Caretaker instance = null;
 

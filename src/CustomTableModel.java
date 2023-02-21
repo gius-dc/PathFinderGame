@@ -6,8 +6,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-
-
 /**
  *  Questa classe estende la classe {@link AbstractTableModel} per rappresentare il modello utilizzato dalle tabelle dell'interfaccia grafica.
  *  Dato che il progetto utilizza la libreria FlatLaf per migliorare l'aspetto grafico dei componenti grafici Swing,
@@ -21,7 +19,6 @@ import java.util.List;
  *   @author Anna Greco
  *   @author Sara Flauto
  */
-
 public class CustomTableModel extends AbstractTableModel {
     private String[] columnNames;
     private Object[][] data = {};

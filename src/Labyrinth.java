@@ -1,3 +1,4 @@
+import static java.lang.Math.sqrt;
 /**
  *  Questa classe rappresenta un labirinto generico.
  *  Il labirinto è rappresentato da una matrice quadrata, la porta d'uscita e un'entità giocatore.
@@ -6,10 +7,6 @@
  *  @author Anna Greco
  *  @author Sara Flauto
  */
-
-
-import static java.lang.Math.sqrt;
-
 public class Labyrinth {
     public static int DIMENSION = 0; // dimensioni labirinto (quadrato)
     public char[][] labyrinth; // matrice del labirinto

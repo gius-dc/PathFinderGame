@@ -6,8 +6,6 @@
  *  @author Anna Greco
  *  @author Sara Flauto
  */
-
-
 public class RobotEntity implements Entity {
     private RobotState state;
     private int x;

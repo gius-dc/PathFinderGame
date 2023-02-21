@@ -6,7 +6,6 @@
  *  @author Anna Greco
  *  @author Sara Flauto
  */
-
 public class Level {
     private char[][] labyrinth;
     private int exit;
