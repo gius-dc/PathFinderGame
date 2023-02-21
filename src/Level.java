@@ -1,6 +1,10 @@
 /**
  * La classe Level rappresenta il livello di un gioco a labirinto.
  * Questa classe fa parte dell'implementazione del design pattern Builder.
+ *
+ *  @author Giuseppe Della Corte
+ *  @author Anna Greco
+ *  @author Sara Flauto
  */
 
 public class Level {

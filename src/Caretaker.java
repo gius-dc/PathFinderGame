@@ -3,8 +3,12 @@ import java.util.List;
 
 /**
  * Questa classe implementa il pattern Memento.
-
+ *
  * Costruttore privato per implementare il pattern Singleton.
+ *
+ *  @author Giuseppe Della Corte
+ *  @author Anna Greco
+ *  @author Sara Flauto
  */
 
 public class Caretaker {

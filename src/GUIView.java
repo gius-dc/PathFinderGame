@@ -8,6 +8,10 @@ import java.util.Objects;
 
 /**
  * Questa classe è responsabile dell'avvio del programma e della gestione dell'interfaccia grafica
+ *
+ *  @author Giuseppe Della Corte
+ *  @author Anna Greco
+ *  @author Sara Flauto
  */
 
 public class GUIView extends JFrame implements Observer {

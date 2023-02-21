@@ -6,6 +6,10 @@ e per il recupero del nodo con distanza minima non ancora visitato.
 
 /**
  * Classe che implementa l'algoritmo di Dijkstra per il calcolo del percorso più breve in un grafo.
+ *
+ *  @author Giuseppe Della Corte
+ *  @author Anna Greco
+ *  @author Sara Flauto
  */
 
 public class Dijkstra {

@@ -1,10 +1,14 @@
+/**
+ *  Questa classe Labirinto è responsabile solo per la creazione e l'aggiornamento del labirinto.
+ *
+ *  @author Giuseppe Della Corte
+ *  @author Anna Greco
+ *  @author Sara Flauto
+ */
+
 import java.util.Observable;
 
 import static java.lang.Math.sqrt;
-
-/**
- *    Questa classe Labirinto è responsabile solo per la creazione e l'aggiornamento del labirinto.
- */
 
 public class Labyrinth extends Observable {
     public static int DIMENSION = 0; // dimensioni labirinto (quadrato)

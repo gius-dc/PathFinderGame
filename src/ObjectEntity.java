@@ -1,5 +1,9 @@
 /**
  * Classe che rappresenta un oggetto che estende l'entità e ha una proprietà di colore.
+ *
+ *  @author Giuseppe Della Corte
+ *  @author Anna Greco
+ *  @author Sara Flauto
  */
 
 public class ObjectEntity implements Entity {

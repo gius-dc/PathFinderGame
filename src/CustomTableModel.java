@@ -16,6 +16,10 @@ import java.util.List;
 
  *  Inoltre, adottando questa soluzione, è stato possibile estendere questo modello con ulteriori metodi utili
  *  al fine del progetto.
+ *
+ *   @author Giuseppe Della Corte
+ *   @author Anna Greco
+ *   @author Sara Flauto
  */
 
 public class CustomTableModel extends AbstractTableModel {

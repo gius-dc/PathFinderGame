@@ -1,6 +1,10 @@
 /**
  * Classe che rappresenta un robot che estende l'entità e mantiene un riferimento allo stato attuale del robot (pursuit, seek, flee, evade).
  * Implementa anche i design pattern State e Memento.
+ *
+ *  @author Giuseppe Della Corte
+ *  @author Anna Greco
+ *  @author Sara Flauto
  */
 
 

@@ -1,3 +1,9 @@
+/**
+ *  @author Giuseppe Della Corte
+ *  @author Anna Greco
+ *  @author Sara Flauto
+ */
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;

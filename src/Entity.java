@@ -1,3 +1,8 @@
+/**
+ *  @author Giuseppe Della Corte
+ *  @author Anna Greco
+ *  @author Sara Flauto
+ */
 public interface Entity {
     int getX();
     int getY();
