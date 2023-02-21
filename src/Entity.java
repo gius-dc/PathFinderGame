@@ -1,4 +1,6 @@
 /**
+ *  Interfaccia Entity
+ *
  *  @author Giuseppe Della Corte
  *  @author Anna Greco
  *  @author Sara Flauto

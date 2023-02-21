@@ -62,13 +62,7 @@ public class RobotEntity implements Entity {
 }
 
 
-interface RobotState {
-    /* La classe astratta RobotState è la classe base per tutti gli stati del robot e ha un metodo
-    astratto updateState che deve essere implementato da tutte le sue classi estese. */
-    public abstract void updateState(RobotEntity robot, ObjectEntity nearestObj);
-}
-
-/* Il design pattern State consente di alterare il comportamento dei metodi della classe in base al suo stato interno.
+/** Il design pattern State consente di alterare il comportamento dei metodi della classe in base al suo stato interno.
 In questo caso nella classe Robot il metodo updateState() deve variare in base allo stato in cui si trova il Robot.
 Il metodo è astratto e la sua implementazione viene effettuata nelle classi PursuitState, SeekState, FleeState ed EvadeState che estendono la classe RobotState.
 Nei metodi updateState() vengono utilizzati i switch case per controllare il tipo dell'oggetto più vicino e impostare lo stato corretto
