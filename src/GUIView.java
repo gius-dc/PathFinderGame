@@ -31,22 +31,6 @@ public class GUIView extends JFrame implements Observer {
     private JSlider volumeSlider;
     private JLabel muteButton;
     private JScrollPane JScrollPanel1;
-    private LabyrinthGame labGame;
-    private final int row = 16;
-    private final int col = 16; // Dimensioni labirinto
-    private Boolean firstRun = true;
-    private CustomTableModel fullRankModel;
-    private CustomTableModel modelLevelRank;
-    private int currentLevel = 0;
-    private final int maxLevels = 5;
-    private int[] scores = new int[maxLevels];
-    private Level level;
-    private Caretaker caretaker = null;
-    private File fileClassifica;
-    private String inputName, inputSurname;
-    private RankGUI rankGUI = null;
-    private Mediator mediator;
-    private FloatControl volume;
 
     /**
      * Costruttore di default che inizializza l'interfaccia grafica e imposta l'icona dell'applicazione.
